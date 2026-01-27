@@ -15,6 +15,9 @@ public class GamePanel extends JPanel{
     final int maxScreenRow = 12;
     final int screenWidth = tileSize * maxScreenCol;
     final int screenHeight = tileSize * maxScreenRow;
+
+    Thread thread;
+            
     // FPS
     int FPS = 60;
 
@@ -39,12 +42,12 @@ public class GamePanel extends JPanel{
             }
         }
         
-    }
-
+    }    
     private Color getRndColor(){
         int r = random.nextInt(256);
         int g = random.nextInt(256);
         int b = random.nextInt(256);
         return new Color(r,g,b);
     }
+
 }
