@@ -3,16 +3,17 @@ package main;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
 
+import inputs.MyMouseListener;
+
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Random;
 
 public class GamePanel extends JPanel implements Runnable{
-    final int originalTileSize = 16; // 16x16 title 
+    final int originalTileSize = 32; // 32x32 title 
     final int scale = 3;
     public final int tileSize = originalTileSize * scale ; // 48x48 title
-    final int maxScreenCol = 16;
-    final int maxScreenRow = 12;
+    final int maxScreenCol = 20;
+    final int maxScreenRow = 11;
     final int screenWidth = tileSize * maxScreenCol;
     final int screenHeight = tileSize * maxScreenRow;
 
@@ -21,34 +22,26 @@ public class GamePanel extends JPanel implements Runnable{
     // FPS
     int FPS = 60;
 
-    private Random random;
+
     
+    private MyMouseListener myMouseListener = new MyMouseListener();
+    private Render render;
+
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
         this.setBackground(Color.WHITE);
         this.setDoubleBuffered(getFocusTraversalKeysEnabled());
         this.setFocusable(true);
+
+        render = new Render(this);
         
-        random = new Random();
     }
 
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
+    public void initInputs(){
+        addMouseListener(myMouseListener);
+        addMouseMotionListener(myMouseListener);
 
-        for(int x = 0; x < 16; x++ ){
-            for(int y = 0; y < 12; y++ ){
-                g.setColor(getRndColor());
-                g.fillRect(x*tileSize, y*tileSize, tileSize, tileSize);
-            }
-        }
-        
-    }    
-
-    private Color getRndColor(){
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
-        return new Color(r,g,b);
+        requestFocus();
     }
 
     public void startGameThread(){      //Goi vong lap
@@ -57,7 +50,6 @@ public class GamePanel extends JPanel implements Runnable{
     }
 
     public void update(){   //cap nhat Frame
-        getRndColor();
     }
 
     @Override
@@ -69,6 +61,7 @@ public class GamePanel extends JPanel implements Runnable{
         long currenTime;    // tg hien tai
         long timer = 0;
         int drawCount = 0;
+
         while(gameThread != null){
             currenTime = System.nanoTime();
             delta += (currenTime - lastTime)/drawInterval; 
@@ -87,5 +80,9 @@ public class GamePanel extends JPanel implements Runnable{
             }
         }
     }
-
+    @Override
+    protected void paintComponent(Graphics g){
+        super.paintComponent(g);
+        render.render(g);
+    } 
 }
