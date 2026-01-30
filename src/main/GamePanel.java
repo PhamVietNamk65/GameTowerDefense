@@ -3,41 +3,63 @@ package main;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
 
+import inputs.KeyHandler;
 import inputs.MyMouseListener;
+import scener.Menu;
+import scener.Playing;
+import scener.Setting;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
+
 public class GamePanel extends JPanel implements Runnable{
-    final int originalTileSize = 32; // 32x32 title 
-    final int scale = 3;
+    final int originalTileSize = 16; // 16x16 title 
+    final int scale = 3;     
     public final int tileSize = originalTileSize * scale ; // 48x48 title
-    final int maxScreenCol = 20;
-    final int maxScreenRow = 11;
+    public final int maxScreenCol = 20;
+    public final int maxScreenRow = 11;
     final int screenWidth = tileSize * maxScreenCol;
     final int screenHeight = tileSize * maxScreenRow;
 
     private Thread gameThread;
 
     // FPS
-    int FPS = 60;
+    private int FPS = 60;
 
-
+    private Menu menu;
+    private Playing playing;
+    private Setting setting;
     
-    private MyMouseListener myMouseListener = new MyMouseListener();
+    private MyMouseListener myMouseListener;
+    private KeyHandler keyH = new KeyHandler();
+    
     private Render render;
 
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
         this.setBackground(Color.WHITE);
-        this.setDoubleBuffered(getFocusTraversalKeysEnabled());
+        setDoubleBuffered(true);
         this.setFocusable(true);
 
-        render = new Render(this);
+        initClasses();
         
     }
+    // nham nhan tin hieu chon che do cua trang ( trang menu hay trang playing ... )
+    private void initClasses() {
+        render = new Render(this);
+        menu = new Menu(this);
+        playing = new Playing(this);
+        setting = new Setting(this);
 
+        myMouseListener = new MyMouseListener(this);
+    }
+
+    // ham nhan tin hieu lenh tu chuot
     public void initInputs(){
+
+        addKeyListener(keyH);
+
         addMouseListener(myMouseListener);
         addMouseMotionListener(myMouseListener);
 
@@ -55,7 +77,7 @@ public class GamePanel extends JPanel implements Runnable{
     @Override
     public void run() {
 
-        double drawInterval = 1000000000/FPS;
+        double drawInterval = 1000000000/FPS; // thoi gian ve 1 khung hinh 
         double delta = 0;
         long lastTime = System.nanoTime(); // tg ve truoc day
         long currenTime;    // tg hien tai
@@ -82,7 +104,25 @@ public class GamePanel extends JPanel implements Runnable{
     }
     @Override
     protected void paintComponent(Graphics g){
-        super.paintComponent(g);
+        super.paintComponent(g); // xoa trang de ve truoc day
         render.render(g);
     } 
+
+    // lấy giá trị và gán giá trị
+    public Render getRender(){
+        return render;
+    }
+    //trang menu game
+    public Menu getMenu() {
+        return menu;
+    }
+    //trang man choi 
+    public Playing getPlaying() {
+        return playing;
+    }
+    // trang cai dat 
+    public Setting getSetting() {
+        return setting;
+    }
+
 }

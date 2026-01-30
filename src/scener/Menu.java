@@ -1,33 +1,65 @@
 package scener;
-
-import java.awt.Color;
 import java.awt.Graphics;
-import java.util.Random;
-
 import main.GamePanel;
+import ui.MyButton;
+
+import static main.GameStates.*;
 
 public class Menu extends GameScene implements SceneMethods{
+
     private GamePanel gamePanel;
-    private Random random;
+
+    private MyButton bPlaying, bSetting, bQuit ;
+
     public Menu(GamePanel gamePanel) {
         super(gamePanel);
         this.gamePanel = gamePanel;
-        this.random = new Random();
+        initButton();
+    }
+
+    public void initButton(){
+        bPlaying = new MyButton(100, 100, 100, 30, "Play");
+    }
+    @Override
+    public void render(Graphics g) {
+        drawButons(g);
+    }
+    
+    private void drawButons(Graphics g){
+        bPlaying.draw(g);
     }
 
     @Override
-    public void render(Graphics g) {
-               for(int x = 0; x < gamePanel.maxScreenCol; x++ ){
-            for(int y = 0; y < gamePanel.maxScreenRow; y++ ){
-                g.setColor(getRndColor());
-                g.fillRect(x*gamePanel.tileSize, y*gamePanel.tileSize, gamePanel.tileSize, gamePanel.tileSize);
-            }
+    public void mouseClicked(int x, int y) {
+        if(bPlaying.getBounds().contains(x, y)){
+            SetGameState(PLAYING);
         }
     }
-    private Color getRndColor(){
-        int r = random.nextInt(256);
-        int g = random.nextInt(256);
-        int b = random.nextInt(256);
-        return new Color(r,g,b);
+
+    @Override
+    public void mouseMoved(int x, int y) {
+        bPlaying.setMouseOver(false);
+        if(bPlaying.getBounds().contains(x, y)){
+            bPlaying.setMouseOver(true);
+        }
     }
+
+    @Override
+    public void mousePressed(int x, int y) {
+        bPlaying.setMousePressed(false);
+        if(bPlaying.getBounds().contains(x, y)){
+            bPlaying.setMousePressed(true);
+        }
+    }
+
+    @Override
+    public void mouseReleased(int x, int y) {
+        resetButtons();
+    }
+
+    private void resetButtons() {
+       bPlaying.resetBooleans();
+    }
+    
+    
 }
