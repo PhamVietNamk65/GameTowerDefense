@@ -55,7 +55,7 @@ public class Menu extends GameScene implements SceneMethods{
     public void render(Graphics g) {
         // 1. Vẽ ảnh nền trước
         if (logo != null) {
-        int logoWidth = 500;
+        int logoWidth = 550;
         int logoHeight = 250;
 
         int logoX = (gamePanel.screenWidth - logoWidth) / 2; // Căn giữa ngang
