@@ -13,8 +13,8 @@ public class Render {
             case MENU:
                 gamePanel.getMenu().render(g);
                 break;
-            case PLAYING:
-                gamePanel.getPlaying().render(g);
+            case LEVEL:
+                gamePanel.getLevel().render(g);
                 break;
             case SETTING:
                 gamePanel.getSetting().render(g);
