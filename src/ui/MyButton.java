@@ -4,6 +4,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
 import java.awt.FontMetrics;
+import java.awt.Font;
 
 public class MyButton {
 
@@ -12,7 +13,7 @@ public class MyButton {
     private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
     private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
 
-    public MyButton(int x, int y, int width, int height, String text) {
+    public MyButton(String text, int x, int y, int width, int height) {
         this.x = x;
         this.y = y;
         this.width = width;
@@ -26,7 +27,6 @@ public class MyButton {
         this.bounds = new Rectangle(x, y, width, height);
     }
     public void draw(Graphics g){
-
         //body 
         drawBody(g);
 
@@ -49,11 +49,14 @@ public class MyButton {
         g.drawRect(x, y, width, height);
         if( mousePressed ){
             g.drawRect(x + 1, y + 1, width - 2, height - 2);
-            g.drawRect(x + 2, y + 2, width - 2, height - 2);
+            g.drawRect(x + 2, y + 2, width - 2, height - 4);
         }
     }
 
     private void drawText(Graphics g){
+        Font myFont = new Font("Arial", Font.PLAIN, 22); 
+        g.setFont(myFont); // Áp dụng Font này để vẽ
+        g.setColor(Color.BLACK); // Đừng quên set màu chữ
         FontMetrics fm = g.getFontMetrics(); // lay thong tin cua text
         
         int stringWidth = fm.stringWidth(text); //chieu dai cua text
