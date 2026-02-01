@@ -24,10 +24,12 @@ public class Playing extends GameScene implements SceneMethods{
 
     @Override
     public void mouseMoved(int x, int y) {
+        
     }
 
     @Override
     public void mousePressed(int x, int y) {
+        
     }
 
     @Override
