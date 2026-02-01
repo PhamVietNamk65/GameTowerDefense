@@ -5,6 +5,7 @@ import javax.swing.plaf.DimensionUIResource;
 
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
+import scener.Level;
 import scener.Menu;
 import scener.Playing;
 import scener.Setting;
@@ -19,8 +20,8 @@ public class GamePanel extends JPanel implements Runnable{
     public final int tileSize = originalTileSize * scale ; // 48x48 title
     public final int maxScreenCol = 20;
     public final int maxScreenRow = 11;
-    final int screenWidth = tileSize * maxScreenCol;
-    final int screenHeight = tileSize * maxScreenRow;
+    public final int screenWidth = tileSize * maxScreenCol;
+    public final int screenHeight = tileSize * maxScreenRow;
 
     private Thread gameThread;
 
@@ -30,7 +31,8 @@ public class GamePanel extends JPanel implements Runnable{
     private Menu menu;
     private Playing playing;
     private Setting setting;
-    
+    private Level level;
+
     private MyMouseListener myMouseListener;
     private KeyHandler keyH = new KeyHandler();
     
@@ -38,12 +40,12 @@ public class GamePanel extends JPanel implements Runnable{
 
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
-        this.setBackground(Color.WHITE);
+        this.setBackground(Color.white);
         setDoubleBuffered(true);
         this.setFocusable(true);
 
         initClasses();
-        
+        initInputs();
     }
     // nham nhan tin hieu chon che do cua trang ( trang menu hay trang playing ... )
     private void initClasses() {
@@ -51,6 +53,7 @@ public class GamePanel extends JPanel implements Runnable{
         menu = new Menu(this);
         playing = new Playing(this);
         setting = new Setting(this);
+        level = new Level(this);
 
         myMouseListener = new MyMouseListener(this);
     }
@@ -124,5 +127,7 @@ public class GamePanel extends JPanel implements Runnable{
     public Setting getSetting() {
         return setting;
     }
-
+    public Level getLevel(){
+        return level;
+    }
 }
