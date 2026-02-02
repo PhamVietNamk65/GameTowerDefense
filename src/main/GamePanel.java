@@ -9,7 +9,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 public class GamePanel extends JPanel implements Runnable{
-    final int originalTileSize = 32; // 32x32 title 
+    final int originalTileSize = 16; // 16x16 title 
     final int scale = 3;
     public final int tileSize = originalTileSize * scale ; // 48x48 title
     final int maxScreenCol = 20;
