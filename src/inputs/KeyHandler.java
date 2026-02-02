@@ -1,5 +1,6 @@
 package inputs;
 
+import static main.GameStates.MENU;
 import static main.GameStates.PLAYING;
 import static main.GameStates.gameStates;
 
@@ -17,6 +18,9 @@ public class KeyHandler implements KeyListener{
     public void keyPressed(KeyEvent e) {
         if(e.getExtendedKeyCode() == KeyEvent.VK_W){
             gameStates.SetGameState(PLAYING);
+        }
+        if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE){
+            gameStates.SetGameState(MENU);
         }
     }
 
