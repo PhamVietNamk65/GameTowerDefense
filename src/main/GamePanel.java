@@ -41,17 +41,17 @@ public class GamePanel extends JPanel implements Runnable{
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
         this.setBackground(Color.white);
-        setDoubleBuffered(true);
-        this.setFocusable(true);
+        setDoubleBuffered(true); // tang hieu suat ve
+        this.setFocusable(true); // de JPanel co the nhan duoc su kien tu ban phim
 
-        initClasses();
-        initInputs();
+        initClasses(); 
+        initInputs();   
     }
-    // nham nhan tin hieu chon che do cua trang ( trang menu hay trang playing ... )
+    // khoi tao cac lop can thiet
     private void initClasses() {
-        render = new Render(this);
-        menu = new Menu(this);
-        playing = new Playing(this);
+        render = new Render(this); // khoi tao lop render de ve theo trang hien tai
+        menu = new Menu(this);  // khoi tao trang menu
+        playing = new Playing(this); 
         setting = new Setting(this);
         level = new Level(this);
 
@@ -63,8 +63,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         addKeyListener(keyH);
 
-        addMouseListener(myMouseListener);
-        addMouseMotionListener(myMouseListener);
+        addMouseListener(myMouseListener);  
+        addMouseMotionListener(myMouseListener); 
 
         requestFocus();
     }
@@ -89,13 +89,13 @@ public class GamePanel extends JPanel implements Runnable{
 
         while(gameThread != null){
             currenTime = System.nanoTime();
-            delta += (currenTime - lastTime)/drawInterval; 
-            timer += (currenTime - lastTime);
-            lastTime = currenTime;
-            if( delta >= 1 ){
-                update();
-                repaint();
-                delta--;
+            delta += (currenTime - lastTime)/drawInterval; //  tinh toan so khung hinh can ve
+            timer += (currenTime - lastTime); // dem thoi gian
+            lastTime = currenTime;      // cap nhat tg ve truoc day
+            if( delta >= 1 ){   
+                update();   
+                repaint();  // goi ham paintComponent
+                delta--; 
                 drawCount++;
             }
             if(timer >= 1000000000){
@@ -108,7 +108,7 @@ public class GamePanel extends JPanel implements Runnable{
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g); // xoa trang de ve truoc day
-        render.render(g);
+        render.render(g); // goi ham render de ve theo trang hien tai
     } 
 
     // lấy giá trị và gán giá trị
@@ -127,6 +127,7 @@ public class GamePanel extends JPanel implements Runnable{
     public Setting getSetting() {
         return setting;
     }
+    // trang level
     public Level getLevel(){
         return level;
     }
