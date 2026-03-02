@@ -88,12 +88,12 @@ public class GamePanel extends JPanel implements Runnable{
         int drawCount = 0;
 
         while(gameThread != null){
-            currenTime = System.nanoTime();
-            delta += (currenTime - lastTime)/drawInterval; 
-            timer += (currenTime - lastTime);
-            lastTime = currenTime;
+            currenTime = System.nanoTime(); // lay tg hien tai
+            delta += (currenTime - lastTime)/drawInterval; // tinh toan so khung hinh can ve
+            timer += (currenTime - lastTime); // dem tg
+            lastTime = currenTime; // cap nhat tg ve truoc day
             if( delta >= 1 ){
-                update();
+                update(); // cap nhat khung hinh
                 repaint();
                 delta--;
                 drawCount++;
