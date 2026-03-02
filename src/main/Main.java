@@ -5,7 +5,7 @@ public class Main {
         GamePanel gamePanel = new GamePanel();
         new Window(gamePanel);
         
-        gamePanel.startGameThread();
+        gamePanel.startGameThread();    
         gamePanel.initInputs();
     }
 }
