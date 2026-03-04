@@ -13,9 +13,7 @@ public class MyButton {
     private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
     private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
 
-    public MyButton(String text, int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
+    public MyButton(String text, int width, int height) {
         this.width = width;
         this.height = height;
         this.text = text;
@@ -23,6 +21,7 @@ public class MyButton {
         initBounds();
     }
     
+
     private void initBounds(){
         this.bounds = new Rectangle(x, y, width, height);
     }
@@ -85,5 +84,13 @@ public class MyButton {
     public void resetBooleans() {
         this.mouseOver = false;
         this.mousePressed = false;
+    }
+
+    public void setButton(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        initBounds();
     }
 }

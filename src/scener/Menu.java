@@ -4,6 +4,7 @@ import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.lang.System.Logger.Level;
 
 import javax.imageio.ImageIO;
 
@@ -17,11 +18,9 @@ public class Menu extends GameScene implements SceneMethods{
 
     private GamePanel gamePanel;
 
-    private MyButton[] buttons = new MyButton[3];
-
     private BufferedImage logo, background;
 
-    private ButtonBar quitMenu;
+    private ButtonBar quitMenu, settingsMenu, mainMenu;
     public Menu(GamePanel gamePanel) {
         super(gamePanel);
         this.gamePanel = gamePanel;
@@ -33,53 +32,33 @@ public class Menu extends GameScene implements SceneMethods{
                 // TODO Auto-generated catch block
                 e.printStackTrace();
             }
-        quitMenu = new ButtonBar(280, 164 , 400, 200);
-
-        initButton();
-    }
-
-    public void initButton(){
-        String[] labels = {"LEVEL", "SETTING", "QUIT"};
-        int w = 200;
-        int h = 45;
-        int gap = 20;
-
-        // Tọa độ X căn giữa
-        int x = (gamePanel.screenWidth - w) / 2;
         
-        // Tính Y bắt đầu để cả khối menu nằm giữa màn hình
-        int totalHeight = (labels.length * h) + ((labels.length - 1) * gap);
-        int startY = (gamePanel.screenHeight - totalHeight) / 2 + 80;
+        mainMenu = new ButtonBar(280, 250 , 400, 200);
+        mainMenu.setOrientation(1, 20); // vertical, gap 20px
+        mainMenu.addButton(new MyButton("LEVEL", 200, 50));
+        mainMenu.addButton(new MyButton("SETTING", 200, 50));
+        mainMenu.addButton(new MyButton("QUIT", 200, 50));
+        mainMenu.visible = true;
 
-        for (int i = 0; i < labels.length; i++) {
-            int y = startY + (i * (h + gap));
-
-            // Khởi tạo nút với tọa độ đã tính
-            buttons[i] = new MyButton(labels[i], x, y, w, h);
-        }
+        quitMenu = new ButtonBar(280, 214, 420, 100);
+        quitMenu.setOrientation(0, 20); // horizontal, gap 20px
+        quitMenu.addButton(new MyButton("YES", 200, 50)); 
+        quitMenu.addButton(new MyButton("NO", 200, 50)); 
+        quitMenu.visible = false;
     }
+
     @Override
     public void render(Graphics g) {
         // 1. Vẽ ảnh nền trước
         drawBackground(g);
         drawLogo(g);
-        drawButons(g);
+        mainMenu.draw(g);
         if( quitMenu.visible ){
             drawOverlay(g);
-            drawQuitMenu(g);
+            quitMenu.draw(g);
         }
     }
 
-
-    private void drawButons(Graphics g){
-        for (MyButton b : buttons) {
-            b.draw(g);
-        }
-    }
-
-    private void drawQuitMenu(Graphics g){
-        quitMenu.draw(g);
-    }
     private void drawLogo(Graphics g){
         if (logo != null) {
         int logoWidth = 550;
@@ -102,67 +81,90 @@ public class Menu extends GameScene implements SceneMethods{
     }
 
     private void drawBackground(Graphics g){
-        g.drawImage(background,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null);
+        g.drawImage(background,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null); 
         g.setColor(new Color(0, 0, 0, 110)); // Màu đen với độ trong suốt (Alpha)
         g.fillRect(0, 0, gamePanel.screenWidth, gamePanel.screenHeight);
     }
 
     @Override
     public void mouseClicked(int x, int y) {
-
-    // Kiểm tra nút LEVEL 
-    if(buttons[0].getBounds().contains(x, y)){
-        SetGameState(LEVEL);
-    }
-    // Kiểm tra nút SETTING 
-    else if(buttons[1].getBounds().contains(x, y)){
-        SetGameState(SETTING); // Nếu bạn có state này
-    }
-    // Kiểm tra nút QUIT 
-    else if(buttons[2].getBounds().contains(x, y)){
-        quitMenu.visible = true; // hien menu thoat game
-    }
+        if( quitMenu.visible ){
+            if( quitMenu.buttons.get(0).getBounds().contains(x, y))
+                System.exit(0);
+            else if( quitMenu.buttons.get(1).getBounds().contains(x, y)){
+                quitMenu.visible = false;
+                mainMenu.visible = true;
+                return;
+            }
+            else if ( !quitMenu.getBounds().contains(x,y)){
+                quitMenu.visible = false;
+                mainMenu.visible = true;
+                System.out.println("Click: " + x + " " + y);
+                System.out.println("Quit bounds: " + quitMenu.getBounds()); 
+            }    
+            return;
+        }
+            
+        if( mainMenu.visible )
+            if( mainMenu.buttons.get(0).getBounds().contains(x,y) )
+                gameStates = LEVEL;
+            else if( mainMenu.buttons.get(1).getBounds().contains(x,y))
+                gameStates = SETTING;
+            else if( mainMenu.buttons.get(2).getBounds().contains(x,y)){
+                quitMenu.visible = true;
+                mainMenu.visible = false;
+            }
+            
     }
 
     @Override
     public void mouseMoved(int x, int y) {
-        for (MyButton b : buttons) {
-        b.setMouseOver(false); // Tắt highlight tất cả các nút
+        if (mainMenu.visible) {
+        for (MyButton button : mainMenu.buttons) {
+            button.setMouseOver(button.getBounds().contains(x, y));
+        }
     }
 
-    for (MyButton b : buttons) {
-        if (b.getBounds().contains(x, y)) {
-            b.setMouseOver(true); // Chỉ bật highlight nút đang trỏ vào
-            break; 
+    if (quitMenu.visible) {
+        for (MyButton button : quitMenu.buttons) {
+            button.setMouseOver(button.getBounds().contains(x, y));
         }
     }
     }
 
     @Override
     public void mousePressed(int x, int y) {
-        if (quitMenu.visible) {
-        if (!quitMenu.getBounds().contains(x, y)) {
-            quitMenu.visible = false; // Thả chuột ngoài bảng thì tắt
+        if (mainMenu.visible) {
+        for (MyButton button : mainMenu.buttons) {
+            if (button.getBounds().contains(x, y)) {
+                button.setMousePressed(true);
             }
         }
-        for (MyButton b : buttons) {
-        if (b.getBounds().contains(x, y)) {
-            b.setMousePressed(true);
-            break;
+    }
+
+    if (quitMenu.visible) {
+        for (MyButton button : quitMenu.buttons) {
+            if (button.getBounds().contains(x, y)) {
+                button.setMousePressed(true);
             }
         }
+    }
     }
 
     @Override
     public void mouseReleased(int x, int y) {
-        resetButtons();
-    }
+        if (mainMenu.visible) {
+            for (MyButton button : mainMenu.buttons) {
+                button.resetBooleans();
+                }
+        }
 
-    private void resetButtons() {
-        for (MyButton b : buttons) {
-            b.resetBooleans();
+        if (quitMenu.visible) {
+            for (MyButton button : quitMenu.buttons) {
+                button.resetBooleans();
+            }
         }
     }
-    
-    
+
+  
 }

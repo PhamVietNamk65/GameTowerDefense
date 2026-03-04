@@ -8,4 +8,4 @@ public class Main {
         gamePanel.startGameThread();
         gamePanel.initInputs();
     }
-}
+}   
