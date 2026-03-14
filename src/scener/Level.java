@@ -3,12 +3,13 @@ package scener;
 import java.awt.Color;
 import java.awt.Graphics;
 
+import Manager.AssetManager;
 import main.GamePanel;
 
 public class Level extends GameScene implements SceneMethods{
     private GamePanel gamePanel;
  
-    public Level(GamePanel gamePanel) {
+    public Level(GamePanel gamePanel, AssetManager assetManager) {
         super(gamePanel);
         this.gamePanel = gamePanel;
 

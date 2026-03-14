@@ -3,6 +3,7 @@ package main;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
 
+import Manager.AssetManager;
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
 import scener.Level;
@@ -28,6 +29,7 @@ public class GamePanel extends JPanel implements Runnable{
     // FPS
     private int FPS = 60;
 
+    private AssetManager assetManager;
     private Menu menu;
     private Playing playing;
     private Setting setting;
@@ -49,11 +51,12 @@ public class GamePanel extends JPanel implements Runnable{
     }
     // khoi tao cac lop can thiet
     private void initClasses() {
+        assetManager = AssetManager.getInstance(); // khoi tao asset manager
         render = new Render(this); // khoi tao lop render de ve theo trang hien tai
-        menu = new Menu(this);  // khoi tao trang menu
-        playing = new Playing(this); 
-        setting = new Setting(this);
-        level = new Level(this);
+        menu = new Menu(this,assetManager);  // khoi tao trang menu
+        playing = new Playing(this, assetManager); // khoi tao trang choi game
+        setting = new Setting(this, assetManager);
+        level = new Level(this, assetManager);
 
         myMouseListener = new MyMouseListener(this);
     }

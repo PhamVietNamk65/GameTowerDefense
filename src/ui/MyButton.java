@@ -13,7 +13,7 @@ public class MyButton {
     private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
     private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
 
-    public MyButton(String text, int width, int height) {
+    public MyButton(String text , int width, int height) {
         this.width = width;
         this.height = height;
         this.text = text;

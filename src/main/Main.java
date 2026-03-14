@@ -1,4 +1,4 @@
- package main;
+package main;
 
 public class Main {
     public static void main(String[] args) {
@@ -8,4 +8,4 @@ public class Main {
         gamePanel.startGameThread();
         gamePanel.initInputs();
     }
-}   
+}    

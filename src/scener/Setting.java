@@ -2,13 +2,14 @@ package scener;
 
 import java.awt.Graphics;
 
+import Manager.AssetManager;
 import main.GamePanel;
 
 public class Setting extends GameScene implements SceneMethods{
 
     GamePanel gamePanel;
 
-    public Setting(GamePanel gamePanel) {
+    public Setting(GamePanel gamePanel, AssetManager assetManager) {
         super(gamePanel);
         this.gamePanel = gamePanel;
     }
