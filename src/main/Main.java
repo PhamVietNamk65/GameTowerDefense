@@ -6,6 +6,5 @@ public class Main {
         new Window(gamePanel);
         
         gamePanel.startGameThread();
-        gamePanel.initInputs();
     }
 }    

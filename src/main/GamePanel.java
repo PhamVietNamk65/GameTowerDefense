@@ -6,6 +6,7 @@ import javax.swing.plaf.DimensionUIResource;
 import Manager.AssetManager;
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
+import scener.GameScene;
 import scener.Level;
 import scener.Menu;
 import scener.Playing;
@@ -36,9 +37,10 @@ public class GamePanel extends JPanel implements Runnable{
     private Level level;
 
     private MyMouseListener myMouseListener;
-    private KeyHandler keyH = new KeyHandler();
+    private KeyHandler keyH;
     
     private Render render;
+    private GameScene gameScene;
 
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
@@ -46,13 +48,22 @@ public class GamePanel extends JPanel implements Runnable{
         setDoubleBuffered(true); // tang hieu suat ve
         this.setFocusable(true); // de JPanel co the nhan duoc su kien tu ban phim
 
+        gameScene = new GameScene(this);
+        keyH = new KeyHandler(this);
+        addKeyListener(keyH);
+        
         initClasses(); 
         initInputs();   
     }
+
+    public GameScene getGameScene() {
+            return gameScene;
+    }
+
     // khoi tao cac lop can thiet
     private void initClasses() {
         assetManager = AssetManager.getInstance(); // khoi tao asset manager
-        render = new Render(this); // khoi tao lop render de ve theo trang hien tai
+        render = new Render(this, menu); // khoi tao lop render de ve theo trang hien tai
         menu = new Menu(this,assetManager);  // khoi tao trang menu
         playing = new Playing(this, assetManager); // khoi tao trang choi game
         setting = new Setting(this, assetManager);

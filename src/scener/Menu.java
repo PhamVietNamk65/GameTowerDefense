@@ -62,9 +62,9 @@ public class Menu extends GameScene implements SceneMethods{
             
         if( uiManager.mainMenuBar.visible )
             if( uiManager.mainMenuBar.buttons.get(0).getBounds().contains(x,y) )
-                SetGameState(PLAYING);
+                setCurrentState(PLAYING);
             else if( uiManager.mainMenuBar.buttons.get(1).getBounds().contains(x,y))
-                SetGameState(SETTING);
+                setCurrentState(SETTING);
             else if( uiManager.mainMenuBar.buttons.get(2).getBounds().contains(x,y)){
                 uiManager.quitMenuBar.visible = true;
                 uiManager.mainMenuBar.visible = false;
