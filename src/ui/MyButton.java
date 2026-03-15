@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.awt.FontMetrics;
 import java.awt.Font;
 
@@ -13,6 +14,9 @@ public class MyButton {
     private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
     private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
 
+    private Runnable action; // chua hanh dong khi click vao button
+    private BufferedImage image;
+
     public MyButton(String text , int width, int height) {
         this.width = width;
         this.height = height;
@@ -20,7 +24,22 @@ public class MyButton {
 
         initBounds();
     }
-    
+
+    public MyButton(BufferedImage image, int width, int height) {
+        this.image = image;
+        this.width = width;
+        this.height = height;
+        initBounds();
+    }
+
+    public void setAction(Runnable action) {
+        this.action = action;
+    }
+    public void click() {
+        if(action != null) {
+            action.run();
+        }
+    }
 
     private void initBounds(){
         this.bounds = new Rectangle(x, y, width, height);
@@ -67,6 +86,16 @@ public class MyButton {
         int textY = y + ((height - stringHeight) / 2) + ascent;
         
         g.drawString(text, textX, textY);
+    }
+
+    public void drawImageButton(Graphics g){
+        if(image != null){
+            g.drawImage(image, x, y, width, height, null);
+        }
+
+        if(mousePressed){
+            g.drawRect(x, y, width, height);
+        }
     }
 
     public void setMouseOver(boolean mouseOver){    // ham de gan gia tri cho mouseOver

@@ -6,6 +6,8 @@ import java.awt.event.KeyListener;
 import main.GamePanel;
 import main.GameStates;
 
+import static main.GameStates.*;
+
 public class KeyHandler implements KeyListener {
 
     private GamePanel game;
@@ -23,11 +25,11 @@ public class KeyHandler implements KeyListener {
         switch(e.getKeyCode()){
 
             case KeyEvent.VK_W:
-                game.getGameScene().setCurrentState(GameStates.LEVEL);
+                GameStates.setGameStates(PLAYING);
                 break;
 
             case KeyEvent.VK_ESCAPE:
-                game.getGameScene().setCurrentState(GameStates.MENU);
+                GameStates.setGameStates(MENU);
                 break;
         }
 

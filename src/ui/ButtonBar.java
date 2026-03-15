@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,14 +40,14 @@ public class ButtonBar {
             for(int i = 0; i < buttons.size(); i++){
                 MyButton button = buttons.get(i);
                 button.setButton(x + i * (buttonWidth + gap), y, buttonWidth, height);
-                button.draw(g);
+                button.drawImageButton(g);
             }
         } else { // vertical
             int buttonHeight = (height - (buttons.size() - 1) * gap) / buttons.size();
             for(int i = 0; i < buttons.size(); i++){
                 MyButton button = buttons.get(i);
                 button.setButton(x, y + i * (buttonHeight + gap), width, buttonHeight);
-                button.draw(g);
+                button.drawImageButton(g);
             }
         }
     }

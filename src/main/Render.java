@@ -2,19 +2,16 @@ package main;
 
 import java.awt.Graphics;
 
-import scener.GameScene;
     
 public class Render {
     private GamePanel gamePanel;
-    private GameScene gameScene;
 
-    public Render( GamePanel gamePanel, GameScene gameScene){
+    public Render( GamePanel gamePanel){
         this.gamePanel = gamePanel;
-        this.gameScene = gameScene;
     }
 
     public void render(Graphics g){
-        switch(gameScene.getCurrentState()){ 
+        switch(GameStates.getGameStates()){ 
             case MENU:
                 gamePanel.getMenu().render(g);
                 break;

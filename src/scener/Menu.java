@@ -1,13 +1,14 @@
 package scener;
+import static main.GameStates.*;
+
 import java.awt.Color;
 import java.awt.Graphics;
 
 import Manager.AssetManager;
 import Manager.UIManager;
 import main.GamePanel;
+import main.GameStates;
 import ui.MyButton;
-
-import static main.GameStates.*;
 
 public class Menu extends GameScene implements SceneMethods{
 
@@ -18,7 +19,9 @@ public class Menu extends GameScene implements SceneMethods{
     public Menu(GamePanel gamePanel, AssetManager assetManager) {
         super(gamePanel);
         this.gamePanel = gamePanel;
-        this.assetManager = assetManager;
+        if(GameStates.getGameStates() == GameStates.MENU && assetManager.backGround == null){
+        assetManager.loadMenuAssets();
+        }
         uiManager = new UIManager(gamePanel, assetManager);
     }
 
@@ -62,9 +65,9 @@ public class Menu extends GameScene implements SceneMethods{
             
         if( uiManager.mainMenuBar.visible )
             if( uiManager.mainMenuBar.buttons.get(0).getBounds().contains(x,y) )
-                setCurrentState(PLAYING);
+                GameStates.setGameStates(PLAYING);
             else if( uiManager.mainMenuBar.buttons.get(1).getBounds().contains(x,y))
-                setCurrentState(SETTING);
+                GameStates.setGameStates(SETTING);
             else if( uiManager.mainMenuBar.buttons.get(2).getBounds().contains(x,y)){
                 uiManager.quitMenuBar.visible = true;
                 uiManager.mainMenuBar.visible = false;
@@ -124,6 +127,11 @@ public class Menu extends GameScene implements SceneMethods{
                 button.resetBooleans();
             }
         }
+    }
+
+    @Override
+    public void update() {
+
     }
 
   

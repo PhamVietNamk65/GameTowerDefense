@@ -8,6 +8,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 
 import main.GamePanel;
+import main.GameStates;
 
 public class UIManager{
     public ButtonBar mainMenuBar , quitMenuBar, settingsMenuBar; 
@@ -19,9 +20,9 @@ public class UIManager{
 
         mainMenuBar = new ButtonBar(280, 250 , 400, 200);
         mainMenuBar.setOrientation(1, 20); // vertical, gap 20px
-        mainMenuBar.addButton(new MyButton("LEVEL", 200, 50));
-        mainMenuBar.addButton(new MyButton("SETTING", 200, 50));
-        mainMenuBar.addButton(new MyButton("QUIT", 200, 50));
+        mainMenuBar.addButton(new MyButton(assetManager.menuButtonsNormol[0], 200, 50));
+        mainMenuBar.addButton(new MyButton(assetManager.menuButtonsNormol[1], 200, 50));
+        mainMenuBar.addButton(new MyButton(assetManager.menuButtonsNormol[2], 200, 50));
         mainMenuBar.visible = true;
 
         quitMenuBar = new ButtonBar(295, 320, 420, 100);
@@ -36,7 +37,7 @@ public class UIManager{
     }
 
     public void draw(Graphics g, GameScene currentScene) {
-        switch (currentScene.getCurrentState()) {
+        switch (GameStates.getGameStates()) {
             case MENU:
                 drawMenu(g);    // Vẽ giao diện menu
                 break;

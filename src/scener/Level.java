@@ -39,4 +39,9 @@ public class Level extends GameScene implements SceneMethods{
      
     }
 
+    @Override
+    public void update() {
+
+    }
+
 }

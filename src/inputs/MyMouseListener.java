@@ -23,7 +23,7 @@ public class MyMouseListener implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        switch (gamePanel.getGameScene().getCurrentState()) {
+        switch (GameStates.getGameStates()) {
                 case MENU:
                     gamePanel.getMenu().mouseMoved(e.getX(), e.getY());
                     break;
@@ -42,7 +42,7 @@ public class MyMouseListener implements MouseListener, MouseMotionListener {
     public void mouseClicked(MouseEvent e) {
         if(e.getButton() == MouseEvent.BUTTON1){
             
-            switch (gamePanel.getGameScene().getCurrentState()) {
+            switch (GameStates.getGameStates()) {
                 case MENU:
                     gamePanel.getMenu().mouseClicked(e.getX(), e.getY());
                     break;
@@ -60,7 +60,7 @@ public class MyMouseListener implements MouseListener, MouseMotionListener {
 
     @Override
     public void mousePressed(MouseEvent e) {
-        switch (gamePanel.getGameScene().getCurrentState()) {
+        switch (GameStates.getGameStates()) {
                 case MENU:
                     gamePanel.getMenu().mousePressed(e.getX(), e.getY());
                     break;
@@ -77,7 +77,7 @@ public class MyMouseListener implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        switch (gamePanel.getGameScene().getCurrentState()) {
+        switch (GameStates.getGameStates()) {
                 case MENU:
                     gamePanel.getMenu().mouseReleased(e.getX(), e.getY());
                     break;
