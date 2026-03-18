@@ -19,8 +19,9 @@ public class Menu extends GameScene implements SceneMethods{
     public Menu(GamePanel gamePanel, AssetManager assetManager) {
         super(gamePanel);
         this.gamePanel = gamePanel;
+        this.assetManager = assetManager;
         if(GameStates.getGameStates() == GameStates.MENU && assetManager.backGround == null){
-        assetManager.loadMenuAssets();
+            assetManager.loadMenuAssets();
         }
         uiManager = new UIManager(gamePanel, assetManager);
     }
@@ -29,8 +30,14 @@ public class Menu extends GameScene implements SceneMethods{
     public void render(Graphics g) {
         // 1. Vẽ ảnh nền trước
         drawBackground(g);
+        drawLayout(g);
         drawLogo(g);
         uiManager.draw(g, this);
+    }
+
+    private void drawLayout(Graphics g) {
+        g.setColor(new Color(0,0,0,100));
+        g.fillRect(0,0,gamePanel.screenWidth,gamePanel.screenHeight);   
     }
 
     private void drawLogo(Graphics g){
@@ -53,80 +60,23 @@ public class Menu extends GameScene implements SceneMethods{
 
     @Override
     public void mouseClicked(int x, int y) {
-        if( uiManager.quitMenuBar.visible ){
-            if( uiManager.quitMenuBar.buttons.get(0).getBounds().contains(x, y))
-                System.exit(0);
-            else if( uiManager.quitMenuBar.buttons.get(1).getBounds().contains(x, y)){
-                uiManager.quitMenuBar.visible = false;
-                uiManager.mainMenuBar.visible = true;
-            }
-            return;
-        }
-            
-        if( uiManager.mainMenuBar.visible )
-            if( uiManager.mainMenuBar.buttons.get(0).getBounds().contains(x,y) )
-                GameStates.setGameStates(PLAYING);
-            else if( uiManager.mainMenuBar.buttons.get(1).getBounds().contains(x,y))
-                GameStates.setGameStates(SETTING);
-            else if( uiManager.mainMenuBar.buttons.get(2).getBounds().contains(x,y)){
-                uiManager.quitMenuBar.visible = true;
-                uiManager.mainMenuBar.visible = false;
-            }
-            
+        uiManager.mouseClicked(x, y);
     }
 
     @Override
     public void mouseMoved(int x, int y) {
-        if (uiManager.mainMenuBar.visible) {
-        for (MyButton button : uiManager.mainMenuBar.buttons) {
-            button.setMouseOver(button.getBounds().contains(x, y));
-        }
-    }
-
-    if (uiManager.quitMenuBar.visible) {
-        for (MyButton button : uiManager.quitMenuBar.buttons) {
-            button.setMouseOver(button.getBounds().contains(x, y));
-        }
-    }
+        uiManager.mouseMoved(x, y);
     }
 
     @Override
     public void mousePressed(int x, int y) {
-        if ( !uiManager.quitMenuBar.getBounds().contains(x,y)){
-                uiManager.quitMenuBar.visible = false;
-                uiManager.mainMenuBar.visible = true;
-                return;
-            }    
-        if (uiManager.mainMenuBar.visible) {
-        for (MyButton button : uiManager.mainMenuBar.buttons) {
-            if (button.getBounds().contains(x, y)) {
-                button.setMousePressed(true);
-            }
-        }
+        uiManager.mousePressed(x, y);
     }
 
-    if (uiManager.quitMenuBar.visible) {
-        for (MyButton button : uiManager.quitMenuBar.buttons) {
-            if (button.getBounds().contains(x, y)) {
-                button.setMousePressed(true);
-            }
-        }
-    }
-    }
 
     @Override
     public void mouseReleased(int x, int y) {
-        if (uiManager.mainMenuBar.visible) {
-            for (MyButton button : uiManager.mainMenuBar.buttons) {
-                button.resetBooleans();
-                }
-        }
-
-        if (uiManager.quitMenuBar.visible) {
-            for (MyButton button : uiManager.quitMenuBar.buttons) {
-                button.resetBooleans();
-            }
-        }
+        uiManager.mouseReleased(x, y);
     }
 
     @Override

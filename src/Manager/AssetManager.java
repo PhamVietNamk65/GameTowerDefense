@@ -25,14 +25,14 @@ public class AssetManager {
     public void loadMenuAssets() {
         try {
             // 1. Load ảnh gốc chứa cả 3 nút
-            BufferedImage atlas = ImageIO.read(getClass().getResourceAsStream("/menu/buttons_normal.png"));
+            BufferedImage atlas = ImageIO.read(getClass().getResourceAsStream("/menu/button_normal.png"));
             
             menuButtonsNormol = new BufferedImage[3];
             
             // 2. Cắt ảnh dựa trên tọa độ đã phân tích
-            menuButtonsNormol[0] = atlas.getSubimage(250, 15, 593, 120);  // LEVEL
-            menuButtonsNormol[1] = atlas.getSubimage(277, 210, 542, 142); // SETTING
-            menuButtonsNormol[2] = atlas.getSubimage(282, 424, 532, 123); // QUIT
+            menuButtonsNormol[0] = atlas.getSubimage(40, 60, 995, 200);  // LEVEL
+            menuButtonsNormol[1] = atlas.getSubimage(40, 390, 995, 235); // SETTING
+            menuButtonsNormol[2] = atlas.getSubimage(40, 730, 995, 230); // QUIT
             
             // Các ảnh khác
             backGround = ImageIO.read(getClass().getResourceAsStream("/menu/background.png"));

@@ -25,10 +25,8 @@ public class MyButton {
         initBounds();
     }
 
-    public MyButton(BufferedImage image, int width, int height) {
+    public MyButton(BufferedImage image) {
         this.image = image;
-        this.width = width;
-        this.height = height;
         initBounds();
     }
 
