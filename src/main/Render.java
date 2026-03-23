@@ -19,6 +19,9 @@ public class Render {
             case SETTING:
                 gamePanel.getSetting().render(g);
                 break;
+            case PLAYING:
+                gamePanel.getPlaying().render(g);
+                break;
             default:
                 break;
         }

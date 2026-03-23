@@ -2,8 +2,8 @@ package scener;
 
 import java.awt.Color;
 import java.awt.Graphics;
-
 import main.GamePanel;
+import main.GameStates;
 
 public class Level extends GameScene implements SceneMethods{
     private GamePanel gamePanel;
@@ -14,6 +14,10 @@ public class Level extends GameScene implements SceneMethods{
 
     }
 
+    public void update(){
+        
+    }
+
     @Override
     public void render(Graphics g) {
         g.setColor(Color.CYAN);
@@ -22,7 +26,9 @@ public class Level extends GameScene implements SceneMethods{
 
     @Override
     public void mouseClicked(int x, int y) {
-        
+        //if(level1Button.contains(x,y))
+        GameStates.SetGameState(GameStates.PLAYING);
+
     }
 
     @Override

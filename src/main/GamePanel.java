@@ -1,17 +1,15 @@
 package main;
 
-import javax.swing.JPanel;
-import javax.swing.plaf.DimensionUIResource;
-
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
+import java.awt.Color;
+import java.awt.Graphics;
+import javax.swing.JPanel;
+import javax.swing.plaf.DimensionUIResource;
 import scener.Level;
 import scener.Menu;
 import scener.Playing;
 import scener.Setting;
-
-import java.awt.Color;
-import java.awt.Graphics;
 
 
 public class GamePanel extends JPanel implements Runnable{
@@ -74,7 +72,24 @@ public class GamePanel extends JPanel implements Runnable{
         gameThread.start();
     }
 
-    public void update(){   //cap nhat Frame
+    public void update(){  
+        switch(GameStates.gameStates){
+
+        case PLAYING:
+            playing.update();
+            break;
+
+        case LEVEL:
+            level.update();
+            break;
+
+        case SETTING:
+            //menu.update();
+            break;
+
+        default:
+            break;
+    } 
     }
 
     @Override

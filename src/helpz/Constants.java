@@ -82,14 +82,14 @@ public class Constants {
         public static final int DOWN = 3;
     }
 
-    public static class Enemies{
+    public static class Monsters{
         public static final int SLIME = 0;
         public static final int ORC = 1;
         public static final int WOLF = 2;
         public static final int BEE = 3;
 
-        public static float GetSpeed(int enemyType){
-            switch (enemyType) {
+        public static float GetSpeed(int monsterType){
+            switch (monsterType) {
                 case ORC:
                     return 0.5f;
                 case SLIME:
@@ -102,8 +102,8 @@ public class Constants {
             return 0;
         }
 
-        public static int GetStartHealth(int enemyType){
-            switch (enemyType) {
+        public static int GetStartHealth(int monsterType){
+            switch (monsterType) {
                 case ORC:
                     return 150;
                 case SLIME:

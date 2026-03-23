@@ -12,6 +12,10 @@ public class Monster {
 	protected int enemyType;
 	protected int lastDir;
 	protected boolean alive = true;
+	private int pathIndex = 0;
+	private EnemyState state = EnemyState.WALK;
+	private int aniIndex = 0;
+
 
 	public Monster(float x, float y, int ID, int enemyType) {
 		this.x = x;
@@ -24,14 +28,16 @@ public class Monster {
 	}
 
 	private void setStartHealth() {
-		health = helpz.Constants.Enemies.GetStartHealth(enemyType);
+		health = helpz.Constants.Monsters.GetStartHealth(enemyType);
 		maxHealth = health;
 	}
 
 	public void hurt(int dmg){
 		this.health -=dmg;
-		if(health <= 0)
+		if(health <= 0){
 			alive = false;
+			state = EnemyState.DEATH;
+		}
 	}
 
 	public void move(float speed, int dir) {
@@ -57,6 +63,30 @@ public class Monster {
 	private void updateHitBox(){
 		bounds.x = (int)x;
 		bounds.y = (int)y;
+	}
+
+	public int getAniIndex() {
+    	return aniIndex;
+	}
+
+	public void setAniIndex(int aniIndex) {
+    	this.aniIndex = aniIndex;
+	}
+
+	public EnemyState getState(){
+    	return state;
+	}
+
+	public void setState(EnemyState state){
+    	this.state = state;
+	}
+
+	public int getPathIndex() {
+    	return pathIndex;
+	}
+
+	public void nextPath() {
+    	pathIndex++;
 	}
 
 	public void setPos(int x, int y) {
