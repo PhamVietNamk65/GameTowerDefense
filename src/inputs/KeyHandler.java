@@ -1,12 +1,12 @@
 package inputs;
 
+import static States.GameState.*;
+
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
+import States.GameState;
 import main.GamePanel;
-import main.GameStates;
-
-import static main.GameStates.*;
 
 public class KeyHandler implements KeyListener {
 
@@ -25,11 +25,10 @@ public class KeyHandler implements KeyListener {
         switch(e.getKeyCode()){
 
             case KeyEvent.VK_W:
-                GameStates.setGameStates(PLAYING);
+
                 break;
 
             case KeyEvent.VK_ESCAPE:
-                GameStates.setGameStates(MENU);
                 break;
         }
 

@@ -34,20 +34,20 @@ public class ButtonBar {
         drawButtons(g);
     }
 
-    private void drawButtons( Graphics g){
+    public void drawButtons( Graphics g ){
         if(orientation == 0){ // horizontal
             int buttonWidth = (width - (buttons.size() - 1) * gap) / buttons.size();
             for(int i = 0; i < buttons.size(); i++){
                 MyButton button = buttons.get(i);
                 button.setButton(x + i * (buttonWidth + gap), y, buttonWidth, height);
-                button.drawImageButton(g);
+                button.draw(g);
             }
         } else { // vertical
             int buttonHeight = (height - (buttons.size() - 1) * gap) / buttons.size();
             for(int i = 0; i < buttons.size(); i++){
                 MyButton button = buttons.get(i);
                 button.setButton(x, y + i * (buttonHeight + gap), width, buttonHeight);
-                button.drawImageButton(g);
+                button.draw(g);
             }
         }
     }
