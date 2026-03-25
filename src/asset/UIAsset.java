@@ -1,34 +1,31 @@
-package utils;
+package asset;
 
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
-public class AssetManager {
+public class UIAsset {
 
-    private static AssetManager instance;
+    private static UIAsset instance; 
 
-    public static BufferedImage[] tiles;
+    public static BufferedImage backGround;
+    public static BufferedImage logo;
 
-    public BufferedImage backGround;
-    public BufferedImage logo;
+    public static BufferedImage[] menuButtonsNormol = new BufferedImage[3];
+    public static BufferedImage[] menuButtonsOver = new BufferedImage[3];
+    public static BufferedImage[] menuButtonsPressed = new BufferedImage[3];
 
-    public BufferedImage[] menuButtonsNormol = new BufferedImage[3];
-    public BufferedImage[] menuButtonsOver = new BufferedImage[3];
-    public BufferedImage[] menuButtonsPressed = new BufferedImage[3];
-
-    private AssetManager() {
+    private UIAsset() {
     }
 
-    public static AssetManager getInstance() {
+    public static UIAsset getInstance() {
         if(instance == null){
-            instance = new AssetManager();
+            instance = new UIAsset();
         }
         return instance;
     }
-    public void loadAllAssets(){
+    public void load(){
         loadMenuAssets();
         loadLevelAssets();
-        loadPlayingAssets();
     }
 
     public void loadMenuAssets() {
@@ -61,7 +58,5 @@ public class AssetManager {
     }
     private void loadLevelAssets() { 
     }
-    private void loadPlayingAssets(){
-
-    }
+   
 }

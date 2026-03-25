@@ -1,14 +1,14 @@
 package ui;
 
+import asset.UIAsset;
 import main.GamePanel;
-import utils.AssetManager;
 
 public class Setting {
-    private AssetManager assetManager;
+    private UIAsset uiAsset;
     GamePanel gamePanel;
     public Setting(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
-        assetManager = AssetManager.getInstance();
+        uiAsset = UIAsset.getInstance();
     }
     
     public static void update() {

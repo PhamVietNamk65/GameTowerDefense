@@ -8,18 +8,16 @@ import java.util.logging.Level;
 import States.GameStateManager;
 import States.LevelSelectState;
 import States.SettingState;
+import asset.UIAsset;
 import main.GamePanel;
-import utils.AssetManager;
 
 public class Menu {
 
-    private AssetManager assetManager;
     private GamePanel gamePanel;
     private ButtonBar buttonBar;
 
     public Menu(GamePanel gamePanel){ 
         this.gamePanel = gamePanel;
-        this.assetManager = AssetManager.getInstance();
 
         initButtons();
     }
@@ -32,20 +30,20 @@ public class Menu {
             (int) (gamePanel.screenHeight * 0.5));
         buttonBar.setOrientation(1, 10); // vertical, gap 20px
         MyButton button1 = new MyButton(
-            assetManager.menuButtonsNormol[0],
-            assetManager.menuButtonsOver[0],
-            assetManager.menuButtonsPressed[0]);
+            UIAsset.menuButtonsNormol[0],
+            UIAsset.menuButtonsOver[0],
+            UIAsset.menuButtonsPressed[0]);
         button1.setAction(()->{
             gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
         });
         MyButton button2 = new MyButton(
-            assetManager.menuButtonsNormol[1],
-            assetManager.menuButtonsOver[1],
-            assetManager.menuButtonsPressed[1]);
+            UIAsset.menuButtonsNormol[1],
+            UIAsset.menuButtonsOver[1],
+            UIAsset.menuButtonsPressed[1]);
         button2.setAction(()->{
             gamePanel.getGameStateManager().setState(new SettingState(gamePanel));
         });
-        MyButton button3 = new MyButton(assetManager.menuButtonsNormol[2],assetManager.menuButtonsOver[2],assetManager.menuButtonsPressed[2]);
+        MyButton button3 = new MyButton(UIAsset.menuButtonsNormol[2],UIAsset.menuButtonsOver[2],UIAsset.menuButtonsPressed[2]);
         
         buttonBar.addButton(button1);
         buttonBar.addButton(button2);
@@ -61,7 +59,7 @@ public class Menu {
         drawButtons(g);
     }
     private void drawBackground(Graphics g){
-        g.drawImage(assetManager.backGround,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null); 
+        g.drawImage(UIAsset.backGround,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null); 
     }
 
     private void drawLayout(Graphics g) {
@@ -70,8 +68,8 @@ public class Menu {
     }
 
     private void drawLogo(Graphics g){
-        if (assetManager.logo != null) {
-        g.drawImage(assetManager.logo, 
+        if (UIAsset.logo != null) {
+        g.drawImage(UIAsset.logo, 
             (int) (gamePanel.screenWidth * 0.25),
             (int) (gamePanel.screenHeight * 0.05),
             (int) (gamePanel.screenWidth * 0.5),

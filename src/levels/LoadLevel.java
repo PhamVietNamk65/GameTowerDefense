@@ -1,42 +1,45 @@
 package levels;
+
 import java.io.BufferedReader;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 
-class LoadLevel {
+public class LoadLevel {
 
-    public static int[][] loadLevelCSV(String fileName){
-        int[][] data = null;
-        try (InputStream is = LoadLevel.class.getClassLoader().getResourceAsStream(fileName);
-        BufferedReader br = new BufferedReader(new InputStreamReader(is))) {
+    // Load map từ file txt
+    public static int[][] loadLevel(String path) {
+        int[][] map = null;
 
-        // Đọc tất cả dòng trước
-        java.util.List<int[]> rows = new java.util.ArrayList<>();
+        try {
+            FileInputStream fis = new FileInputStream(path);
+            BufferedReader br = new BufferedReader(new InputStreamReader(fis));
 
-        String line;
-        while((line = br.readLine()) != null){
+            // Đọc dòng đầu: width height
+            String firstLine = br.readLine();
+            String[] size = firstLine.split(" ");
 
-            String[] tokens = line.split(",");
+            int cols = Integer.parseInt(size[0]);
+            int rows = Integer.parseInt(size[1]);
 
-            int[] row = new int[tokens.length];
+            map = new int[rows][cols];
 
-            for(int i = 0; i < tokens.length; i++){
-                row[i] = Integer.parseInt(tokens[i].trim());
+            // Đọc từng dòng map
+            for (int y = 0; y < rows; y++) {
+                String line = br.readLine();
+                String[] tokens = line.split(",");
+
+                for (int x = 0; x < cols; x++) {
+                    map[y][x] = Integer.parseInt(tokens[x]);
+                }
             }
 
-            rows.add(row);
+            br.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
         }
 
-        data = new int[rows.size()][];
-        for(int i = 0; i < rows.size(); i++){
-            data[i] = rows.get(i);
-        }
-
-    } catch (Exception e){
-        System.out.println("Lỗi load CSV: " + fileName);
-        e.printStackTrace();
+        return map;
     }
-
-    return data;
-}
 }

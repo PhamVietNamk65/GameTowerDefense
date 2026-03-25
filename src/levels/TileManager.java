@@ -3,7 +3,7 @@ package levels;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import utils.AssetManager;
+import asset.MapAsset;
 import utils.Constants;
 
 public class TileManager {
@@ -11,11 +11,11 @@ public class TileManager {
     private BufferedImage[] tiles;
 
     public TileManager(){
-        tiles = AssetManager.tiles;
+        tiles = MapAsset.tiles;
     }
 
     public void draw(Graphics g, int[][] map){
-        int tileSize = Constants.Tile.SIZE;
+        int tileSize = Constants.Tiles.TILE_SIZE;
 
         for(int row = 0; row < map.length; row++){
             for(int col = 0; col < map[row].length; col++){

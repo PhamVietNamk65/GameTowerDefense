@@ -4,16 +4,16 @@ import java.awt.Graphics;
 
 import States.MenuState;
 import States.PlayingState;
+import asset.UIAsset;
 import main.GamePanel;
-import utils.AssetManager;
 
 public class LevelSelect {
-    private AssetManager assetManager;
+    private UIAsset uiAsset;
     private GamePanel gamePanel;
     private ButtonBar buttonBar;
     public LevelSelect(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
-        assetManager = AssetManager.getInstance();
+        uiAsset = UIAsset.getInstance();
 
         initbutton();
     }

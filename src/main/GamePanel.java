@@ -1,18 +1,20 @@
 package main;
 
+import inputs.KeyHandler;
+import inputs.MyMouseListener;
+import java.awt.Color;
+import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
 
 import States.GameStateManager;
 
 import States.MenuState;
-
-
+import asset.AssetLoad;
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
 import ui.LevelSelect;
 import ui.Menu;
-import utils.AssetManager;
 
 import java.awt.Color;
 import java.awt.Graphics;
@@ -32,7 +34,7 @@ public class GamePanel extends JPanel implements Runnable{
     // FPS
     private int FPS = 60;
 
-    private AssetManager assetManager;
+    private AssetLoad assetLoad;
     // private PlayingState playing;
     // private Setting setting;
 
@@ -58,9 +60,9 @@ public class GamePanel extends JPanel implements Runnable{
 
     // khoi tao cac lop can thiet
     private void initClasses() {
-        assetManager = AssetManager.getInstance(); // khoi tao asset manager
-        assetManager.loadAllAssets();
-
+        assetLoad = new AssetLoad(); // khoi tao asset manager
+        assetLoad.loadAllAssets(); // load tat ca asset
+        
         gameStateManager = new GameStateManager(); // khoi tao game state manager
         gameStateManager.setState(new MenuState(this)); // dat trang hien tai la menu
 
