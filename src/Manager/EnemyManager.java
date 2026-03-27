@@ -6,12 +6,15 @@ import entity.Monster;
 import entity.Orc;
 import entity.Slime;
 import entity.Wolf;
-import static helpz.Constants.Direction.*;
 import static helpz.Constants.Monsters.*;
 import helpz.LoadSave;
+import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -21,82 +24,133 @@ import scener.Playing;
 public class EnemyManager {
 
     private Playing playing;
-
-    // Mỗi loại enemy có 1 mảng frame riêng
-    private Map<Integer, Map<EnemyState, BufferedImage[]>> enemyAnimations;
+    private Map<Integer, Map<String, BufferedImage[]>> enemyAnimations;
     private ArrayList<Monster> monsters = new ArrayList<>();
-    private int HPbarWidth = 20;
 
-    // animation đơn giản cho WALK
     private int aniTick;
     private int aniIndex;
     private final int aniSpeed = 20;
-	private static final int ENEMY_SIZE = 32;
-	private static final int HP_BAR_WIDTH = 24;
-	private static final int HP_BAR_HEIGHT = 4;
-	private static final int HP_BAR_Y_OFFSET = 8;
+
+    private static final int ENEMY_SIZE = 32;
+    private static final int HALF_ENEMY = ENEMY_SIZE / 2;
+
+    private static final int HP_BAR_WIDTH = 24;
+    private static final int HP_BAR_HEIGHT = 4;
+    private static final int HP_BAR_Y_OFFSET = 8;
+
+    private Point[] levelPath = {
+        new Point(32, 100),
+        new Point(200, 100),
+        new Point(200, 200),
+        new Point(400, 200),
+        new Point(400, 350),
+        new Point(700, 350)
+    };
 
     public EnemyManager(Playing playing) {
         this.playing = playing;
         this.enemyAnimations = new HashMap<>();
-
-        addMonster(ORC);
-        addMonster(BEE);
-        addMonster(SLIME);
-        addMonster(WOLF);
-
         loadEnemyImgs();
     }
 
+    public void spawnMonster(int monsterType) {
+        int x = levelPath[0].x - HALF_ENEMY;
+        int y = levelPath[0].y - HALF_ENEMY;
+        int id = monsters.size();
+
+        switch (monsterType) {
+            case ORC:
+                monsters.add(new Orc(x, y, id));
+                break;
+            case BEE:
+                monsters.add(new Bee(x, y, id));
+                break;
+            case SLIME:
+                monsters.add(new Slime(x, y, id));
+                break;
+            case WOLF:
+                monsters.add(new Wolf(x, y, id));
+                break;
+        }
+    }
+
     private void loadEnemyImgs() {
-    	loadEnemyAnimation(SLIME,
-            "enemies/1/U_Walk.png",
-            "enemies/1/S_Special.png",
-            "enemies/1/S_Death.png");
+        loadEnemyAnimation(SLIME, "enemies/1",
+                new String[]{"U", "S", "D"}, new String[]{"U", "S", "D"}, false);
 
-    	loadEnemyAnimation(ORC,
-            "enemies/2/U_Walk.png",
-            "enemies/2/D_Attack.png",
-            "enemies/2/D_Death.png");
+        loadEnemyAnimation(ORC, "enemies/2",
+                new String[]{"U", "S", "D"}, new String[]{"U", "S", "D"}, true);
 
-    	loadEnemyAnimation(WOLF,
-            "enemies/3/U_Walk.png",
-            "enemies/3/U_Attack.png",
-            "enemies/3/U_Death.png");
+        loadEnemyAnimation(WOLF, "enemies/3",
+                new String[]{"U", "S", "D"}, new String[]{"U", "S", "D"}, true);
 
-    	loadEnemyAnimation(BEE,
-            "enemies/4/U_Walk.png",
-            null,
-            "enemies/4/U_Death.png");
-	}
+        loadEnemyAnimation(BEE, "enemies/4",
+                new String[]{"U", "S", "D"}, new String[]{"U", "S", "D"}, false);
+    }
 
-	private void loadEnemyAnimation(int type, String walkPath, String attackPath, String deathPath) {
-    	Map<EnemyState, BufferedImage[]> stateMap = new HashMap<>();
+    private void loadEnemyAnimation(int type, String folder,
+                                    String[] walkDirs, String[] deathDirs, boolean hasAttack) {
+        Map<String, BufferedImage[]> map = new HashMap<>();
 
-    	stateMap.put(EnemyState.WALK, LoadSave.getSpriteFrames(walkPath, 48, 48));
-    	stateMap.put(EnemyState.DEATH, LoadSave.getSpriteFrames(deathPath, 48, 48));
+        for (String dir : walkDirs) {
+            BufferedImage[] frames = LoadSave.getSpriteFrames(folder + "/" + dir + "_Walk.png", 48, 48);
+            map.put("WALK_" + dir, frames);
+            map.put("ATTACK_" + dir, frames);
+        }
 
-    	if (attackPath != null) {
-        	stateMap.put(EnemyState.ATTACK, LoadSave.getSpriteFrames(attackPath, 48, 48));
-    	} else {
-        	stateMap.put(EnemyState.ATTACK, stateMap.get(EnemyState.WALK));
-    	}
+        if (hasAttack) {
+            for (String dir : walkDirs) {
+                BufferedImage[] frames = LoadSave.getSpriteFrames(folder + "/" + dir + "_Attack.png", 48, 48);
+                if (frames != null && frames.length > 0) {
+                    map.put("ATTACK_" + dir, frames);
+                }
+            }
+        }
 
-    	enemyAnimations.put(type, stateMap);
-	}
+        for (String dir : deathDirs) {
+            BufferedImage[] frames = LoadSave.getSpriteFrames(folder + "/" + dir + "_Death.png", 48, 48);
+            if (frames != null && frames.length > 0) {
+                map.put("DEATH_" + dir, frames);
+            }
+        }
+
+        enemyAnimations.put(type, map);
+    }
 
     public void update() {
+        java.util.Iterator<Monster> it = monsters.iterator();
 
-    	for (Monster m : monsters) {
+        while (it.hasNext()) {
+            Monster m = it.next();
 
-        	if (m.IsAlive()) {
-            	moveMonsterAlongPath(m);
-        	}
+            if (m.hasReachedEnd()) {
+                it.remove();
+                continue;
+            }
 
-    	}
+            if (m.IsAlive()) {
+                moveMonsterAlongPath(m);
+            } else {
+                Map<String, BufferedImage[]> map = enemyAnimations.get(m.getEnemyType());
+                int totalFrames = 1;
 
-    	updateAnimationTick();
-	}
+                if (map != null) {
+                    BufferedImage[] df = map.get("DEATH_" + m.getAnimDir());
+                    if (df != null && df.length > 0) {
+                        totalFrames = df.length;
+                    }
+                }
+
+                m.tickDeath(totalFrames, aniSpeed);
+
+                if (m.isDeathDone()) {
+                    it.remove();
+                }
+            }
+        }
+
+        updateAnimationTick();
+    }
 
     private void updateAnimationTick() {
         aniTick++;
@@ -106,182 +160,162 @@ public class EnemyManager {
         }
     }
 
-    public void updateMonsterMove(Monster m) {
-        if (m.getLastDir() == -1)
-            setNewDirectionAndMove(m);
-
-        int newX = (int) (m.getX() + getSpeedAndWidth(m.getLastDir(), m.getEnemyType()));
-        int newY = (int) (m.getY() + getSpeedAndHeight(m.getLastDir(), m.getEnemyType()));
-
-        // if (getTileType(newX, newY) == ROAD_TILE) {
-        //     m.move(GetSpeed(m.getEnemyType()), m.getLastDir());
-        // } else if (isAtEnd(m)) {
-        //     System.out.println("Lives Lost!");
-        // } else {
-        //     setNewDirectionAndMove(m);
-        // }
-    }
-
-    private void setNewDirectionAndMove(Monster m) {
-        int dir = m.getLastDir();
-
-        int xCord = (int) (m.getX() / 32);
-        int yCord = (int) (m.getY() / 32);
-
-        fixMonsterOffsetTile(m, dir, xCord, yCord);
-
-        // if (dir == LEFT || dir == RIGHT) {
-        //     int newY = (int) (m.getY() + getSpeedAndHeight(UP, m.getEnemyType()));
-        //     if (getTileType((int) m.getX(), newY) == ROAD_TILE)
-        //         m.move(GetSpeed(m.getEnemyType()), UP);
-        //     else
-        //         m.move(GetSpeed(m.getEnemyType()), DOWN);
-        // } else {
-        //     int newX = (int) (m.getX() + getSpeedAndWidth(RIGHT, m.getEnemyType()));
-        //     if (getTileType(newX, (int) m.getY()) == ROAD_TILE)
-        //         m.move(GetSpeed(m.getEnemyType()), RIGHT);
-        //     else
-        //         m.move(GetSpeed(m.getEnemyType()), LEFT);
-        // }
-    }
-
-    private void fixMonsterOffsetTile(Monster e, int dir, int xCord, int yCord) {
-        switch (dir) {
-            case RIGHT:
-                if (xCord < 19)
-                    xCord++;
-                break;
-            case DOWN:
-                if (yCord < 19)
-                    yCord++;
-                break;
+    private void moveMonsterAlongPath(Monster m) {
+        if (m.getPathIndex() >= levelPath.length) {
+            playing.loseLife(1);
+            m.reachEnd();
+            return;
         }
 
-        e.setPos(xCord * 32, yCord * 32);
-    }
+        Point target = levelPath[m.getPathIndex()];
+        float speed = GetSpeed(m.getEnemyType());
 
-    private float getSpeedAndHeight(int dir, int enemyType) {
-        if (dir == UP)
-            return -GetSpeed(enemyType);
-        else if (dir == DOWN)
-            return GetSpeed(enemyType) + 32;
+        float centerX = m.getX() + HALF_ENEMY;
+        float centerY = m.getY() + HALF_ENEMY;
 
-        return 0;
-    }
+        float dx = target.x - centerX;
+        float dy = target.y - centerY;
+        float distance = (float) Math.sqrt(dx * dx + dy * dy);
 
-    private float getSpeedAndWidth(int dir, int enemyType) {
-        if (dir == LEFT)
-            return -GetSpeed(enemyType);
-        else if (dir == RIGHT)
-            return GetSpeed(enemyType) + 32;
-
-        return 0;
-    }
-
-	private Point[] levelPath = {
-        new Point(32, 100),
-        new Point(200, 100),
-        new Point(200, 200),
-        new Point(400, 200),
-        new Point(400, 350),
-        new Point(700, 350)
-	};
-
-	private void moveMonsterAlongPath(Monster m) {
-
-    	if (m.getPathIndex() >= levelPath.length){
-			m.setState(EnemyState.ATTACK);
-        	return;
-		}
-
-    	Point target = levelPath[m.getPathIndex()];
-
-    	float speed = GetSpeed(m.getEnemyType());
-
-    	float dx = target.x - m.getX();
-    	float dy = target.y - m.getY();
-
-    	float distance = (float)Math.sqrt(dx * dx + dy * dy);
-
-    	if(distance < speed){
-        	m.setPos(target.x, target.y);
-        	m.nextPath();
-        	return;
-    	}
-
-    	float moveX = (dx / distance) * speed;
-    	float moveY = (dy / distance) * speed;
-
-    	m.setPos((int)(m.getX() + moveX), (int)(m.getY() + moveY));
-	}
-
-    public void addMonster(int monsterType) {
-        int x = levelPath[0].x;
-    	int y = levelPath[0].y;
-
-
-        switch (monsterType) {
-            case ORC:
-                monsters.add(new Orc(x*3, y*3, 0));
-                break;
-            case BEE:
-                monsters.add(new Bee(x, y, 0));
-                break;
-            case SLIME:
-                monsters.add(new Slime(x*2, y*2, 0));
-                break;
-            case WOLF:
-                monsters.add(new Wolf(x*9, y*9, 0));
-                break;
+        if (distance <= speed) {
+            m.setPos(target.x - HALF_ENEMY, target.y - HALF_ENEMY);
+            m.nextPath();
+            return;
         }
+
+        float moveX = (dx / distance) * speed;
+        float moveY = (dy / distance) * speed;
+
+        m.updateAnimDirection(moveX, moveY);
+        m.setPos(m.getX() + moveX, m.getY() + moveY);
+    }
+
+    public void drawPath(Graphics g) {
+        Graphics2D g2 = (Graphics2D) g;
+
+        g2.setColor(new Color(194, 160, 120));
+        g2.setStroke(new BasicStroke(22f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        for (int i = 0; i < levelPath.length - 1; i++) {
+            Point p1 = levelPath[i];
+            Point p2 = levelPath[i + 1];
+            g2.drawLine(p1.x, p1.y, p2.x, p2.y);
+        }
+
+        g2.setColor(Color.GREEN);
+        g2.fillOval(levelPath[0].x - 8, levelPath[0].y - 8, 16, 16);
+
+        Point end = levelPath[levelPath.length - 1];
+        g2.setColor(Color.RED);
+        g2.fillOval(end.x - 8, end.y - 8, 16, 16);
     }
 
     public void draw(Graphics g) {
         for (Monster m : monsters) {
+            drawEnemy(m, g);
             if (m.IsAlive()) {
-                drawEnemy(m, g);
                 drawHealthBar(m, g);
             }
         }
     }
 
-    private void drawHealthBar(Monster m, Graphics g) {
-    int currentWidth = getNewBarWidth(m);
+    private void drawEnemy(Monster m, Graphics g) {
+        Map<String, BufferedImage[]> map = enemyAnimations.get(m.getEnemyType());
+        if (map == null) return;
 
-    int barX = (int) m.getX() + (ENEMY_SIZE - HP_BAR_WIDTH) / 2;
-    int barY = (int) m.getY() - HP_BAR_Y_OFFSET;
+        BufferedImage[] frames;
+        int index;
 
-    g.setColor(Color.black);
-    g.drawRect(barX - 1, barY - 1, HP_BAR_WIDTH + 1, HP_BAR_HEIGHT + 1);
+        if (!m.IsAlive()) {
+            String key = "DEATH_" + m.getAnimDir();
+            frames = map.get(key);
+            if (frames == null || frames.length == 0) frames = map.get("DEATH_U");
+            if (frames == null || frames.length == 0) return;
 
-    g.setColor(Color.red);
-    g.fillRect(barX, barY, HP_BAR_WIDTH, HP_BAR_HEIGHT);
+            index = Math.min(m.getDeathTick() / aniSpeed, frames.length - 1);
+        } else {
+            EnemyState state = m.getState();
+            String prefix = state == EnemyState.ATTACK ? "ATTACK_" : "WALK_";
+            String dir = m.getAnimDir();
 
-    g.setColor(Color.green);
-    g.fillRect(barX, barY, currentWidth, HP_BAR_HEIGHT);
-}
+            frames = map.get(prefix + dir);
+            if (frames == null || frames.length == 0) frames = map.get("WALK_U");
+            if (frames == null || frames.length == 0) return;
 
-private int getNewBarWidth(Monster m) {
-    return (int) (HP_BAR_WIDTH * m.getHealthBarFloat());
-}
+            index = aniIndex % frames.length;
+        }
 
-private void drawEnemy(Monster m, Graphics g) {
-    Map<EnemyState, BufferedImage[]> stateMap = enemyAnimations.get(m.getEnemyType());
-    if (stateMap == null) return;
+        BufferedImage img = frames[index];
 
-    EnemyState state = m.getState();
-    BufferedImage[] frames = stateMap.get(state);
-
-    if (frames == null || frames.length == 0) {
-        frames = stateMap.get(EnemyState.WALK);
+        // Nếu đang đi ngang sang phải thì lật ảnh
+        if (m.getAnimDir().equals("S") && m.isFacingRight()) {
+            g.drawImage(img,
+                    (int) m.getX() + ENEMY_SIZE, (int) m.getY(),
+                    -ENEMY_SIZE, ENEMY_SIZE, null);
+        } else {
+            g.drawImage(img,
+                    (int) m.getX(), (int) m.getY(),
+                    ENEMY_SIZE, ENEMY_SIZE, null);
+        }
     }
 
-    if (frames == null || frames.length == 0) return;
+    private void drawHealthBar(Monster m, Graphics g0) {
+    Graphics2D g = (Graphics2D) g0.create();
+    g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-    int index = aniIndex % frames.length;
+    int barWidth = HP_BAR_WIDTH;
+    int barHeight = HP_BAR_HEIGHT;
+    int barX = (int) m.getX() + (ENEMY_SIZE - barWidth) / 2;
+    int barY = (int) m.getY() - HP_BAR_Y_OFFSET;
 
-    g.drawImage(frames[index], (int) m.getX(), (int) m.getY(), ENEMY_SIZE, ENEMY_SIZE, null);
+    float hpPercent = m.getHealthBarFloat();
+    int currentWidth = (int) (barWidth * hpPercent);
+
+    int arc = 8;
+
+    // ===== Shadow =====
+    g.setColor(new Color(0, 0, 0, 100));
+    g.fillRoundRect(barX + 2, barY + 2, barWidth, barHeight, arc, arc);
+
+    // ===== Background (empty HP) =====
+    g.setColor(new Color(40, 40, 40));
+    g.fillRoundRect(barX, barY, barWidth, barHeight, arc, arc);
+
+    // ===== Color theo % máu =====
+    Color hpColor;
+    if (hpPercent > 0.6f) {
+        hpColor = new Color(60, 200, 80);   // xanh
+    } else if (hpPercent > 0.3f) {
+        hpColor = new Color(255, 200, 0);   // vàng
+    } else {
+        hpColor = new Color(220, 50, 50);   // đỏ
+    }
+
+    // ===== Gradient fill =====
+    GradientPaint gp = new GradientPaint(
+            barX, barY, hpColor.brighter(),
+            barX, barY + barHeight, hpColor.darker()
+    );
+    g.setPaint(gp);
+    g.fillRoundRect(barX, barY, currentWidth, barHeight, arc, arc);
+
+    // ===== Highlight (ánh sáng phía trên) =====
+    g.setColor(new Color(255, 255, 255, 60));
+    g.fillRoundRect(barX + 1, barY + 1, currentWidth - 2, barHeight / 2, arc - 2, arc - 2);
+
+    // ===== Border =====
+    g.setColor(new Color(0, 0, 0, 150));
+    g.setStroke(new BasicStroke(1.2f));
+    g.drawRoundRect(barX, barY, barWidth, barHeight, arc, arc);
+
+    g.dispose();
 }
 
+    public ArrayList<Monster> getMonsters() {
+        return monsters;
+    }
 
+    public Point[] getLevelPath() {
+        return levelPath;
+    }
 }
