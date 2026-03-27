@@ -15,8 +15,9 @@ public class Monster {
 	protected boolean alive = true;
 	private int pathIndex = 0;
 	private EnemyState state = EnemyState.WALK;
+	private int direction = 2;
 	private int aniIndex = 0;
-
+	protected float xOffset, yOffset;
 
 	public Monster(float x, float y, int ID, int enemyType) {
 		this.x = x;
@@ -90,7 +91,7 @@ public class Monster {
     	pathIndex++;
 	}
 
-	public void setPos(int x, int y) {
+	public void setPos(float x, float y) {
 		// Don't use this one for moving the enemy.
 		this.x = x;
 		this.y = y;
@@ -131,5 +132,24 @@ public class Monster {
 	public boolean IsAlive(){
 		return alive;
 	}
-    
+	
+	public void setDirection(int right){
+		this.direction = right;
+	}
+
+	public int getDirection(){
+		return direction;
+	}
+
+	public void createOffset() {
+        int maxOffset = 15; // Độ lệch tối đa trong ô 64x64
+        java.util.Random r = new java.util.Random();
+        
+        // Random từ -15 đến 15
+        this.xOffset = r.nextInt(maxOffset * 2) - maxOffset;
+        this.yOffset = r.nextInt(maxOffset * 2) - maxOffset;
+    }
+
+    public float getxOffset() { return xOffset; }
+    public float getyOffset() { return yOffset; }
 }

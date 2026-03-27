@@ -1,6 +1,10 @@
 package entity;
 
 import utils.Constants;
+import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
+
+import asset.TowerAsset;
 
 public class Tower {
 
@@ -20,7 +24,7 @@ public class Tower {
     private int dmg;
     private float range, cooldown;
     private int cdTick;
-    private boolean selected = false;
+    private Rectangle bounds;
 
     // Archer animation
     private int animState = IDLE;
@@ -46,11 +50,26 @@ public class Tower {
     private boolean justStartedUpgrade  = false;
     private boolean justFinishedUpgrade = false;
 
+    private boolean selected = false;
+
+    public boolean isSelected() {
+        return selected;
+    }   
+
+    public void setSelected(boolean selected) {
+        this.selected = selected;
+    }
+
     public Tower(int x, int y, int id, int towerType, int tileX, int tileY) {
         this.x = x; this.y = y; this.id = id;
         this.towerType = towerType;
         this.tileX = tileX; this.tileY = tileY;
+        initBounds();
         setDefaultStats();
+    }
+
+    private void initBounds(){
+        this.bounds = new Rectangle(x, y, tileX, tileY);
     }
 
     public void update() {
@@ -121,7 +140,14 @@ public class Tower {
         range = Constants.Towers.GetDefaultRange(towerType);
         cooldown = Constants.Towers.GetDefaultCoolDown(towerType);
     }
-
+    public Rectangle getBounds(){
+        return bounds;
+    }
+    public int getFrameAmount(Tower t) {
+        BufferedImage[] frames = TowerAsset.archerAnimations[t.getDirection()][t.getAnimState()];
+        return frames==null ? 0 : frames.length;
+    }
+    
     public int     getTowerAnimFrame()     { return towerAnimFrame; }
     public boolean isUpgrading()           { return upgrading; }
     public boolean isJustStartedUpgrade()  { return justStartedUpgrade; }
@@ -149,6 +175,5 @@ public class Tower {
     public int     getAnimState()          { return animState; }
     public int     getAnimIndex()          { return animIndex; }
     public int     getDirection()          { return direction; }
-    public boolean isSelected()            { return selected; }
-    public void    setSelected(boolean s)  { this.selected = s; }
+
 }

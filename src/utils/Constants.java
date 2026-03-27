@@ -91,16 +91,21 @@ public class Constants {
         public static final int WOLF = 2;
         public static final int BEE = 3;
 
+        public static final int ENEMY_SIZE = 32 * 2;
+	    public static final int HP_BAR_WIDTH = 24;
+	    public static final int HP_BAR_HEIGHT = 4;
+	    public static final int HP_BAR_Y_OFFSET = 8;
+        
         public static float GetSpeed(int monsterType){
             switch (monsterType) {
                 case ORC:
-                    return 0.5f;
+                    return 1f;
                 case SLIME:
-                    return 0.65f;
+                    return 0.8f;
                 case BEE:
-                    return 0.5f;
+                    return 1.5f;
                 case WOLF:
-                    return 0.75f;
+                    return 2f;
             }
             return 0;
         }

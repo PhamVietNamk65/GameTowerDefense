@@ -1,11 +1,8 @@
 package ui;
-import static States.GameState.*;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.util.logging.Level;
 
-import States.GameStateManager;
 import States.LevelSelectState;
 import States.SettingState;
 import asset.UIAsset;

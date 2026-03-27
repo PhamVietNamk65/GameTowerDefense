@@ -1,11 +1,8 @@
 package inputs;
 
-import static States.GameState.*;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-import States.GameState;
 import main.GamePanel;
 
 public class KeyHandler implements KeyListener {

@@ -1,4 +1,4 @@
-package helpz;
+package utils;
 
 import java.util.ArrayList;
 
@@ -35,4 +35,6 @@ public class Utilz {
 
         return (int) Math.hypot(xDiff, yDiff);
     }
+
+    public static int clamp(int v, int min, int max) { return Math.max(min, Math.min(max, v)); }
 }

@@ -1,6 +1,8 @@
-package levels;
+package Manager;
 
 import java.awt.Graphics;
+
+import levels.Level;
 
 public class LevelManager {
 
@@ -14,6 +16,9 @@ public class LevelManager {
         currentLevel = new Level(id);
     }
 
+    public Level getCurrentLevel(){
+        return currentLevel;
+    }
     public void update(){
         currentLevel.update();
     }

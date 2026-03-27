@@ -5,29 +5,56 @@ import java.awt.Font;
 import java.awt.Graphics2D;
 
 import entity.Tower;
+import system.TowerActionListener;
 import utils.Constants;
 
 public class TowerUI {
-    int bx, by;
+    ButtonBar buttonBar;
+    private Tower selectedTower;
+    TowerActionListener listener;
     public TowerUI(Tower t){
-        initbutton(Tower t);
+        initButton(t);
     }
 
-    private void drawTowerButtons(Graphics2D g2, Tower t) { //hien nut bam upgrade va sell
-        int bx = t.getX() + Constants.Tiles.TILE_SIZE + 4, by = t.getY() - 8;
-        g2.setFont(new Font("Arial",Font.BOLD,14));
-        if (t.canUpgrade() && !t.isUpgrading()) {
-            g2.setColor(Color.YELLOW); g2.fillRect(bx,by,88,30); 
-            g2.setColor(Color.BLACK);  g2.drawRect(bx,by,88,30);
-            g2.drawString("Upgrade", bx+12, by+20);
-        } else if (t.isUpgrading()) {
-            g2.setColor(new Color(160,160,80)); g2.fillRect(bx,by,88,30);
-            g2.setColor(Color.DARK_GRAY); g2.drawRect(bx,by,88,30);
-            g2.drawString("Upgrading...", bx+4, by+20);
+    private void initButton(Tower t){
+        buttonBar = new ButtonBar(0, 0, 88, 66);
+        buttonBar.setOrientation(1, 5);
+
+        MyButton upgrade = new MyButton("Uprade", 88,33);
+        upgrade.setAction(()->{
+            if (listener != null) {
+                listener.onUpgrade(selectedTower);
+            }
+        });
+
+        MyButton sell = new MyButton("Sell", 88,3);
+        sell.setAction(()->{
+             if (listener != null)
+                listener.onSell(selectedTower);
+        });
+        buttonBar.addButton(upgrade);
+        buttonBar.addButton(sell);
+
+    }
+     public void setListener(TowerActionListener l) {
+        this.listener = l;
+    }
+
+    public void setSelectedTower(Tower t) {
+        this.selectedTower = t;
+
+        if (t != null) {
+            int bx = t.getX() + 45;
+            int by = t.getY();
+
+            buttonBar.setPosition(bx, by);
         }
-        g2.setColor(Color.RED);   g2.fillRect(bx,by+40,88,30);
-        g2.setColor(Color.BLACK); g2.drawRect(bx,by+40,88,30);
-        g2.drawString("Sell", bx+28, by+60);
+    }
+
+    public void draw(Graphics2D g ){
+        if (selectedTower == null) return;
+        buttonBar.draw(g);
+        drawSelectedInfo(g, selectedTower);
     }
 
     private void drawSelectedInfo(Graphics2D g2, Tower t) { //hien thong tin tru
@@ -38,13 +65,28 @@ public class TowerUI {
         g2.drawString("Range:"+(int)t.getRange(), x+8, y+30);
     }
 
-    public boolean handleButtonClick(int mx, int my) { //xu ly su kien click chuot;
-        Tower t = getSelectedTower();
-        if (t==null) return false;
-        int bx = t.getX()+ Constants.Tiles.TILE_SIZE + 4, by = t.getY()-8;
-        if (t.canUpgrade() && !t.isUpgrading())
-            if (mx>=bx && mx<=bx+88 && my>=by && my<=by+30) { upgradeSelectedTower(); return true; }
-        if (mx>=bx && mx<=bx+88 && my>=by+40 && my<=by+70) { sellSelectedTower(); return true; }
-        return false;
+    public boolean mousePressed(int x, int y) {
+        boolean handled = false;
+
+        for (MyButton b : buttonBar.buttons) {
+            if (b.getBounds().contains(x, y)) {
+                b.setMousePressed(true);
+                handled = true;
+            }
+        }
+        return handled;
+    }
+
+    public boolean mouseReleased(int x, int y) {
+        boolean handled = false;
+
+        for (MyButton b : buttonBar.buttons) {
+            if (b.getBounds().contains(x, y) && b.isMousePressed()) {
+                b.execute();
+                handled = true;
+            }
+        b.setMousePressed(false);
+        }
+        return handled;
     }
 }

@@ -64,4 +64,11 @@ public class ButtonBar {
         buttons.add(button);
     }
     
+    public void setPosition(int x, int y) {
+        this.x = x;
+        this.y = y;
+
+        // update lại bounds
+        this.bounds.setLocation(x, y);
+    }
 }

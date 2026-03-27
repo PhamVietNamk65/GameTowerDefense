@@ -1,7 +1,6 @@
 package States;
 //trang thai cua game
 import java.awt.Graphics;
-import java.awt.Menu;
 public interface GameState {
     
     void update();

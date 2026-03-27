@@ -7,12 +7,13 @@ import java.util.Iterator;
 import java.util.Random;
 
 import entity.Tower;
+import utils.Utilz;
 
 
 public class ParticleSystem {
 
     private ArrayList<Particle> particles = new ArrayList<>();
-    private Random random;
+    private Random random = new Random();
 
     public void update() {
         Iterator<Particle> it = particles.iterator();
@@ -37,7 +38,7 @@ public class ParticleSystem {
     };
     
     private void spawnParticles(Tower t, boolean burst) {
-        int lv = clamp(t.getTowerLevel(), 0, 6);
+        int lv = Utilz.clamp(t.getTowerLevel(), 0, 6);
         int[] col = PARTICLE_COLORS[lv];
         float cx = t.getCenterX(), cy = t.getCenterY();
         int count = burst ? 28 : 14;
@@ -53,5 +54,4 @@ public class ParticleSystem {
             particles.add(new Particle(cx, cy, vx, vy, life, r, g, b, size));
         }
     }
-    private int clamp(int v, int min, int max) { return Math.max(min, Math.min(max, v)); }
 }
