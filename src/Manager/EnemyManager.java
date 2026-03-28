@@ -1,25 +1,19 @@
 package Manager;
 
 import entity.Bee;
-import entity.EnemyState;
 import entity.Monster;
 import entity.Orc;
 import entity.Slime;
 import entity.Wolf;
-import helpz.LoadSave;
 import system.EnemyMovement;
 import system.EnemySpawner;
 
-import static utils.Constants.Direction.*;
+
 import static utils.Constants.Monsters.*;
 
-import java.awt.Color;
-import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.image.BufferedImage;
+
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
 import States.PlayingState;
 
@@ -31,23 +25,27 @@ public class EnemyManager {
     private ArrayList<Monster> monsters = new ArrayList<>();
 	private EnemyMovement enemyMovement;
     private EnemySpawner enemySpawner;
-
+    private WaveManager waveManager;
     public EnemyManager(PlayingState playingState,EnemyMovement enemyMovement,Point[] path) {
         this.playingState = playingState;
         this.enemyMovement = enemyMovement;
         enemySpawner = new EnemySpawner(path);
-        addMonster(ORC);
-        addMonster(BEE);
-        addMonster(SLIME);
-        addMonster(WOLF);
-
+        waveManager = new WaveManager(this);
     }
 
     public void update() {
+        waveManager.update();
+        java.util.Iterator<Monster> it = monsters.iterator();
 
-    	for (Monster m : monsters) {
+        while (it.hasNext()) {
+            Monster m = it.next();
 
-        	if (m.IsAlive()) {
+            if (m.hasReachedEnd()) {
+                it.remove();
+                continue;
+            }
+
+        	if (m.isAlive()) {
             	enemyMovement.move(m);
         	}
 
@@ -83,5 +81,9 @@ public class EnemyManager {
 
     public ArrayList<Monster> getMonsters(){
         return monsters;
+    }
+
+    public WaveManager getWaveManager() {
+        return waveManager;
     }
 }

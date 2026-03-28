@@ -26,7 +26,7 @@ public class EnemyRenderer {
         updateAnimation();
 
         for (Monster m : enemyManager.getMonsters()) {
-            if (m.IsAlive()) {
+            if (m.isAlive()) {
                 drawEnemy(m, g);
                 drawHealthBar(m, g);
             }  

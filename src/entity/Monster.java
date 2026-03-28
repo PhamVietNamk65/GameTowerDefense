@@ -18,78 +18,100 @@ public class Monster {
 	private int direction = 2;
 	private int aniIndex = 0;
 	protected float xOffset, yOffset;
+	protected int deathTick = 0;
+	protected boolean deathDone = false;
+	protected boolean reachedEnd = false;
 
-	public Monster(float x, float y, int ID, int enemyType) {
-		this.x = x;
-		this.y = y;
-		this.ID = ID;
-		this.enemyType = enemyType;
-		bounds = new Rectangle((int) x, (int) y, 32, 32);
-		lastDir = -1;
-		setStartHealth();
-	}
+    public Monster(float x, float y, int ID, int enemyType) {
+        this.x = x;
+        this.y = y;
+        this.ID = ID;
+        this.enemyType = enemyType;
+        bounds = new Rectangle((int) x, (int) y, 32, 32);
+        lastDir = -1;
+        setStartHealth();
+    }
 
 	private void setStartHealth() {
 		health = utils.Constants.Monsters.GetStartHealth(enemyType);
 		maxHealth = health;
 	}
 
-	public void hurt(int dmg){
-		this.health -=dmg;
-		if(health <= 0){
-			alive = false;
-			state = EnemyState.DEATH;
-		}
-	}
+    public void hurt(int dmg) {
+        this.health -= dmg;
+        if (health <= 0 && alive) {
+            alive = false;
+            state = EnemyState.DEATH;
+            deathTick = 0;
+        }
+    }
 
-	public void move(float speed, int dir) {
-		lastDir = dir;
-		switch (dir) {
-		case LEFT:
-			this.x -= speed;
-			break;
-		case UP:
-			this.y -= speed;
-			break;
-		case RIGHT:
-			this.x += speed;
-			break;
-		case DOWN:
-			this.y += speed;
-			break;
-		}
 
-		updateHitBox();
-	}
+    public void tickDeath(int totalFrames, int aniSpeed) {
+        if (state != EnemyState.DEATH) return;
+        deathTick++;
+        if (deathTick >= totalFrames * aniSpeed) {
+            deathDone = true;
+        }
+    }
 
-	private void updateHitBox(){
-		bounds.x = (int)x;
-		bounds.y = (int)y;
-	}
+    public void reachEnd() {
+        reachedEnd = true;
+        alive = false;
+    }
 
-	public int getAniIndex() {
-    	return aniIndex;
+	public boolean hasReachedEnd(){
+		return reachedEnd;
 	}
+    public void move(float speed, int dir) {
+        lastDir = dir;
 
-	public void setAniIndex(int aniIndex) {
-    	this.aniIndex = aniIndex;
-	}
+        switch (dir) {
+            case LEFT:
+                this.x -= speed;
+                break;
+            case UP:
+                this.y -= speed;
+                break;
+            case RIGHT:
+                this.x += speed;
+                break;
+            case DOWN:
+                this.y += speed;
+                break;
+        }
 
-	public EnemyState getState(){
-    	return state;
-	}
+        updateHitBox();
+    }
 
-	public void setState(EnemyState state){
-    	this.state = state;
-	}
+    private void updateHitBox() {
+        bounds.x = (int) x;
+        bounds.y = (int) y;
+    }
 
-	public int getPathIndex() {
-    	return pathIndex;
-	}
+    public int getAniIndex() {
+        return aniIndex;
+    }
 
-	public void nextPath() {
-    	pathIndex++;
-	}
+    public void setAniIndex(int aniIndex) {
+        this.aniIndex = aniIndex;
+    }
+
+    public EnemyState getState() {
+        return state;
+    }
+
+    public void setState(EnemyState state) {
+        this.state = state;
+    }
+
+    public int getPathIndex() {
+        return pathIndex;
+    }
+
+    public void nextPath() {
+        pathIndex++;
+    }
 
 	public void setPos(float x, float y) {
 		// Don't use this one for moving the enemy.
@@ -97,39 +119,39 @@ public class Monster {
 		this.y = y;
 	}
 
-	public float getHealthBarFloat() {
-		return health / (float) maxHealth;
-	}
+    public float getHealthBarFloat() {
+        return health / (float) maxHealth;
+    }
 
-	public float getX() {
-		return x;
-	}
+    public float getX() {
+        return x;
+    }
 
-	public float getY() {
-		return y;
-	}
+    public float getY() {
+        return y;
+    }
 
-	public Rectangle getBounds() {
-		return bounds;
-	}
+    public Rectangle getBounds() {
+        return bounds;
+    }
 
-	public int getHealth() {
-		return health;
-	}
+    public int getHealth() {
+        return health;
+    }
 
-	public int getID() {
-		return ID;
-	}
+    public int getID() {
+        return ID;
+    }
 
-	public int getEnemyType() {
-		return enemyType;
-	}
+    public int getEnemyType() {
+        return enemyType;
+    }
 
-	public int getLastDir() {
-		return lastDir;
-	}
+    public int getLastDir() {
+        return lastDir;
+    }
 
-	public boolean IsAlive(){
+	public boolean isAlive(){
 		return alive;
 	}
 	

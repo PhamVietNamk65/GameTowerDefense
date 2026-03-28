@@ -126,10 +126,25 @@ public class Constants {
     }
 
     public static class Tiles{
-        public static final int TILE_SIZE = 32;
-        public static final int WATER_TILE = 0;
-        public static final int GRASS_TILE = 1;
-        public static final int ROAD_TILE = 2;
+        //thong so co ban cua tile
+        public static final int ORIGIANLTILESIZE = 32;
+        public static final int SCALE = 2;
+        public static final int TILE_SIZE = ORIGIANLTILESIZE * SCALE;
+        //ID cua cac loai tile
+        public static final int GRASS = 0;
+        public static final int ROAD_HORIZONTAL = 1;
+        public static final int ROAD_DOWN = 2;
+        public static final int ROAD_LEFT_UP = 3;
+        public static final int ROAD_LEFT_DOWN = 4;
+        public static final int ROAD_RIGHT_UP = 5;
+        public static final int ROAD_RIGHT_DOWN = 6;
+        
+        
     }
 
+    public static class Projectile{
+        public static final float SPEED      = 6f;
+        public static final float HIT_RADIUS = 12f;
+        public static final float TURN_SPEED = 0.18f;
+    }
 }

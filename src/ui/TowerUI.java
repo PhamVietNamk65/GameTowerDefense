@@ -66,6 +66,7 @@ public class TowerUI {
     }
 
     public boolean mousePressed(int x, int y) {
+        if (selectedTower == null) return false;
         boolean handled = false;
 
         for (MyButton b : buttonBar.buttons) {
@@ -78,6 +79,7 @@ public class TowerUI {
     }
 
     public boolean mouseReleased(int x, int y) {
+        if (selectedTower == null) return false;
         boolean handled = false;
 
         for (MyButton b : buttonBar.buttons) {

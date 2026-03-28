@@ -26,7 +26,7 @@ public class PathFinder {
 
         while (true) {
 
-            path.add(new Point(x * Constants.Tiles.TILE_SIZE * 2 , y * Constants.Tiles.TILE_SIZE * 2));
+            path.add(new Point(x * Constants.Tiles.TILE_SIZE , y * Constants.Tiles.TILE_SIZE ));
             visited[y][x] = true;
 
             // tìm hướng tiếp theo

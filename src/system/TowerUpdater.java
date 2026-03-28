@@ -13,7 +13,7 @@ public class TowerUpdater{
             t.update();
             if (t.getTowerType() == Constants.Towers.ARCHER) {
                 autoUpdateArcher(t);
-                t.updateAnimation(t.getFrameAmount(t));
+                t.updateAnimation();
             }
             }
     }

@@ -7,7 +7,7 @@ import java.io.InputStreamReader;
 
 public class LoadLevel {
 
-    // Load map từ file txt
+    // Load map từ file csv
     public static int[][] loadLevel(String path) {
         int[][] map = null;
 

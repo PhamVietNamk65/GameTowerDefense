@@ -1,15 +1,18 @@
 package asset;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
+import javax.imageio.ImageIO;
 
 import entity.Tower;
 import helpz.LoadSave;
-import utils.Constants;
 
 public class TowerAsset {
     private static TowerAsset instance;
 
     public static BufferedImage[][] towerFrames;
+    public static BufferedImage placeTower;
     public static int[] towerDrawW;
     public static BufferedImage[][][] archerAnimations;
 
@@ -32,6 +35,7 @@ public class TowerAsset {
     public void load(){
         loadTowerFrames();
         loadArcherAnimations();
+        loadPlaceBuildTower();
     }
 
     private void loadTowerFrames() {
@@ -70,17 +74,23 @@ public class TowerAsset {
                     lv+1, n, fw, fh, towerDrawW[lv]);
         }
     }
-
+    private void loadPlaceBuildTower(){
+        try {
+            placeTower = ImageIO.read(getClass().getResourceAsStream("/2 Objects/PlaceForTower1.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
     private void loadArcherAnimations() {
         archerAnimations = new BufferedImage[3][3][];
-        archerAnimations[Tower.SIDE][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/S_Idle.png",      Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.SIDE][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/S_Preattack.png", Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.SIDE][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/S_Attack.png",    Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.UP  ][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/U_Idle.png",      Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.UP  ][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/U_Preattack.png", Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.UP  ][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/U_Attack.png",    Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.DOWN][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/D_Idle.png",      Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.DOWN][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/D_Preattack.png", Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
-        archerAnimations[Tower.DOWN][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/D_Attack.png",    Constants.Towers.ARCHER, Constants.Towers.ARCHER_H);
+        archerAnimations[Tower.SIDE][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/S_Idle.png",      48, 48);
+        archerAnimations[Tower.SIDE][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/S_Preattack.png", 48, 48);
+        archerAnimations[Tower.SIDE][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/S_Attack.png",    48, 48);
+        archerAnimations[Tower.UP  ][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/U_Idle.png",      48, 48);
+        archerAnimations[Tower.UP  ][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/U_Preattack.png", 48, 48);
+        archerAnimations[Tower.UP  ][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/U_Attack.png",    48, 48);
+        archerAnimations[Tower.DOWN][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/D_Idle.png",      48, 48);
+        archerAnimations[Tower.DOWN][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/D_Preattack.png", 48, 48);
+        archerAnimations[Tower.DOWN][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/D_Attack.png",    48, 48);
     }
 }

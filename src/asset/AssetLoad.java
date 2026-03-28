@@ -10,7 +10,7 @@ public class AssetLoad {
         mapAsset = MapAsset.getInstance();
         uiAsset = UIAsset.getInstance();
         towerAsset = TowerAsset.getInstance();
-        monsterAsset = monsterAsset.getInstance();
+        monsterAsset = MonsterAsset.getInstance();
     }
 
     public void loadAllAssets() {

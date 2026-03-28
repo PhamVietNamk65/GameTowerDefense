@@ -17,6 +17,9 @@ import utils.Utilz;
 public class TowerRenderer {
     private TowerManager towerManager;
 
+    private static final int ARCHER_W  = 48;
+    private static final int ARCHER_H  = 48;
+
     // drawW=51 cho tất cả, ARCHER_W=48, căn giữa: TOP_X = (51-48)/2 = 1
     // TOP_Y = screen_y_của_đỉnh_ván_gỗ - 48 (chiều cao archer)
     // lv1: wood_screen=64 -> TOP_Y=16
@@ -55,11 +58,11 @@ public class TowerRenderer {
         BufferedImage img = TowerAsset.towerFrames[lv][frame];
         if (img == null) return;
 
-        int dw = TowerAsset.towerDrawW[lv];
-        int dh = TowerAsset.DRAW_H;
+        int dw = TowerAsset.towerDrawW[lv] + 35 ;
+        int dh = TowerAsset.DRAW_H + 35 ;
 
         // Căn giữa theo x, đáy ảnh = đáy ô tile
-        int drawX = t.getX() - (dw - Constants.Tiles.TILE_SIZE) / 2;
+        int drawX = t.getX() - (dw - Constants.Tiles.TILE_SIZE ) / 2;
         int drawY = t.getY() + Constants.Tiles.TILE_SIZE - dh;
 
         // Flash brightness khi upgrade
@@ -117,14 +120,19 @@ public class TowerRenderer {
     private void drawArcher(Graphics2D g2, Tower t, int drawX, int drawY) {
         if (t.getTowerType() != Constants.Towers.ARCHER) return;
         int lv = Utilz.clamp(t.getTowerLevel(), 0, 6);
-        // Chỉ vẽ archer ở các level được phép
         if (!ARCHER_VISIBLE[lv]) return;
+
         BufferedImage img = getArcherFrame(t);
         if (img == null) return;
-        // Vị trí archer = đỉnh ván gỗ của tháp
+
         int ax = drawX + ARCHER_TOP_X[lv];
         int ay = drawY + ARCHER_TOP_Y[lv];
-        g2.drawImage(img, ax, ay, null);
+
+        if (t.isFacingLeft()) {
+            g2.drawImage(img, ax + ARCHER_W, ay, -ARCHER_W, ARCHER_H, null);
+        } else {
+            g2.drawImage(img, ax, ay, ARCHER_W, ARCHER_H, null);
+        }
     }
 
     private BufferedImage getArcherFrame(Tower t) {
@@ -135,6 +143,6 @@ public class TowerRenderer {
 
     private void drawSelected(Graphics g, Tower t) {
         g.setColor(Color.YELLOW);
-        g.drawRect(t.getX(), t.getY(), 32, 32);
+        g.drawRect(t.getX(), t.getY(), 64, 64);
     }
 }
