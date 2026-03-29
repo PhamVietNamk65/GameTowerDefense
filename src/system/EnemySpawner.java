@@ -1,29 +1,34 @@
 package system;
 
+import entity.*;
 import java.awt.Point;
 
-import entity.*;
-import utils.Constants;
+import static utils.Constants.Monsters.*;
 
 public class EnemySpawner {
 
-    private Point[] levelPath;
+    private Point[] path;
 
-    public EnemySpawner(Point[] levelPath) {
-        this.levelPath = levelPath;
+    public EnemySpawner(Point[] path) {
+        this.path = path;
     }
 
     public Monster spawn(int type) {
 
-        int x = levelPath[0].x;
-        int y = levelPath[0].y;
+        int x = path[0].x;
+        int y = path[0].y;
 
-        return switch (type) {
-            case Constants.Monsters.ORC -> new Orc(x, y, 0);
-            case Constants.Monsters.BEE -> new Bee(x, y, 0);
-            case Constants.Monsters.SLIME -> new Slime(x, y, 0);
-            case Constants.Monsters.WOLF -> new Wolf(x, y, 0);
-            default -> null;
-        };
+        switch (type) {
+            case ORC:
+                return new Orc(x, y, 0);
+            case BEE:
+                return new Bee(x, y, 0);
+            case SLIME:
+                return new Slime(x, y, 0);
+            case WOLF:
+                return new Wolf(x, y, 0);
+        }
+
+        return null;
     }
 }

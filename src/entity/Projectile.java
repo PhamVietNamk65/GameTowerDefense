@@ -25,7 +25,11 @@ public class Projectile {
     }
 
     public boolean update(int screenW, int screenH) {
-        if (target != null && target.isAlive()) {
+        if (target == null || target.getState() == EnemyState.DEATH) {
+            alive = false;
+            return false;
+        }
+
             float tx = target.getX() + 16;
             float ty = target.getY() + 16;
             float desiredAngle = (float) Math.atan2(ty - y, tx - x);
@@ -47,7 +51,6 @@ public class Projectile {
                 alive = false;
                 return false;
             }
-        }
 
         x += vx;
         y += vy;

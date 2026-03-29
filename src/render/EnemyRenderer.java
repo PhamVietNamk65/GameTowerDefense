@@ -1,23 +1,22 @@
 package render;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
-import java.awt.RenderingHints;
-import java.awt.Graphics2D;
-import java.awt.GradientPaint;
-import java.awt.BasicStroke;
-
 import Manager.EnemyManager;
+import entity.Monster;
+import entity.EnemyState;
 import asset.MonsterAsset;
 
-import entity.Monster;
-import utils.Constants;
+import static utils.Constants.Monsters.ENEMY_SIZE;
+import static utils.Constants.Monsters.HP_BAR_HEIGHT;
+import static utils.Constants.Monsters.HP_BAR_WIDTH;
+import static utils.Constants.Monsters.HP_BAR_Y_OFFSET;
+
+import java.awt.*;
+import java.awt.image.BufferedImage;
+
 public class EnemyRenderer {
 
     private EnemyManager enemyManager;
-    private MonsterAsset monsterAsset;
-    // animation đơn giản cho WALK
+
     private int aniTick;
     private int aniIndex;
     private final int aniSpeed = 20;
@@ -30,10 +29,11 @@ public class EnemyRenderer {
         updateAnimation();
 
         for (Monster m : enemyManager.getMonsters()) {
-            if (m.isAlive()) {
-                drawEnemy(m, g);
+            drawEnemy(m, g);
+
+            if (m.getState() != EnemyState.DEATH) {
                 drawHealthBar(m, g);
-            }  
+            }
         }
     }
 
@@ -46,52 +46,53 @@ public class EnemyRenderer {
     }
 
     private void drawEnemy(Monster m, Graphics g) {
-        if( m.getDirection() == Constants.Direction.RIGHT){
-            BufferedImage[] frames = MonsterAsset.getFrames(
+
+        BufferedImage[] frames;
+
+        if (m.getState() == EnemyState.DEATH) {
+            frames = MonsterAsset.getFrames(
+                m.getEnemyType(),
+                EnemyState.DEATH,
+                m.getDirection()
+            );
+        } else {
+            frames = MonsterAsset.getFrames(
                 m.getEnemyType(),
                 m.getState(),
-                Constants.Direction.LEFT
+                m.getDirection()
             );
-            if (frames == null || frames.length == 0)
-                return;
-
-            int index = aniIndex % frames.length;
-
-            g.drawImage(frames[index],
-                (int) m.getX() + Constants.Monsters.ENEMY_SIZE,
-                (int) m.getY(),
-                -Constants.Monsters.ENEMY_SIZE, Constants.Monsters.ENEMY_SIZE,
-                null);
-            }
-        else{
-            BufferedImage[] frames = MonsterAsset.getFrames(
-            m.getEnemyType(),
-            m.getState(),
-            m.getDirection()
-        );
+        }
 
         if (frames == null || frames.length == 0)
             return;
 
         int index = aniIndex % frames.length;
 
-        g.drawImage(frames[index],
-            (int) m.getX(),
-            (int) m.getY(),
-            Constants.Monsters.ENEMY_SIZE, Constants.Monsters.ENEMY_SIZE,
-            null);
+        if (m.getDirection() == utils.Constants.Direction.RIGHT) {
+            g.drawImage(frames[index],
+                    (int) m.getX() + utils.Constants.Monsters.ENEMY_SIZE,
+                    (int) m.getY(),
+                    -utils.Constants.Monsters.ENEMY_SIZE,
+                    utils.Constants.Monsters.ENEMY_SIZE,
+                    null);
+        } else {
+            g.drawImage(frames[index],
+                    (int) m.getX(),
+                    (int) m.getY(),
+                    utils.Constants.Monsters.ENEMY_SIZE,
+                    utils.Constants.Monsters.ENEMY_SIZE,
+                    null);
         }
-        
     }
 
     private void drawHealthBar(Monster m, Graphics g0) {
         Graphics2D g = (Graphics2D) g0.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int barWidth = Constants.Monsters.HP_BAR_WIDTH;
-        int barHeight = Constants.Monsters.HP_BAR_HEIGHT;
-        int barX = (int) m.getX() + (Constants.Monsters.ENEMY_SIZE - barWidth) / 2;
-        int barY = (int) m.getY() - Constants.Monsters.HP_BAR_Y_OFFSET;
+        int barWidth = HP_BAR_WIDTH;
+        int barHeight = HP_BAR_HEIGHT;
+        int barX = (int) m.getX() + (ENEMY_SIZE - barWidth) / 2;
+        int barY = (int) m.getY() - HP_BAR_Y_OFFSET;
 
         float hpPercent = m.getHealthBarFloat();
         int currentWidth = (int) (barWidth * hpPercent);
@@ -135,5 +136,4 @@ public class EnemyRenderer {
 
         g.dispose();
     }
-
 }

@@ -1,26 +1,14 @@
 package Manager;
 
-import static utils.Constants.Monsters.*;
+import helpz.LoadLevel;
+import levels.LevelData;
 
 public class WaveManager {
-    private enum WaveState {
-        SPAWNING,
-        WAITING_NEXT,
-        CLEANUP,
-        DONE
-    }
-    private WaveState state = WaveState.SPAWNING;
-    // Mỗi wave = danh sách loại quái
-    private static final int[][] WAVES = {
-        { SLIME, SLIME, SLIME, SLIME },
-        { SLIME, SLIME, ORC, SLIME, ORC },
-        { ORC, WOLF, ORC, WOLF, WOLF },
-        { BEE, BEE, ORC, WOLF, BEE, ORC, WOLF },
-        { ORC, ORC, WOLF, WOLF, BEE, BEE, ORC, WOLF, SLIME, SLIME }
-    };
 
-    private static final int SPAWN_DELAY = 90;
-    private static final int WAVE_DELAY = 300;
+    private int[][] waves;
+
+    private int spawnDelay;
+    private int waveDelay;
 
     private int currentWave = 0;
     private int spawnIndex = 0;
@@ -29,11 +17,19 @@ public class WaveManager {
     private boolean waveActive = false;
     private boolean waitingNext = false;
     private boolean wavesDone = false;
+    private boolean spawnedAllEnemies = false;
 
     private EnemyManager enemyManager;
 
-    public WaveManager(EnemyManager enemyManager) {
+    private LevelData currentLevel;
+
+    public WaveManager(EnemyManager enemyManager, int level) {
         this.enemyManager = enemyManager;
+        currentLevel = LoadLevel.LoadLevel(String.valueOf(level));
+        waves = currentLevel.getWaves();
+        spawnDelay = currentLevel.getSpawnDelay();
+        waveDelay = currentLevel.getWaveDelay();
+
     }
 
     public void update() {
@@ -41,68 +37,85 @@ public class WaveManager {
 
         tickCounter++;
 
-        switch (state) {
+        // Chưa bắt đầu wave nào
+        if (!waveActive && !waitingNext && !spawnedAllEnemies) {
+            startWave();
+            return;
+        }
 
-            case SPAWNING:
-                if (tickCounter >= SPAWN_DELAY) {
+        // 1. Nếu đang trong thời gian chờ giữa 2 wave
+        if (waitingNext) {
+            if (tickCounter >= waveDelay) { 
+                tickCounter = 0;
+                waitingNext = false;
+                startWave();
+            }
+            return; 
+        }
+
+        // 2. Nếu đang trong quá trình sinh quái (Spawning)
+        if (waveActive) {
+            if (tickCounter >= spawnDelay) {
+                tickCounter = 0;
+                spawnNext();
+            }
+            return;
+        }
+
+        // 3. Nếu đã sinh hết quái nhưng vẫn còn quái trên màn hình (Cleanup)
+        if (spawnedAllEnemies) {
+            if (enemyManager.getMonsters().isEmpty()) {
+                spawnedAllEnemies = false;
+                currentWave++;
+
+               if (currentWave >= waves.length) {
+                    wavesDone = true;
+                    System.out.println("Tất cả wave đã hoàn thành!");
+                } else {
+                    waitingNext = true; // Bắt đầu trạng thái chờ wave tiếp theo
                     tickCounter = 0;
-                    spawnNext();
                 }
-                break;
-
-            case CLEANUP:
-                if (enemyManager.getMonsters().isEmpty()) {
-                    currentWave++;
-
-                    if (currentWave >= WAVES.length) {
-                        wavesDone = true;
-                        state = WaveState.DONE;
-                    } else {
-                        state = WaveState.WAITING_NEXT;
-                        tickCounter = 0;
-                    }
-                }
-                break;
-
-            case WAITING_NEXT:
-                if (tickCounter >= WAVE_DELAY) {
-                    startWave();
-                }
-                break;
-
-            case DONE:
-                break;
+            }
         }
     }
 
     private void startWave() {
+        if (currentWave >= waves.length) {
+            wavesDone = true;
+            return;
+        }
+
         spawnIndex = 0;
         tickCounter = 0;
-        state = WaveState.SPAWNING;
+        waveActive = true;
+        waitingNext = false;
+        spawnedAllEnemies = false;
 
         System.out.println("Wave " + (currentWave + 1) + " bắt đầu!");
-        spawnNext();
+        spawnNext(); // spawn ngay con đầu tiên
     }
 
     private void spawnNext() {
-        int[] wave = WAVES[currentWave];
+        int[] wave = waves[currentWave];
 
         if (spawnIndex >= wave.length) {
-            state = WaveState.CLEANUP;
+            waveActive = false;
+            spawnedAllEnemies = true;
             tickCounter = 0;
             return;
         }
 
-        enemyManager.addMonster(wave[spawnIndex]);
+        int type = wave[spawnIndex];
+        enemyManager.spawnMonster(type);
         spawnIndex++;
     }
 
     public int getCurrentWave() {
-        return Math.min(currentWave + 1, WAVES.length);
+        return Math.min(currentWave + 1, waves.length);
     }
 
     public int getTotalWaves() {
-        return WAVES.length;
+        return waves.length;
     }
 
     public boolean isWavesDone() {
@@ -119,7 +132,7 @@ public class WaveManager {
 
     public int getSecondsUntilNext(int fps) {
         if (!waitingNext) return 0;
-        int remaining = WAVE_DELAY - tickCounter;
+        int remaining = waveDelay - tickCounter;
         return Math.max(0, remaining / fps);
     }
 }

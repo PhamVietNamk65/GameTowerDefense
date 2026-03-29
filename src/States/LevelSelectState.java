@@ -4,7 +4,6 @@ import java.awt.Graphics;
 
 import main.GamePanel;
 import ui.LevelSelect;
-import ui.Menu;
 
 public class LevelSelectState implements GameState{
 

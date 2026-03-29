@@ -2,6 +2,7 @@ package Manager;
 
 import entity.ArcherTower;
 import entity.CannonTower;
+import entity.EnemyState;
 import entity.Tower;
 import entity.TowerSlot;
 import utils.Constants;
@@ -81,7 +82,7 @@ public class TowerManager {
         entity.Monster nearest = null;
         float minDist = Float.MAX_VALUE;
         for (entity.Monster m : monsters) {
-            if (!m.isAlive()) continue;
+            if (m.getState() == EnemyState.DEATH) continue;
             float dx = m.getX() - t.getX();
             float dy = m.getY() - t.getY();
             float dist = dx * dx + dy * dy;

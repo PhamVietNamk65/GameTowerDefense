@@ -7,6 +7,7 @@ import Manager.ArrowManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
 import Manager.TowerManager;
+import Manager.WaveManager;
 import entity.Tower;
 import entity.TowerSlot;
 import main.GamePanel;
@@ -14,7 +15,6 @@ import render.ArrowRenderer;
 import render.EnemyRenderer;
 import render.TowerRenderer;
 import system.EnemyMovement;
-import system.EnemySpawner;
 import system.TowerActionListener;
 import system.TowerUpdater;
 import ui.TowerSlotUI;
@@ -22,7 +22,7 @@ import ui.TowerUI;
 
 public class PlayingState implements GameState {
 
-    private int level;
+    public int level;
     private GamePanel gamePanel;
 
     private LevelManager levelManager;
@@ -39,6 +39,8 @@ public class PlayingState implements GameState {
     private EnemyManager enemyManager;
     private EnemyMovement enemyMovement;
     private EnemyRenderer enemyRenderer;
+
+    private WaveManager waveManager;
 
     private int mouseX, mouseY;
     public PlayingState(GamePanel gamePanel,int level){
@@ -81,8 +83,10 @@ public class PlayingState implements GameState {
         });
         Point[] path = levelManager.getCurrentLevel().getPath();
         enemyMovement = new EnemyMovement(path);
-        enemyManager = new EnemyManager(this,enemyMovement,path);
+        enemyManager = new EnemyManager(this,path);
         enemyRenderer = new EnemyRenderer(enemyManager);
+
+        waveManager = new WaveManager(enemyManager,level);
     }
 
     @Override
@@ -91,6 +95,7 @@ public class PlayingState implements GameState {
         levelManager.update();
         towerUpdater.update(towerManager.getTowers());
         enemyManager.update();
+        waveManager.update();
         towerManager.update(enemyManager.getMonsters());
         towerManager.getArrowManager().update(gamePanel.screenWidth, gamePanel.screenHeight);
     }

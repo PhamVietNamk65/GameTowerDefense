@@ -1,89 +1,83 @@
 package Manager;
 
-import entity.Bee;
 import entity.Monster;
-import entity.Orc;
-import entity.Slime;
-import entity.Wolf;
+import entity.EnemyState;
 import system.EnemyMovement;
 import system.EnemySpawner;
-
-
-import static utils.Constants.Monsters.*;
+import States.PlayingState;
+import asset.MonsterAsset;
 
 import java.awt.Point;
-
+import java.awt.image.BufferedImage;
 import java.util.ArrayList;
-
-import States.PlayingState;
-
+import java.util.Iterator;
 
 public class EnemyManager {
 
     private PlayingState playingState;
-
     private ArrayList<Monster> monsters = new ArrayList<>();
-	private EnemyMovement enemyMovement;
+
+    private EnemyMovement enemyMovement;
     private EnemySpawner enemySpawner;
     private WaveManager waveManager;
-    public EnemyManager(PlayingState playingState,EnemyMovement enemyMovement,Point[] path) {
+
+    private int aniSpeed = 20;
+
+    public EnemyManager(PlayingState playingState, Point[] path) {
         this.playingState = playingState;
-        this.enemyMovement = enemyMovement;
-        enemySpawner = new EnemySpawner(path);
-        waveManager = new WaveManager(this);
+        this.enemyMovement = new EnemyMovement(path);
+        this.enemySpawner = new EnemySpawner(path);
     }
 
     public void update() {
-        waveManager.update();
-        java.util.Iterator<Monster> it = monsters.iterator();
+        Iterator<Monster> it = monsters.iterator();
 
         while (it.hasNext()) {
             Monster m = it.next();
 
             if (m.hasReachedEnd()) {
+                // playingState.loseLife(1);
                 it.remove();
                 continue;
             }
 
-        	if (m.isAlive()) {
-            	enemyMovement.move(m);
-        	}
+            if (m.getState() == EnemyState.DEATH) {
 
-    	}
+                BufferedImage[] df = MonsterAsset.getFrames(
+                    m.getEnemyType(),
+                    EnemyState.DEATH,
+                    m.getDirection()
+                );
 
-	}
+                int totalFrames = (df != null) ? df.length : 1;
 
-    public void addMonster(int monsterType) {
-        // Lấy điểm bắt đầu từ Path
-        Point start = enemyMovement.getStartPoint();
-        float startX = (float) start.x;
-        float startY = (float) start.y;
+                m.tickDeath(totalFrames, aniSpeed);
 
-        Monster m = null;
+                if (m.isDeathDone())
+                    it.remove();
 
-        //Khởi tạo đúng loại Monster
-        switch (monsterType) {
-            case ORC:   m = new Orc(startX, startY, 0);   break;
-            case BEE:   m = new Bee(startX, startY, 0);   break;
-            case SLIME: m = new Slime(startX, startY, 0); break;
-            case WOLF:  m = new Wolf(startX, startY, 0);  break;
+            } 
+            // ===== ALIVE =====
+            else {
+                enemyMovement.move(m);
+            }
         }
+    }
+    
+    public void spawnMonster(int type) {
+        Monster m = enemySpawner.spawn(type);
 
         if (m != null) {
-            m.createOffset(); 
-        
-            //Áp dụng offset vào vị trí xuất phát để chúng không đè lên nhau ngay từ đầu
-            m.setPos(startX + m.getxOffset(), startY + m.getyOffset()); 
-
+            m.createOffset();
+            m.setPos(
+                m.getX() + m.getxOffset(),
+                m.getY() + m.getyOffset()
+            );
             monsters.add(m);
         }
     }
 
-    public ArrayList<Monster> getMonsters(){
+    public ArrayList<Monster> getMonsters() {
         return monsters;
-    }
-
-    public WaveManager getWaveManager() {
-        return waveManager;
     }
 }
