@@ -1,33 +1,34 @@
 package render;
 
 import entity.Arrow;
-import helpz.LoadSave;
+import asset.TowerAsset;
 
-import java.awt.Graphics2D;
-import java.awt.geom.AffineTransform;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 
 public class ArrowRenderer {
 
-    private BufferedImage[] arrowFrames;
     private static final int SIZE = 10;
-    public ArrowRenderer() {
-        arrowFrames = LoadSave.getSpriteFramesFromFolder("tower/3 Units/Arrow");
+
+    public void render(Graphics2D g2, ArrayList<Arrow> arrows) {
+        for (Arrow a : arrows) {
+            draw(g2, a);
+        }
     }
 
-    public void draw(Graphics2D g2, ArrayList<Arrow> arrows) {
+    private void draw(Graphics2D g2, Arrow a) {
+        BufferedImage[] frames = TowerAsset.arrowFrames;
 
-        for (Arrow a : arrows) {
-            AffineTransform old = g2.getTransform();
+        if (frames == null || frames.length == 0) return;
 
-            g2.translate(a.getX(), a.getY());
-            g2.rotate(a.getAngle());
+        BufferedImage img = frames[0];
 
-            BufferedImage img = arrowFrames[a.getAnimIndex() % arrowFrames.length];
-            g2.drawImage(img, -SIZE/2, -SIZE/2, SIZE, SIZE, null);
+        Graphics2D g = (Graphics2D) g2.create();
+        g.translate(a.x, a.y);
+        g.rotate(a.angle);
 
-            g2.setTransform(old);
-        }
+        g.drawImage(img, -SIZE/2, -SIZE/2, SIZE, SIZE, null);
+        g.dispose();
     }
 }

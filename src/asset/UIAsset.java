@@ -9,6 +9,7 @@ public class UIAsset {
 
     public static BufferedImage backGround;
     public static BufferedImage logo;
+    public static BufferedImage logoTH;
 
     public static BufferedImage[] menuButtonsNormol = new BufferedImage[3];
     public static BufferedImage[] menuButtonsOver = new BufferedImage[3];
@@ -51,7 +52,7 @@ public class UIAsset {
             // Các ảnh khác
             backGround = ImageIO.read(getClass().getResourceAsStream("/menu/background.png"));
             logo = ImageIO.read(getClass().getResourceAsStream("/menu/logo.png")).getSubimage(5, 80, 1330, 635 );
-            
+            logoTH = ImageIO.read(getClass().getResourceAsStream("/menu/logoTH.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }

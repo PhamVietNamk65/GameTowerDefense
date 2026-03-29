@@ -100,11 +100,10 @@ public class PlayingState implements GameState {
         levelManager.render(g2);
         towerRenderer.draw(g2);
         enemyRenderer.draw(g2);
-        arrowRenderer.draw(g2,towerManager.getArrowManager().getArrows());
+        arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
 
         towerUI.draw(g2);
         slotUI.render(g2);
-        System.out.println("Số lượng mũi tên hiện tại: " + towerManager.getArrowManager().getArrows().size());
     }
 
     @Override

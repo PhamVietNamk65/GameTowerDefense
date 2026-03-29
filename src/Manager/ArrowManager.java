@@ -13,12 +13,9 @@ public class ArrowManager {
 
     public void update(int screenW, int screenH) {
         Iterator<Arrow> it = arrows.iterator();
-
         while (it.hasNext()) {
-            Arrow a = it.next();
-            if (!a.update(screenW, screenH)) {
+            if (!it.next().update(screenW, screenH))
                 it.remove();
-            }
         }
     }
 

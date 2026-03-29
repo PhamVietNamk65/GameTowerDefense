@@ -15,6 +15,7 @@ public class TowerAsset {
     public static BufferedImage placeTower;
     public static int[] towerDrawW;
     public static BufferedImage[][][] archerAnimations;
+    public static BufferedImage[] arrowFrames;
 
     public static final int MAX_LEVEL = 7;
     // Sprite sheet info per level — frame width đều 70px cho tất cả level
@@ -36,6 +37,7 @@ public class TowerAsset {
         loadTowerFrames();
         loadArcherAnimations();
         loadPlaceBuildTower();
+        loadArrowFrames();
     }
 
     private void loadTowerFrames() {
@@ -92,5 +94,9 @@ public class TowerAsset {
         archerAnimations[Tower.DOWN][Tower.IDLE]      = LoadSave.getSpriteFrames("tower/3 Units/1/D_Idle.png",      48, 48);
         archerAnimations[Tower.DOWN][Tower.PREATTACK] = LoadSave.getSpriteFrames("tower/3 Units/1/D_Preattack.png", 48, 48);
         archerAnimations[Tower.DOWN][Tower.ATTACK]    = LoadSave.getSpriteFrames("tower/3 Units/1/D_Attack.png",    48, 48);
+    }
+
+    private void loadArrowFrames() {
+        arrowFrames = LoadSave.getSpriteFramesFromFolder("tower/3 Units/Arrow");
     }
 }

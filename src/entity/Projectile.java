@@ -1,47 +1,37 @@
 package entity;
-
+import static utils.Constants.Projectile.*;
 public class Projectile {
-    private float x, y;
-    private float angle;
-    private float vx, vy;
-    private boolean alive;
-    private int dmg;
-    private Monster target;
+    public float x, y;
+    public float vx, vy;
+    public float angle;
+    public boolean alive;
+    public int dmg;
+    public Monster target;
 
-    private int animIndex, animTick;
-    private final int animSpeed = 4;
-
-    private static final float SPEED = 6f;
-    private static final float HIT_RADIUS = 12f;
-    private static final float TURN_SPEED = 0.18f;
-
-    public Projectile(float x, float y, Monster target, int dmg) {
-        this.x = x;
-        this.y = y;
+    public Projectile(float startX, float startY, Monster target, int dmg) {
+        this.x = startX;
+        this.y = startY;
         this.target = target;
         this.dmg = dmg;
+
+        float dx = (target.getX() + 16) - startX;
+        float dy = (target.getY() + 16) - startY;
+        float dist = (float) Math.sqrt(dx * dx + dy * dy);
+
+        this.vx = dist > 0 ? (dx / dist) * SPEED : 0;
+        this.vy = dist > 0 ? (dy / dist) * SPEED : 0;
+        this.angle = (float) Math.atan2(dy, dx);
         this.alive = true;
     }
 
     public boolean update(int screenW, int screenH) {
-        updateMovement();
-        updateAnimation();
-
-        if (x < -64 || x > screenW + 64 || y < -64 || y > screenH + 64)
-            alive = false;
-
-        return alive;
-    }
-
-    private void updateMovement() {
         if (target != null && target.isAlive()) {
             float tx = target.getX() + 16;
             float ty = target.getY() + 16;
-
             float desiredAngle = (float) Math.atan2(ty - y, tx - x);
 
             float diff = desiredAngle - angle;
-            while (diff > Math.PI) diff -= 2 * Math.PI;
+            while (diff >  Math.PI) diff -= 2 * Math.PI;
             while (diff < -Math.PI) diff += 2 * Math.PI;
 
             if (Math.abs(diff) < TURN_SPEED) angle = desiredAngle;
@@ -55,24 +45,16 @@ public class Projectile {
             if (dx * dx + dy * dy <= HIT_RADIUS * HIT_RADIUS) {
                 target.hurt(dmg);
                 alive = false;
+                return false;
             }
         }
 
         x += vx;
         y += vy;
-    }
 
-    private void updateAnimation() {
-        animTick++;
-        if (animTick >= animSpeed) {
-            animTick = 0;
-            animIndex++;
-        }
-    }
+        if (x < -64 || x > screenW + 64 || y < -64 || y > screenH + 64)
+            alive = false;
 
-    // getters
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public float getAngle() { return angle; }
-    public int getAnimIndex() { return animIndex; }
+        return alive;
+    }
 }

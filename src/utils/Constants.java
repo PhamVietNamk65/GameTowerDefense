@@ -147,4 +147,9 @@ public class Constants {
         public static final float HIT_RADIUS = 12f;
         public static final float TURN_SPEED = 0.18f;
     }
+
+    public static class Arrow{
+        public static final int ARROW_DRAW_SIZE = 10;
+        public static final int ARROW_ANIM_SPEED = 4;
+    }
 }

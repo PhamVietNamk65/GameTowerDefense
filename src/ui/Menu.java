@@ -56,7 +56,8 @@ public class Menu {
         drawButtons(g);
     }
     private void drawBackground(Graphics g){
-        g.drawImage(UIAsset.backGround,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null); 
+        g.drawImage(UIAsset.backGround,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null);
+        g.drawImage(UIAsset.logoTH, 1180 , 669, 80,80,null) ;
     }
 
     private void drawLayout(Graphics g) {

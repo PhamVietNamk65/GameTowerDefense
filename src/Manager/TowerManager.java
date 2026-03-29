@@ -74,7 +74,7 @@ public class TowerManager {
             }
         }
 
-        arrowManager.update(1280, 720); // nên thay bằng screenW/H sau
+        arrowManager.update(1280, 768); // nên thay bằng screenW/H sau
     }
 
     private entity.Monster findTarget(Tower t, ArrayList<entity.Monster> monsters) {
