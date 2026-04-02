@@ -1,11 +1,8 @@
 {
     "java.project.sourcePaths": [
         "src",
-        "rec/free-field-enemies-pixel-art-for-tower-defense",
-        "rec"
+        "res"
     ],
     "java.project.outputPath": "bin",
-    "java.project.referencedLibraries": [
-        "lib/**/*.jar"
-    ]
+    "java.project.referencedLibraries": []
 }

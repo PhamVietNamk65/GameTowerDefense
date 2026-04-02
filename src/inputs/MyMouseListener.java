@@ -6,7 +6,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 
 import main.GamePanel;
-import main.GameStates;
 
 public class MyMouseListener implements MouseListener, MouseMotionListener {
 
@@ -23,73 +22,21 @@ public class MyMouseListener implements MouseListener, MouseMotionListener {
 
     @Override
     public void mouseMoved(MouseEvent e) {
-        switch (GameStates.gameStates) {
-                case MENU:
-                    gamePanel.getMenu().mouseMoved(e.getX(), e.getY());
-                    break;
-                case PLAYING:
-
-                    break;
-                case SETTING:
-
-                    break;
-                default:
-                    break;
-            }
+        gamePanel.getGameStateManager().getCurrentState().mouseMoved(e.getX(), e.getY());
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
-        if(e.getButton() == MouseEvent.BUTTON1){
-            
-            switch (GameStates.gameStates) {
-                case MENU:
-                    gamePanel.getMenu().mouseClicked(e.getX(), e.getY());
-                    break;
-                case PLAYING:
-
-                    break;
-                case SETTING:
-
-                    break;
-                default:
-                    break;
-            }
-        }
     }
 
     @Override
     public void mousePressed(MouseEvent e) {
-        switch (GameStates.gameStates) {
-                case MENU:
-                    gamePanel.getMenu().mousePressed(e.getX(), e.getY());
-                    break;
-                case PLAYING:
-
-                    break;
-                case SETTING:
-
-                    break;
-                default:
-                    break;
-            }
+        gamePanel.getGameStateManager().getCurrentState().mousePressed(e.getX(), e.getY());
     }
 
     @Override
     public void mouseReleased(MouseEvent e) {
-        switch (GameStates.gameStates) {
-                case MENU:
-                    gamePanel.getMenu().mouseReleased(e.getX(), e.getY());
-                    break;
-                case PLAYING:
-
-                    break;
-                case SETTING:
-
-                    break;
-                default:
-                    break;
-            }
+        gamePanel.getGameStateManager().getCurrentState().mouseReleased(e.getX(), e.getY());
     }
 
     @Override

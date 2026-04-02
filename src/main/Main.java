@@ -1,11 +1,9 @@
- package main;
-
+package main;
 public class Main {
     public static void main(String[] args) {
         GamePanel gamePanel = new GamePanel();
         new Window(gamePanel);
         
-        gamePanel.startGameThread();
-        gamePanel.initInputs();
+        gamePanel.startGameThread();     
     }
-}
+}    

@@ -3,6 +3,7 @@ package ui;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Rectangle;
+import java.awt.image.BufferedImage;
 import java.awt.FontMetrics;
 import java.awt.Font;
 
@@ -13,28 +14,49 @@ public class MyButton {
     private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
     private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
 
-    public MyButton(String text, int x, int y, int width, int height) {
-        this.x = x;
-        this.y = y;
+    private BufferedImage normalImage, pressedImage, overImage;
+
+    private Runnable action;
+
+    boolean type ;
+    public MyButton(String text , int width, int height) {
         this.width = width;
         this.height = height;
         this.text = text;
-
-        initBounds();
+        this.type = false;
     }
-    
+
+    public MyButton(BufferedImage normal,BufferedImage over,BufferedImage pressed ) {
+        this.normalImage = normal;
+        this.pressedImage = pressed;
+        this.overImage = over;
+        this.type = true;
+        
+    }
+
     private void initBounds(){
         this.bounds = new Rectangle(x, y, width, height);
     }
+
+    public void setAction(Runnable action){
+        this.action = action;
+    }
+
     public void draw(Graphics g){
-        //body 
-        drawBody(g);
+        if(type){
+            drawImageButton(g);
+        }
+        else{
+            //body 
+            drawBody(g);
 
-        //Border    // vien
-        drawBorder(g);
+            //Border    // vien
+            drawBorder(g);
 
-        //TEXT
-        drawText(g);
+            //TEXT
+            drawText(g);
+        }
+        
     }
     private void drawBody(Graphics g){
         if( mouseOver )
@@ -70,6 +92,20 @@ public class MyButton {
         g.drawString(text, textX, textY);
     }
 
+    public void drawImageButton(Graphics g){
+         if(mousePressed){
+            g.drawImage(pressedImage, x, y,width,height, null);
+        }
+        else if(mouseOver){
+            g.drawImage(overImage, x, y, width, height, null);
+        }
+        else g.drawImage(normalImage, x, y, width, height, null);
+    }
+
+    public void execute(){
+        if( action != null ) action.run();
+    }
+    
     public void setMouseOver(boolean mouseOver){    // ham de gan gia tri cho mouseOver
         this.mouseOver = mouseOver;
     }
@@ -78,6 +114,10 @@ public class MyButton {
         this.mousePressed = mousePressed;
     }
 
+    public boolean isMousePressed() {
+        return mousePressed;
+    }
+    
     public Rectangle getBounds(){
         return bounds;
     }
@@ -85,5 +125,13 @@ public class MyButton {
     public void resetBooleans() {
         this.mouseOver = false;
         this.mousePressed = false;
+    }
+
+    public void setButton(int x2, int y, int width2, int buttonHeight) {
+        this.x = x2;
+        this.y = y;
+        this.width = width2;
+        this.height = buttonHeight;
+        initBounds();
     }
 }

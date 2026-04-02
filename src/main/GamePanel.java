@@ -1,59 +1,72 @@
 package main;
 
+import inputs.KeyHandler;
+import inputs.MyMouseListener;
+import java.awt.Color;
+import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
 
+import States.GameStateManager;
+
+import States.MenuState;
+import asset.AssetLoad;
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
-import scener.Level;
-import scener.Menu;
-import scener.Playing;
-import scener.Setting;
+import ui.LevelSelect;
+import ui.Menu;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
 
 public class GamePanel extends JPanel implements Runnable{
-    final int originalTileSize = 16; // 16x16 title 
-    final int scale = 3;     
+    final int originalTileSize = 32; // 16x16 title 
+    final int scale = 2 ;     
     public final int tileSize = originalTileSize * scale ; // 48x48 title
     public final int maxScreenCol = 20;
-    public final int maxScreenRow = 11;
+    public final int maxScreenRow = 12;
     public final int screenWidth = tileSize * maxScreenCol;
-    public final int screenHeight = tileSize * maxScreenRow;
+    public final int screenHeight = tileSize * maxScreenRow; // 960x528
 
     private Thread gameThread;
 
     // FPS
     private int FPS = 60;
 
-    private Menu menu;
-    private Playing playing;
-    private Setting setting;
-    private Level level;
+    private AssetLoad assetLoad;
+    // private PlayingState playing;
+    // private Setting setting;
 
     private MyMouseListener myMouseListener;
-    private KeyHandler keyH = new KeyHandler();
+    private KeyHandler keyH;
     
     private Render render;
+    private GameStateManager gameStateManager;
 
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
         this.setBackground(Color.white);
-        setDoubleBuffered(true);
-        this.setFocusable(true);
+        setDoubleBuffered(true); // tang hieu suat ve
+        this.setFocusable(true); // de JPanel co the nhan duoc su kien tu ban phim
 
-        initClasses();
-        initInputs();
+        
+        keyH = new KeyHandler(this);
+        
+        initClasses(); 
+        initInputs();   
     }
-    // nham nhan tin hieu chon che do cua trang ( trang menu hay trang playing ... )
+
+
+    // khoi tao cac lop can thiet
     private void initClasses() {
-        render = new Render(this);
-        menu = new Menu(this);
-        playing = new Playing(this);
-        setting = new Setting(this);
-        level = new Level(this);
+        assetLoad = new AssetLoad(); // khoi tao asset manager
+        assetLoad.loadAllAssets(); // load tat ca asset
+        
+        gameStateManager = new GameStateManager(); // khoi tao game state manager
+        gameStateManager.setState(new MenuState(this)); // dat trang hien tai la menu
+
+        render = new Render(this); // khoi tao lop render de ve theo trang hien tai
 
         myMouseListener = new MyMouseListener(this);
     }
@@ -63,8 +76,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         addKeyListener(keyH);
 
-        addMouseListener(myMouseListener);
-        addMouseMotionListener(myMouseListener);
+        addMouseListener(myMouseListener);  
+        addMouseMotionListener(myMouseListener); 
 
         requestFocus();
     }
@@ -74,7 +87,8 @@ public class GamePanel extends JPanel implements Runnable{
         gameThread.start();
     }
 
-    public void update(){   //cap nhat Frame
+    public void update(){ //cap nhat Frame
+          gameStateManager.update();
     }
 
     @Override
@@ -108,26 +122,15 @@ public class GamePanel extends JPanel implements Runnable{
     @Override
     protected void paintComponent(Graphics g){
         super.paintComponent(g); // xoa trang de ve truoc day
-        render.render(g);
+        render.render(g); // goi ham render de ve theo trang hien tai
     } 
 
-    // lấy giá trị và gán giá trị
-    public Render getRender(){
-        return render;
+    public void render(Graphics g){
+        gameStateManager.render(g);
     }
-    //trang menu game
-    public Menu getMenu() {
-        return menu;
+
+    public GameStateManager getGameStateManager(){
+        return gameStateManager;
     }
-    //trang man choi 
-    public Playing getPlaying() {
-        return playing;
-    }
-    // trang cai dat 
-    public Setting getSetting() {
-        return setting;
-    }
-    public Level getLevel(){
-        return level;
-    }
+
 }

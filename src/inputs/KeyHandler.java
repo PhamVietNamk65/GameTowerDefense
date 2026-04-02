@@ -1,32 +1,36 @@
 package inputs;
 
-import static main.GameStates.MENU;
-import static main.GameStates.PLAYING;
-import static main.GameStates.gameStates;
-
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
-public class KeyHandler implements KeyListener{
+import main.GamePanel;
+
+public class KeyHandler implements KeyListener {
+
+    private GamePanel game;
+
+    public KeyHandler(GamePanel game){
+        this.game = game;
+    }
 
     @Override
-    public void keyTyped(KeyEvent e) {
-     
-    }
+    public void keyTyped(KeyEvent e) {}
 
     @Override
     public void keyPressed(KeyEvent e) {
-        if(e.getExtendedKeyCode() == KeyEvent.VK_W){
-            gameStates.SetGameState(PLAYING);
+
+        switch(e.getKeyCode()){
+
+            case KeyEvent.VK_W:
+
+                break;
+
+            case KeyEvent.VK_ESCAPE:
+                break;
         }
-        if(e.getExtendedKeyCode() == KeyEvent.VK_ESCAPE){
-            gameStates.SetGameState(MENU);
-        }
+
     }
 
     @Override
-    public void keyReleased(KeyEvent e) {
-
-    }
-    
+    public void keyReleased(KeyEvent e) {}
 }
