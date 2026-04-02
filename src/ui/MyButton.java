@@ -24,14 +24,17 @@ public class MyButton {
         this.height = height;
         this.text = text;
         this.type = false;
+        initBounds();
     }
 
-    public MyButton(BufferedImage normal,BufferedImage over,BufferedImage pressed ) {
+    public MyButton(BufferedImage normal,BufferedImage over,BufferedImage pressed,int width, int height ) {
         this.normalImage = normal;
         this.pressedImage = pressed;
         this.overImage = over;
+        this.width = width;
+        this.height = height;
         this.type = true;
-        
+        initBounds();
     }
 
     private void initBounds(){

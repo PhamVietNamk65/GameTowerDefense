@@ -29,18 +29,27 @@ public class Menu {
         MyButton button1 = new MyButton(
             UIAsset.menuButtonsNormol[0],
             UIAsset.menuButtonsOver[0],
-            UIAsset.menuButtonsPressed[0]);
+            UIAsset.menuButtonsPressed[0],
+            (int)(gamePanel.screenWidth * 0.4),
+            (int)(gamePanel.screenHeight * 0.5) / 3 - 10);
         button1.setAction(()->{
             gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
         });
         MyButton button2 = new MyButton(
             UIAsset.menuButtonsNormol[1],
             UIAsset.menuButtonsOver[1],
-            UIAsset.menuButtonsPressed[1]);
+            UIAsset.menuButtonsPressed[1],
+            (int)(gamePanel.screenWidth * 0.4),
+            (int)(gamePanel.screenHeight * 0.5) / 3 - 10) ;
         button2.setAction(()->{
             gamePanel.getGameStateManager().setState(new SettingState(gamePanel));
         });
-        MyButton button3 = new MyButton(UIAsset.menuButtonsNormol[2],UIAsset.menuButtonsOver[2],UIAsset.menuButtonsPressed[2]);
+        MyButton button3 = new MyButton(
+            UIAsset.menuButtonsNormol[2],
+            UIAsset.menuButtonsOver[2],
+            UIAsset.menuButtonsPressed[2],
+            (int)(gamePanel.screenWidth * 0.4),
+            (int)(gamePanel.screenHeight * 0.5) / 3 - 10);
         
         buttonBar.addButton(button1);
         buttonBar.addButton(button2);
@@ -77,7 +86,7 @@ public class Menu {
     }
 
     private void drawButtons(Graphics g) {
-        buttonBar.drawButtons(g);
+        buttonBar.draw(g);
     }
 
     public void update() {
@@ -92,10 +101,10 @@ public class Menu {
         }
     }
 
-public void mouseReleased(int x, int y) {
-    for (MyButton b : buttonBar.buttons) {
-        if (b.getBounds().contains(x, y) && b.isMousePressed()) {
-            b.execute();
+    public void mouseReleased(int x, int y) {
+        for (MyButton b : buttonBar.buttons) {
+            if (b.getBounds().contains(x, y) && b.isMousePressed()) {
+                b.execute();
             }
             b.setMousePressed(false);
         }

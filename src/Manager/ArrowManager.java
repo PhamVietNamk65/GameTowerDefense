@@ -1,8 +1,8 @@
 package Manager;
 
-import entity.Arrow;
-import entity.Monster;
-import entity.Tower;
+import entity.Projectile.Arrow;
+import entity.monster.Monster;
+import entity.tower.Tower;
 
 import java.util.ArrayList;
 import java.util.Iterator;

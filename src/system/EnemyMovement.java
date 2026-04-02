@@ -1,9 +1,9 @@
 package system;
 
-import entity.Monster;
-import entity.EnemyState;
-
 import java.awt.Point;
+
+import entity.monster.EnemyState;
+import entity.monster.Monster;
 
 import static utils.Constants.Monsters.*;
 
@@ -17,7 +17,7 @@ public class EnemyMovement {
 
     public void move(Monster m) {
 
-        if (m.getState() == EnemyState.DEATH)
+        if (m.getState() == EnemyState.DYING)
             return;
 
         if (m.getPathIndex() >= path.length) {

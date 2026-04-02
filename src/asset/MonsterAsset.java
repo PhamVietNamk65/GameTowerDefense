@@ -5,7 +5,7 @@ import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
 
-import entity.EnemyState;
+import entity.monster.EnemyState;
 import helpz.LoadSave;
 import utils.Constants;
 public class MonsterAsset {
@@ -67,10 +67,10 @@ public class MonsterAsset {
         stateMap.get(EnemyState.WALK).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(walkDown, 48, 48));
         stateMap.get(EnemyState.WALK).put(Constants.Direction.LEFT, LoadSave.getSpriteFrames(walkLeft, 48, 48));
 
-        stateMap.putIfAbsent(EnemyState.DEATH, new HashMap<>());
-    	stateMap.get(EnemyState.DEATH).put(Constants.Direction.UP, LoadSave.getSpriteFrames(deathUp, 48, 48));
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
+        stateMap.putIfAbsent(EnemyState.DYING, new HashMap<>());
+    	stateMap.get(EnemyState.DYING).put(Constants.Direction.UP, LoadSave.getSpriteFrames(deathUp, 48, 48));
+        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
+        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
 
         stateMap.put(EnemyState.ATTACK, new HashMap<>());
         if (attackPath != null) {
@@ -94,11 +94,6 @@ public class MonsterAsset {
         if (directionMap == null) return null;
 
         BufferedImage[] frames = directionMap.get(direction);
-    
-        // Nếu hướng cụ thể không có (ví dụ quái chỉ có 1 hướng), trả về hướng mặc định UP
-        if (frames == null) {
-            return directionMap.get(Constants.Direction.UP);
-        }
 
         return frames;
     }

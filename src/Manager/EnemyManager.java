@@ -1,11 +1,12 @@
 package Manager;
 
-import entity.Monster;
-import entity.EnemyState;
 import system.EnemyMovement;
 import system.EnemySpawner;
 import States.PlayingState;
 import asset.MonsterAsset;
+import entity.monster.EnemyState;
+import entity.monster.Monster;
+import levels.LevelState;
 
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -20,13 +21,15 @@ public class EnemyManager {
     private EnemyMovement enemyMovement;
     private EnemySpawner enemySpawner;
     private WaveManager waveManager;
+    private LevelState levelState;
 
     private int aniSpeed = 20;
 
-    public EnemyManager(PlayingState playingState, Point[] path) {
+    public EnemyManager(PlayingState playingState, Point[] path, LevelState levelState) {
         this.playingState = playingState;
         this.enemyMovement = new EnemyMovement(path);
         this.enemySpawner = new EnemySpawner(path);
+        this.levelState = levelState;
     }
 
     public void update() {
@@ -36,16 +39,16 @@ public class EnemyManager {
             Monster m = it.next();
 
             if (m.hasReachedEnd()) {
-                // playingState.loseLife(1);
+                levelState.loseLife(1);
                 it.remove();
                 continue;
             }
 
-            if (m.getState() == EnemyState.DEATH) {
+            if (m.getState() == EnemyState.DYING) {
 
                 BufferedImage[] df = MonsterAsset.getFrames(
                     m.getEnemyType(),
-                    EnemyState.DEATH,
+                    EnemyState.DYING,
                     m.getDirection()
                 );
 
@@ -53,8 +56,12 @@ public class EnemyManager {
 
                 m.tickDeath(totalFrames, aniSpeed);
 
-                if (m.isDeathDone())
+                if (m.isDeathDone()){
+                    levelState.addGold(m.getReward());
                     it.remove();
+                }
+
+                    
 
             } 
             // ===== ALIVE =====

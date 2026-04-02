@@ -9,7 +9,7 @@ import java.awt.image.BufferedImage;
 
 import Manager.TowerManager;
 import asset.TowerAsset;
-import entity.Tower;
+import entity.tower.Tower;
 import utils.Constants;
 import utils.Utilz;
 

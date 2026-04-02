@@ -1,14 +1,12 @@
 package render;
 
 import Manager.EnemyManager;
-import entity.Monster;
-import entity.EnemyState;
 import asset.MonsterAsset;
+import entity.monster.EnemyState;
+import entity.monster.Monster;
 
-import static utils.Constants.Monsters.ENEMY_SIZE;
-import static utils.Constants.Monsters.HP_BAR_HEIGHT;
-import static utils.Constants.Monsters.HP_BAR_WIDTH;
-import static utils.Constants.Monsters.HP_BAR_Y_OFFSET;
+import static utils.Constants.Direction.*;
+import static utils.Constants.Monsters.*;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -31,7 +29,7 @@ public class EnemyRenderer {
         for (Monster m : enemyManager.getMonsters()) {
             drawEnemy(m, g);
 
-            if (m.getState() != EnemyState.DEATH) {
+            if (m.getState() != EnemyState.DYING) {
                 drawHealthBar(m, g);
             }
         }
@@ -49,17 +47,18 @@ public class EnemyRenderer {
 
         BufferedImage[] frames;
 
-        if (m.getState() == EnemyState.DEATH) {
+        if (m.getState() == EnemyState.DYING) {
             frames = MonsterAsset.getFrames(
                 m.getEnemyType(),
-                EnemyState.DEATH,
+                EnemyState.DYING,
                 m.getDirection()
             );
         } else {
+            int direction = m.getDirection() == RIGHT ? LEFT : m.getDirection(); // Nếu đang đi sang phải, lấy animation LEFT (vì sprite gốc hướng sang trái)
             frames = MonsterAsset.getFrames(
                 m.getEnemyType(),
                 m.getState(),
-                m.getDirection()
+                direction
             );
         }
 

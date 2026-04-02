@@ -5,12 +5,12 @@ import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
-import entity.Tower;
+import entity.tower.Tower;
 import helpz.LoadSave;
 
 public class TowerAsset {
     private static TowerAsset instance;
-
+    // Mỗi level có 1 mảng frame riêng, mỗi frame có kích thước gốc fw x fh, khi vẽ sẽ scale về drawW x DRAW_H
     public static BufferedImage[][] towerFrames;
     public static BufferedImage placeTower;
     public static int[] towerDrawW;
@@ -78,7 +78,7 @@ public class TowerAsset {
     }
     private void loadPlaceBuildTower(){
         try {
-            placeTower = ImageIO.read(getClass().getResourceAsStream("/2 Objects/PlaceForTower1.png"));
+            placeTower = ImageIO.read(getClass().getResourceAsStream("/tile/2 Objects/PlaceForTower1.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }

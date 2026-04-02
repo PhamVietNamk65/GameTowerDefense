@@ -2,7 +2,7 @@ package system;
 
 import java.util.ArrayList;
 
-import entity.Tower;
+import entity.tower.Tower;
 import utils.Constants;
 
 public class TowerUpdater {

@@ -1,7 +1,7 @@
 package render;
 
-import entity.Arrow;
 import asset.TowerAsset;
+import entity.Projectile.Arrow;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;

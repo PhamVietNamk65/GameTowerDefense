@@ -1,6 +1,6 @@
 package Manager;
 
-import helpz.LoadLevel;
+import helpz.LoadLevelData;
 import levels.LevelData;
 
 public class WaveManager {
@@ -23,10 +23,11 @@ public class WaveManager {
 
     private LevelData currentLevel;
 
-    public WaveManager(EnemyManager enemyManager, int level) {
+    public WaveManager(EnemyManager enemyManager, LevelData levelData) {
         this.enemyManager = enemyManager;
-        currentLevel = LoadLevel.LoadLevel(String.valueOf(level));
+        this.currentLevel = levelData;
         waves = currentLevel.getWaves();
+
         spawnDelay = currentLevel.getSpawnDelay();
         waveDelay = currentLevel.getWaveDelay();
 
@@ -104,6 +105,7 @@ public class WaveManager {
             tickCounter = 0;
             return;
         }
+        
 
         int type = wave[spawnIndex];
         enemyManager.spawnMonster(type);
@@ -135,4 +137,6 @@ public class WaveManager {
         int remaining = waveDelay - tickCounter;
         return Math.max(0, remaining / fps);
     }
+
+
 }

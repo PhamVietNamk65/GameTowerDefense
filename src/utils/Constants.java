@@ -46,7 +46,7 @@ public class Constants {
                 case CANNON:
                     return 15;
                 case ARCHER:
-                    return 5;
+                    return 15;
                 case WIZARD:
                     return 0;
             }
@@ -76,13 +76,43 @@ public class Constants {
             }
             return 0;
         }
+
+        public static int GetCostUpdate(int towerType,int towerLevel){
+            switch (towerType) {
+                case CANNON:
+                    return 120;
+                case ARCHER:
+                    switch (towerLevel) {
+                        case 1:
+                            return 75;
+                        case 2:
+                            return 80;
+                        case 3:
+                            return 95;
+                        case 4:
+                            return 110;
+                        case 5:
+                            return 125;
+                        case 6:
+                            return 150;
+                        case 7:
+                            return 200;
+                        default:
+                            break;
+                    }
+                case WIZARD:
+                    return 40;
+            }
+            return 0;
+        }
     }
 
     public static class Direction{
-        public static final int LEFT = 0;
-        public static final int UP = 1;
-        public static final int RIGHT = 2;
-        public static final int DOWN = 3;
+        public static final int UP = 0;
+        public static final int DOWN = 1;
+        public static final int LEFT = 3;
+        public static final int RIGHT = 4;
+        
     }
 
     public static class Monsters{
@@ -123,6 +153,21 @@ public class Constants {
             }
             return 0;
         }
+
+        public static int GetReward(int monsterType){
+            switch (monsterType) {
+                case ORC:
+                    return 60;
+                case SLIME:
+                    return 20;
+                case BEE:
+                    return 10;
+                case WOLF:
+                    return 40;
+            }
+            return 0;
+        }
+
     }
 
     public static class Tiles{
@@ -140,6 +185,18 @@ public class Constants {
         public static final int ROAD_RIGHT_DOWN = 6;
         
         
+    }
+
+    private static class Objects{
+
+        public static final int TREE1 = 1;
+        public static final int TREE2 = 2;
+        public static final int GRASS = 3;
+        public static final int BUSH = 4;
+        public static final int STONE1 = 5;
+        public static final int STONE2 = 6;
+
+
     }
 
     public static class Projectile{

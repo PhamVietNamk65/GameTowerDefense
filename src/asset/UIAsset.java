@@ -3,6 +3,8 @@ package asset;
 import java.awt.image.BufferedImage;
 import javax.imageio.ImageIO;
 
+import helpz.LoadSave;
+
 public class UIAsset {
 
     private static UIAsset instance; 
@@ -10,6 +12,9 @@ public class UIAsset {
     public static BufferedImage backGround;
     public static BufferedImage logo;
     public static BufferedImage logoTH;
+    public static BufferedImage frame;
+    public static BufferedImage heart;
+    public static BufferedImage coin;
 
     public static BufferedImage[] menuButtonsNormol = new BufferedImage[3];
     public static BufferedImage[] menuButtonsOver = new BufferedImage[3];
@@ -53,6 +58,9 @@ public class UIAsset {
             backGround = ImageIO.read(getClass().getResourceAsStream("/menu/background.png"));
             logo = ImageIO.read(getClass().getResourceAsStream("/menu/logo.png")).getSubimage(5, 80, 1330, 635 );
             logoTH = ImageIO.read(getClass().getResourceAsStream("/menu/logoTH.png"));
+            frame = ImageIO.read(getClass().getResourceAsStream("/icon/f.png"));
+            heart = ImageIO.read(getClass().getResource("/icon/heart.png"));
+            coin = LoadSave.getSprite("/icon/coin.png");
         } catch (Exception e) {
             e.printStackTrace();
         }

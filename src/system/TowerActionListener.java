@@ -1,6 +1,6 @@
 package system;
 
-import entity.Tower;
+import entity.tower.Tower;
 
 public interface TowerActionListener {
     void onUpgrade(Tower t);

@@ -8,8 +8,9 @@ import Manager.EnemyManager;
 import Manager.LevelManager;
 import Manager.TowerManager;
 import Manager.WaveManager;
-import entity.Tower;
 import entity.TowerSlot;
+import entity.tower.Tower;
+import levels.LevelState;
 import main.GamePanel;
 import render.ArrowRenderer;
 import render.EnemyRenderer;
@@ -17,6 +18,7 @@ import render.TowerRenderer;
 import system.EnemyMovement;
 import system.TowerActionListener;
 import system.TowerUpdater;
+import ui.GameUI;
 import ui.TowerSlotUI;
 import ui.TowerUI;
 
@@ -42,19 +44,26 @@ public class PlayingState implements GameState {
 
     private WaveManager waveManager;
 
+    private LevelState levelState;
+
+    private GameUI gameUI;
     private int mouseX, mouseY;
+
     public PlayingState(GamePanel gamePanel,int level){
         this.level = level;
         this.gamePanel = gamePanel;
 
         levelManager = new LevelManager(level);
-        towerManager = new TowerManager();
+        levelState = new LevelState(levelManager.getCurrentLevelData());
+
+        arrowManager = new ArrowManager();
+
+        towerManager = new TowerManager(levelState,arrowManager);
         towerUpdater = new TowerUpdater();
         towerRenderer = new TowerRenderer(towerManager);
-        arrowManager = new ArrowManager();
         arrowRenderer = new ArrowRenderer();
 
-        towerUI = new TowerUI(selectedTower);
+        towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
 
         towerUI.setListener(new TowerActionListener() {
@@ -62,7 +71,10 @@ public class PlayingState implements GameState {
             @Override
             public void onUpgrade(Tower t) {
                 if( t == null ) return;
-                else t.upgrade();
+                else{
+                    t.upgrade();
+                    levelState.spendGold(t.getCost()); 
+                }
             }
 
             @Override
@@ -83,10 +95,12 @@ public class PlayingState implements GameState {
         });
         Point[] path = levelManager.getCurrentLevel().getPath();
         enemyMovement = new EnemyMovement(path);
-        enemyManager = new EnemyManager(this,path);
+        enemyManager = new EnemyManager(this,path,levelState);
         enemyRenderer = new EnemyRenderer(enemyManager);
 
-        waveManager = new WaveManager(enemyManager,level);
+        waveManager = new WaveManager(enemyManager,levelManager.getCurrentLevelData());
+
+        gameUI = new GameUI(levelState);
     }
 
     @Override
@@ -99,16 +113,19 @@ public class PlayingState implements GameState {
         towerManager.update(enemyManager.getMonsters());
         towerManager.getArrowManager().update(gamePanel.screenWidth, gamePanel.screenHeight);
     }
+
     @Override
     public void render(Graphics g) {
+
         Graphics2D g2 = (Graphics2D) g;
         levelManager.render(g2);
-        towerRenderer.draw(g2);
         enemyRenderer.draw(g2);
+        towerRenderer.draw(g2);
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
 
         towerUI.draw(g2);
         slotUI.render(g2);
+        gameUI.render(g);
     }
 
     @Override

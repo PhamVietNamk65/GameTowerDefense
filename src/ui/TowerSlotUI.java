@@ -13,7 +13,7 @@ public class TowerSlotUI {
     private boolean visible;
 
     private int x, y; // vị trí UI
-
+    private int errorTimer = 0;
     private TowerManager towerManager;
 
     public TowerSlotUI(TowerManager towerManager) {
@@ -41,31 +41,27 @@ public class TowerSlotUI {
         // Button 1: Archer
         if (isIn(mouseX, mouseY, x, y, 120, 30)) {
             if (click) {
-                level.removeSlot(selectedSlot);
-                buildTower(1);
-                
-                close();
+                buildTower(1,level);
             }
         }
 
         // Button 2: Cannon
         if (isIn(mouseX, mouseY, x, y + 40, 120, 30)) {
             if (click) {
-                level.removeSlot(selectedSlot);
-                buildTower(2);
-                
-                close();
+                buildTower(2,level);
             }
         }
     }
 
-    private void buildTower(int type) {
+    private void buildTower(int type,Level level) {
         if (selectedSlot == null) return;
-
-        towerManager.buildTower(selectedSlot, type);
-        selectedSlot.setOccupied(true);
-
-        close();
+        if( towerManager.buildTower(selectedSlot, type) ) {
+            level.removeSlot(selectedSlot);
+            selectedSlot.setOccupied(true);
+            close();
+        }else{
+            errorTimer = 60;
+        }
     }
 
     public void render(Graphics g) {
@@ -83,6 +79,12 @@ public class TowerSlotUI {
         // button Cannon
         g.drawRect(x, y + 40, 120, 30);
         g.drawString("2. Cannon", x + 10, y + 60);
+
+        if (errorTimer > 0) {
+            g.setColor(Color.RED);
+            g.drawString("Not enough gold!", x, y - 10);
+            errorTimer--;
+        }   
     }
 
     private boolean isIn(int mx, int my, int x, int y, int w, int h) {
@@ -97,4 +99,5 @@ public class TowerSlotUI {
     public boolean isInside(int mx, int my) {
         return isIn(mx, my, x, y, 140, 100);
     }
-}
+
+}   

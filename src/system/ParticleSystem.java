@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.Random;
 
-import entity.Tower;
+import entity.tower.Tower;
 import utils.Utilz;
 
 

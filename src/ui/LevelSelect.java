@@ -19,7 +19,7 @@ public class LevelSelect {
     }
 
     private void initbutton() {
-        buttonBar = new ButtonBar(300, 150, 200, 300);
+        buttonBar = new ButtonBar(150, 100, 980,568 );
         buttonBar.setOrientation(1, 10);
 
         // Level 1
@@ -38,6 +38,31 @@ public class LevelSelect {
             );
         });
 
+        //  MyButton lv3 = new MyButton("LEVEL 3", 200, 60);
+        // lv1.setAction(() -> {
+        //     gamePanel.getGameStateManager().setState(
+        //         new PlayingState(gamePanel, 3)
+        //     );
+        // });
+
+        //  MyButton lv4 = new MyButton("LEVEL 4", 200, 60);
+        // lv1.setAction(() -> {
+        //     gamePanel.getGameStateManager().setState(
+        //         new PlayingState(gamePanel, 4)
+        //     );
+        // });
+        //  MyButton lv5 = new MyButton("LEVEL 5", 200, 60);
+        // lv1.setAction(() -> {
+        //     gamePanel.getGameStateManager().setState(
+        //         new PlayingState(gamePanel, 5)
+        //     );
+        // });
+        //  MyButton lv6 = new MyButton("LEVEL 6", 200, 60);
+        // lv1.setAction(() -> {
+        //     gamePanel.getGameStateManager().setState(
+        //         new PlayingState(gamePanel, 6)
+        //     );
+        // });
         // Back
         MyButton back = new MyButton("BACK", 200, 60);
         back.setAction(() -> {
@@ -48,6 +73,11 @@ public class LevelSelect {
 
         buttonBar.addButton(lv1);
         buttonBar.addButton(lv2);
+        // buttonBar.addButton(lv3);
+        // buttonBar.addButton(lv4);
+        // buttonBar.addButton(lv5);
+        // buttonBar.addButton(lv6);
+
         buttonBar.addButton(back);
     
     }

@@ -1,7 +1,9 @@
 package system;
 
-import entity.*;
+
 import java.awt.Point;
+
+import entity.monster.*;
 
 import static utils.Constants.Monsters.*;
 
