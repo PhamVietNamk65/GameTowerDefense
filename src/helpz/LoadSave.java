@@ -101,5 +101,5 @@ public static BufferedImage[] getSpriteFramesFromFolder(String folderPath) {
     }
 
     return frames;
-    }
+}
 }

@@ -5,16 +5,15 @@ import entity.CannonTower;
 import entity.EnemyState;
 import entity.Tower;
 import entity.TowerSlot;
-import utils.Constants;
-
 import java.util.ArrayList;
+import utils.Constants;
 
 public class TowerManager {
 
-    private final ArrayList<Tower>    towers    = new ArrayList<>();  
-    
-    private int     towerId      = 0;
-    private Tower   selectedTower;
+    private final ArrayList<Tower> towers = new ArrayList<>();
+
+    private int          towerId      = 0;
+    private Tower        selectedTower;
     private ArrowManager arrowManager = new ArrowManager();
 
     public void removeTower(Tower t) {
@@ -24,17 +23,14 @@ public class TowerManager {
 
     public Tower getTowerAt(int x, int y) {
         for (Tower t : towers) {
-            if (t.getBounds().contains(x, y)) {
-                return t;
-            }
+            if (t.getBounds().contains(x, y)) return t;
         }
         return null;
     }
 
     public void buildTower(TowerSlot slot, int type) {
-
-        int x = slot.getX() * Constants.Tiles.TILE_SIZE ;
-        int y = slot.getY() * Constants.Tiles.TILE_SIZE ;
+        int x = slot.getX() * Constants.Tiles.TILE_SIZE;
+        int y = slot.getY() * Constants.Tiles.TILE_SIZE;
         if (type == 1) {
             Tower t = new ArcherTower(x, y, towerId++);
             t.setUpgrading(true);
@@ -46,7 +42,6 @@ public class TowerManager {
 
     public void handleClick(int mouseX, int mouseY) {
         selectedTower = null;
-
         for (Tower t : towers) {
             if (t.getBounds().contains(mouseX, mouseY)) {
                 selectedTower = t;
@@ -55,27 +50,52 @@ public class TowerManager {
         }
     }
 
-    public Tower getSelectedTower() {
-        return selectedTower;
-    }
-
+    public Tower getSelectedTower() { return selectedTower; }
     public ArrayList<Tower> getTowers() { return towers; }
 
     public void update(ArrayList<entity.Monster> monsters) {
 
         for (Tower t : towers) {
             t.update();
-            // CHỈ Archer mới bắn
+
             if (t instanceof ArcherTower archer) {
                 entity.Monster target = findTarget(archer, monsters);
-                if (target != null && archer.canAttack()) {
-                    arrowManager.spawnArrow(archer, target);
-                    archer.resetCooldown();
+
+                if (target != null) {
+                    float dx = (target.getX() + 16) - archer.getCenterX();
+                    float dy = (target.getY() + 16) - archer.getCenterY();
+
+                    int dir;
+                    if (Math.abs(dx) >= Math.abs(dy)) {
+                        dir = Tower.SIDE;
+                    } else {
+                        dir = dy < 0 ? Tower.UP : Tower.DOWN;
+                    }
+
+                    // FIX archer ngược hướng:
+                    // Sprite S_Attack nhìn sang PHẢI (→) mặc định
+                    // TowerRenderer: facingLeft=true → vẽ flip → archer nhìn TRÁI
+                    // Đã thử dx<0 bị ngược → đổi thành dx>0
+                    archer.setFacingLeft(dx > 0);
+
+                    if (archer.getAnimState() == Tower.IDLE && archer.canAttack()) {
+                        archer.setAnimation(Tower.PREATTACK, dir);
+                        archer.resetCooldown();
+                    }
+
+                    if (archer.shouldSpawnProjectile()) {
+                        arrowManager.spawnArrow(archer, target);
+                    }
+
+                } else {
+                    if (archer.getAnimState() == Tower.PREATTACK) {
+                        archer.setAnimation(Tower.IDLE, archer.getDirection());
+                    }
                 }
             }
         }
 
-        arrowManager.update(1280, 768); // nên thay bằng screenW/H sau
+        arrowManager.update(1280, 768);
     }
 
     private entity.Monster findTarget(Tower t, ArrayList<entity.Monster> monsters) {
@@ -86,17 +106,13 @@ public class TowerManager {
             float dx = m.getX() - t.getX();
             float dy = m.getY() - t.getY();
             float dist = dx * dx + dy * dy;
-
             if (dist < minDist && dist <= t.getRange() * t.getRange()) {
                 minDist = dist;
                 nearest = m;
             }
         }
-
         return nearest;
     }
-    
-    public ArrowManager getArrowManager() {
-        return arrowManager;
-    }
+
+    public ArrowManager getArrowManager() { return arrowManager; }
 }

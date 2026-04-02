@@ -1,13 +1,10 @@
 package entity;
 
-import static utils.Constants.Tiles.TILE_SIZE;
-import static utils.Constants.Towers.*;
-
-import utils.Constants;
+import asset.TowerAsset;
 import java.awt.Rectangle;
 import java.awt.image.BufferedImage;
-
-import asset.TowerAsset;
+import utils.Constants;
+import static utils.Constants.Tiles.TILE_SIZE;
 
 public class Tower {
 
@@ -32,7 +29,7 @@ public class Tower {
     private int animState = IDLE;
     private int animIndex = 0;
     private int animTick  = 0;
-    private int animSpeed = 0;
+    private int animSpeed = 14; // FIX: tăng lên để IDLE/PREATTACK/ATTACK chậm hơn
     private int direction = SIDE;
 
     // ===== Level =====
@@ -44,9 +41,9 @@ public class Tower {
     // ===== Tower idle animation =====
     private int towerAnimFrame = 0;
     private int towerAnimTick  = 0;
-    private static final int TOWER_ANIM_SPEED = 10;
+    private static final int TOWER_ANIM_SPEED = 18; // FIX: tăng lên để idle tháp chậm hơn
 
-    private static final int ATTACK_HOLD = 10;
+    private static final int ATTACK_HOLD = 4; // FIX: giảm xuống để bắn xong chuyển về IDLE nhanh hơn
     private int attackHoldTick = 0;
 
     // ===== Upgrade =====
@@ -60,6 +57,9 @@ public class Tower {
 
     // ===== Select =====
     private boolean selected = false;
+
+    // Flag báo hiệu cần spawn đạn khi PREATTACK → ATTACK
+    private boolean shouldSpawnProjectile = false;
 
     public Tower(int x, int y, int id, int towerType) {
         this.x = x;
@@ -157,6 +157,7 @@ public class Tower {
                 case PREATTACK:
                     animState = ATTACK;
                     attackHoldTick = 0;
+                    shouldSpawnProjectile = true;
                     break;
 
                 case ATTACK:
@@ -167,6 +168,13 @@ public class Tower {
                     break;
             }
         }
+    }
+
+    /** Trả về true MỘT LẦN khi cần spawn arrow, rồi tự reset. */
+    public boolean shouldSpawnProjectile() {
+        boolean v = shouldSpawnProjectile;
+        shouldSpawnProjectile = false;
+        return v;
     }
 
     public void upgrade() {
