@@ -90,10 +90,10 @@ public class Level {
             }
         }
 
-        if( levelid == 3){
-            g.setColor(new Color(0,0,0,20));
-            g.fillRect(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
-        }
+        // if( levelid == 3){
+        //     g.setColor(new Color(0,0,0,20));
+        //     g.fillRect(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+        // }
 
         for (int y = 0; y < objectsMap.length; y++) {
             for (int x = 0; x < objectsMap[0].length; x++) {
@@ -155,7 +155,7 @@ public class Level {
         java.util.Random rand = new java.util.Random(seed);
 
         // 2. Ngẫu nhiên số lượng khóm cỏ (ví dụ từ 3 đến 6 khóm)
-        int grassCount = 3 + rand.nextInt(6); 
+        int grassCount = 2 + rand.nextInt(3); 
 
          for (int i = 0; i < grassCount; i++) {
         // Ngẫu nhiên vị trí x, y bên trong ô TILE_SIZE

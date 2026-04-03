@@ -150,13 +150,13 @@ public class Constants {
         public static int GetStartHealth(int monsterType){
             switch (monsterType) {
                 case ORC:
-                    return 150;
+                    return 250;
                 case SLIME:
                     return 100;
                 case BEE:
-                    return 50;
+                    return 70;
                 case WOLF:
-                    return 80;
+                    return 150;
             }
             return 0;
         }
@@ -170,7 +170,7 @@ public class Constants {
                 case BEE:
                     return 10;
                 case WOLF:
-                    return 40;
+                    return 25;
             }
             return 0;
         }
