@@ -126,7 +126,7 @@ public class PlayingState implements GameState {
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
 
         slotUI.render(g2);
-        // gameUI.render(g);
+        gameUI.render(g);
     }
 
     @Override
