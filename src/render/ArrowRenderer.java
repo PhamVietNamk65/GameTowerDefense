@@ -1,12 +1,8 @@
 package render;
 
 import asset.TowerAsset;
-<<<<<<< HEAD
 import entity.Projectile.Arrow;
 
-=======
-import entity.Arrow;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;

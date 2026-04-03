@@ -36,4 +36,7 @@ public class LevelData {
         return startLives;
     }
     
+    public int getMaxWaves() {
+        return waves.length;
+    }
 }

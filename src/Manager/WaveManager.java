@@ -21,15 +21,15 @@ public class WaveManager {
 
     private EnemyManager enemyManager;
 
-    private LevelData currentLevel;
+    private LevelManager levelManager;
 
-    public WaveManager(EnemyManager enemyManager, LevelData levelData) {
+
+    public WaveManager(EnemyManager enemyManager, LevelManager levelManager) {
         this.enemyManager = enemyManager;
-        this.currentLevel = levelData;
-        waves = currentLevel.getWaves();
-
-        spawnDelay = currentLevel.getSpawnDelay();
-        waveDelay = currentLevel.getWaveDelay();
+        this.levelManager = levelManager;
+        waves = levelManager.getCurrentLevelData().getWaves();
+        spawnDelay = levelManager.getCurrentLevelData().getSpawnDelay();
+        waveDelay = levelManager.getCurrentLevelData().getWaveDelay();
 
     }
 
@@ -106,10 +106,18 @@ public class WaveManager {
             return;
         }
         
-
         int type = wave[spawnIndex];
-        enemyManager.spawnMonster(type);
+        int pathIndex = 0;
+
+        if (levelManager.getCurrentLevel().getlevelID() == 3) {
+        // wave 2 và 4 (index 1 và 3)
+            if (currentWave == 1 || currentWave == 3) {
+                pathIndex = spawnIndex % 2; 
+            }
+        }
+        enemyManager.spawnMonster(type,pathIndex);
         spawnIndex++;
+        
     }
 
     public int getCurrentWave() {

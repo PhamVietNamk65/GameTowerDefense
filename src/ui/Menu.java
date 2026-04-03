@@ -7,6 +7,7 @@ import States.LevelSelectState;
 import States.SettingState;
 import asset.UIAsset;
 import main.GamePanel;
+import utils.Constants;
 
 public class Menu {
 
@@ -21,17 +22,17 @@ public class Menu {
 
     private void initButtons() {
         buttonBar = new ButtonBar(
-            (int) (gamePanel.screenWidth * 0.3), 
-            (int) (gamePanel.screenHeight * 0.45),
-            (int) (gamePanel.screenWidth * 0.4),
-            (int) (gamePanel.screenHeight * 0.5));
+            (int) (Constants.SCREEN_WIDTH  * 0.3), 
+            (int) (Constants.SCREEN_HEIGHT * 0.45),
+            (int) (Constants.SCREEN_WIDTH  * 0.4),
+            (int) (Constants.SCREEN_HEIGHT * 0.5));
         buttonBar.setOrientation(1, 10); // vertical, gap 20px
         MyButton button1 = new MyButton(
             UIAsset.menuButtonsNormol[0],
             UIAsset.menuButtonsOver[0],
             UIAsset.menuButtonsPressed[0],
-            (int)(gamePanel.screenWidth * 0.4),
-            (int)(gamePanel.screenHeight * 0.5) / 3 - 10);
+            (int)(Constants.SCREEN_WIDTH  * 0.4),
+            (int)(Constants.SCREEN_HEIGHT * 0.5) / 3 - 10);
         button1.setAction(()->{
             gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
         });
@@ -39,8 +40,8 @@ public class Menu {
             UIAsset.menuButtonsNormol[1],
             UIAsset.menuButtonsOver[1],
             UIAsset.menuButtonsPressed[1],
-            (int)(gamePanel.screenWidth * 0.4),
-            (int)(gamePanel.screenHeight * 0.5) / 3 - 10) ;
+            (int)(Constants.SCREEN_WIDTH  * 0.4),
+            (int)(Constants.SCREEN_HEIGHT * 0.5) / 3 - 10) ;
         button2.setAction(()->{
             gamePanel.getGameStateManager().setState(new SettingState(gamePanel));
         });
@@ -48,8 +49,8 @@ public class Menu {
             UIAsset.menuButtonsNormol[2],
             UIAsset.menuButtonsOver[2],
             UIAsset.menuButtonsPressed[2],
-            (int)(gamePanel.screenWidth * 0.4),
-            (int)(gamePanel.screenHeight * 0.5) / 3 - 10);
+            (int)(Constants.SCREEN_WIDTH  * 0.4),
+            (int)(Constants.SCREEN_HEIGHT * 0.5) / 3 - 10);
         
         buttonBar.addButton(button1);
         buttonBar.addButton(button2);
@@ -65,22 +66,22 @@ public class Menu {
         drawButtons(g);
     }
     private void drawBackground(Graphics g){
-        g.drawImage(UIAsset.backGround,0, 0, gamePanel.screenWidth, gamePanel.screenHeight, null);
+        g.drawImage(UIAsset.backGround,0, 0, Constants.SCREEN_WIDTH , Constants.SCREEN_HEIGHT, null);
         g.drawImage(UIAsset.logoTH, 1180 , 669, 80,80,null) ;
     }
 
     private void drawLayout(Graphics g) {
         g.setColor(new Color(0,0,0,100));
-        g.fillRect(0,0,gamePanel.screenWidth,gamePanel.screenHeight);   
+        g.fillRect(0,0,Constants.SCREEN_WIDTH ,Constants.SCREEN_HEIGHT);   
     }
 
     private void drawLogo(Graphics g){
         if (UIAsset.logo != null) {
         g.drawImage(UIAsset.logo, 
-            (int) (gamePanel.screenWidth * 0.25),
-            (int) (gamePanel.screenHeight * 0.05),
-            (int) (gamePanel.screenWidth * 0.5),
-            (int) (gamePanel.screenHeight * 0.38),
+            (int) (Constants.SCREEN_WIDTH  * 0.25),
+            (int) (Constants.SCREEN_HEIGHT * 0.05),
+            (int) (Constants.SCREEN_WIDTH  * 0.5),
+            (int) (Constants.SCREEN_HEIGHT * 0.38),
              null);
         }
     }

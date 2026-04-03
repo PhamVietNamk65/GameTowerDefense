@@ -3,10 +3,11 @@ package levels;
 public class LevelState {
     int gold;
     int lives;
-
+    int maxWaves;
     public LevelState(LevelData levelData) {
         this.gold = levelData.getStartGold();
         this.lives = levelData.getStartLives();
+        this.maxWaves = levelData.getMaxWaves();
     }
 
     public int getGold() {
@@ -38,4 +39,7 @@ public class LevelState {
         }
     }
 
+    public int getMaxWaves() {
+        return maxWaves;
+    }
 }

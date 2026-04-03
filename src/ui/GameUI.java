@@ -5,30 +5,35 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import Manager.WaveManager;
 import asset.UIAsset;
 import levels.LevelState;
 
 public class GameUI {
     private LevelState levelState;
+    private WaveManager waveManager;
 
     private int aniTick;
     private int aniIndex;
     private final int aniSpeed = 20;
 
-    public GameUI(LevelState levelState){
+    public GameUI(LevelState levelState, WaveManager waveManager) {
         this.levelState = levelState;
+        this.waveManager = waveManager;
     }
     
     public void render(Graphics g){
         g.setColor(new Color(0,0,0,150));
         g.fillRect(20, 20, 140, 50);
         g.fillRect(170, 20,100,50);
+        g.fillRect(20, 80, 250, 50);
         drawIcon(g);
         // text
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 30));
         g.drawString("" + levelState.getGold(), 80, 55);
         g.drawString("" + levelState.getLives(), 220, 55);
+        g.drawString("Wave: " + waveManager.getCurrentWave() + "/" + levelState.getMaxWaves(), 30, 115);
     }
 
     private void drawIcon(Graphics g){

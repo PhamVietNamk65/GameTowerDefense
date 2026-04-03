@@ -2,10 +2,11 @@ package Manager;
 
 import system.EnemyMovement;
 import system.EnemySpawner;
-import States.PlayingState;
+
 import asset.MonsterAsset;
 import entity.monster.EnemyState;
 import entity.monster.Monster;
+import levels.Level;
 import levels.LevelState;
 
 import java.awt.Point;
@@ -15,21 +16,18 @@ import java.util.Iterator;
 
 public class EnemyManager {
 
-    private PlayingState playingState;
     private ArrayList<Monster> monsters = new ArrayList<>();
 
-    private EnemyMovement enemyMovement;
     private EnemySpawner enemySpawner;
-    private WaveManager waveManager;
     private LevelState levelState;
+    private Level level;
 
     private int aniSpeed = 20;
 
-    public EnemyManager(PlayingState playingState, Point[] path, LevelState levelState) {
-        this.playingState = playingState;
-        this.enemyMovement = new EnemyMovement(path);
-        this.enemySpawner = new EnemySpawner(path);
+    public EnemyManager(Level level, LevelState levelState) {
+        this.enemySpawner = new EnemySpawner();
         this.levelState = levelState;
+        this.level = level;
     }
 
     public void update() {
@@ -38,12 +36,14 @@ public class EnemyManager {
         while (it.hasNext()) {
             Monster m = it.next();
 
+            // ===== REACH END =====
             if (m.hasReachedEnd()) {
                 levelState.loseLife(1);
                 it.remove();
                 continue;
             }
 
+            // ===== DYING =====
             if (m.getState() == EnemyState.DYING) {
 
                 BufferedImage[] df = MonsterAsset.getFrames(
@@ -56,30 +56,42 @@ public class EnemyManager {
 
                 m.tickDeath(totalFrames, aniSpeed);
 
-                if (m.isDeathDone()){
+                if (m.isDeathDone()) {
                     levelState.addGold(m.getReward());
                     it.remove();
                 }
 
-                    
-
             } 
             // ===== ALIVE =====
             else {
-                enemyMovement.move(m);
+                m.getMovement().move(m);
             }
         }
     }
-    
-    public void spawnMonster(int type) {
+
+    public void spawnMonster(int type, int pathIndex) {
+
+        Point[] chosenPath = level.getPaths().get(pathIndex);
+
         Monster m = enemySpawner.spawn(type);
 
         if (m != null) {
+
+            // gán movement
+            EnemyMovement movement = new EnemyMovement(chosenPath);
+            m.setMovement(movement);
+
+            // offset
             m.createOffset();
+
+            // vị trí start
+            Point start = movement.getStartPoint();
+
             m.setPos(
-                m.getX() + m.getxOffset(),
-                m.getY() + m.getyOffset()
+                start.x + m.getxOffset(),
+                start.y + m.getyOffset()
             );
+
             monsters.add(m);
         }
     }

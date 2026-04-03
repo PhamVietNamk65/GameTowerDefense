@@ -15,19 +15,13 @@ import inputs.KeyHandler;
 import inputs.MyMouseListener;
 import ui.LevelSelect;
 import ui.Menu;
+import utils.Constants;
 
 import java.awt.Color;
 import java.awt.Graphics;
 
 
 public class GamePanel extends JPanel implements Runnable{
-    final int originalTileSize = 32; // 16x16 title 
-    final int scale = 2 ;     
-    public final int tileSize = originalTileSize * scale ; // 48x48 title
-    public final int maxScreenCol = 20;
-    public final int maxScreenRow = 12;
-    public final int screenWidth = tileSize * maxScreenCol;
-    public final int screenHeight = tileSize * maxScreenRow; // 960x528
 
     private Thread gameThread;
 
@@ -45,7 +39,7 @@ public class GamePanel extends JPanel implements Runnable{
     private GameStateManager gameStateManager;
 
     public GamePanel(){
-        this.setPreferredSize(new DimensionUIResource(screenWidth, screenHeight));
+        this.setPreferredSize(new DimensionUIResource(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         this.setBackground(Color.white);
         setDoubleBuffered(true); // tang hieu suat ve
         this.setFocusable(true); // de JPanel co the nhan duoc su kien tu ban phim

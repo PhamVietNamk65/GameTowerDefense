@@ -1,6 +1,7 @@
 package levels;
 import static utils.Constants.Tiles.TILE_SIZE;
 
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
@@ -10,6 +11,7 @@ import java.util.Map;
 import asset.MapAsset;
 import entity.TowerSlot;
 import system.PathFinder;
+import utils.Constants;
 
 public class Level {
     private int levelid;
@@ -19,8 +21,8 @@ public class Level {
     private int[][] groundMap;
     private int[][] objectsMap;
 
-    private Point[] path;
-    
+    private ArrayList<Point[]> paths = new ArrayList<>();
+
     private ArrayList<TowerSlot> allSlots = new ArrayList<>();
     private ArrayList<TowerSlot> activeSlots;
     public Level(int levelid){
@@ -30,11 +32,18 @@ public class Level {
     private void loadLevel() {
         groundMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/ground.csv");
         pathMap  = LoadMap.loadLevel("res/Map/Level" + levelid + "/path.csv");
+        
         towerMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/tower.csv");
         objectsMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/objects.csv");
-        path = PathFinder.buildPath(pathMap);
+
+        paths.add(PathFinder.buildPath(pathMap));
         generateTowerSlots();
         activeSlots = new ArrayList<>(allSlots);
+
+        try {
+            int[][] pathMap1 = LoadMap.loadLevel("res/Map/Level" + levelid + "/path1.csv");
+            paths.add(PathFinder.buildPath(pathMap1));
+        } catch (Exception e) {}
     }
     public void update() {
        
@@ -72,20 +81,48 @@ public class Level {
         for (int y = 0; y < groundMap.length; y++) {
             for (int x = 0; x < groundMap[0].length; x++) {
                 int tileId = groundMap[y][x];
+                
                 g.drawImage(MapAsset.tiles[tileId], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+                if( levelid == 3){
+                    drawMore(g, x, y, 10);
+                    
+                }
             }
         }
-        
+
+        if( levelid == 3){
+            g.setColor(new Color(0,0,0,20));
+            g.fillRect(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+        }
+
         for (int y = 0; y < objectsMap.length; y++) {
             for (int x = 0; x < objectsMap[0].length; x++) {
                 int tileId = objectsMap[y][x];
                 if (tileId > 0 && tileId < MapAsset.objects.length) {
-                    if( tileId == 1) {
-                        g.drawImage(MapAsset.objects[7], x * TILE_SIZE - 18, y * TILE_SIZE + 40 ,MapAsset.objects[7].getWidth(), MapAsset.objects[7].getHeight(), null);
+                    if( tileId == 1 || tileId == 8) {
+                        g.drawImage(
+                            MapAsset.objects[7], 
+                            x * TILE_SIZE - 18, 
+                            y * TILE_SIZE + 38, 
+                            null
+                        );
                         g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE,MapAsset.objects[tileId].getWidth() , MapAsset.objects[tileId].getHeight(), null);
                     }
-                    else if( tileId == 5 || tileId == 6) drawObjectWithGrass(g, MapAsset.objects[tileId], x, y);
+                    else if( tileId == 6){
+                        g.drawImage(MapAsset.objects[8], x * TILE_SIZE - 11 , y * TILE_SIZE - 3 , null);
+                        g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
+                        g.drawImage(MapAsset.objects[5], x * TILE_SIZE - 8, y * TILE_SIZE + 20, null);
+                    }
+                    else if( tileId == 4){
+                        g.drawImage(MapAsset.objects[9], x * TILE_SIZE - 5 , y * TILE_SIZE - 3 , null);
+                        g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
+                    }
+                    else if( tileId == 7 ) {
+                        drawMore(g, x, y, tileId);
+                    }
+                    else g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
                 }
+
             }
         }
         // ===== VẼ TOWER SLOT (debug) =====
@@ -94,8 +131,8 @@ public class Level {
         }
     }
 
-    public Point[] getPath() {
-        return path;
+    public ArrayList<Point[]> getPaths() {
+        return paths;
     }
 
     public ArrayList<TowerSlot> getTowerSlots() {
@@ -112,35 +149,30 @@ public class Level {
 
         return null;
     }
+    private void drawMore(Graphics g, int x, int y, int id){
+        // 1. Dùng tọa độ x, y để tạo Seed cố định cho ô này
+        long seed = (long)x * 73856093 ^ (long)y * 19349663;
+        java.util.Random rand = new java.util.Random(seed);
 
-    public void drawObjectWithGrass(Graphics g, BufferedImage objImg, int x, int y) {
-    int drawX = x * TILE_SIZE;
-    int drawY = (y + 1) * TILE_SIZE - objImg.getHeight();
+        // 2. Ngẫu nhiên số lượng khóm cỏ (ví dụ từ 3 đến 6 khóm)
+        int grassCount = 3 + rand.nextInt(6); 
 
-    // 1. Draw object
-    g.drawImage(objImg, drawX, drawY,objImg.getWidth(), objImg.getHeight(), null);
-
-
-    // 2. Random theo vị trí (không bị nhấp nháy)
-    long seed = x * 73856093 ^ y * 19349663;
-    java.util.Random rand = new java.util.Random(seed);
-
-    int grassCount = rand.nextInt(3); // 0 -> 2 bụi
-
-    for (int i = 0; i < grassCount; i++) {
-        int offsetX = rand.nextInt(objImg.getWidth());
-        int offsetY = rand.nextInt(10);
-
-        int size = 10 + rand.nextInt(8);
+         for (int i = 0; i < grassCount; i++) {
+        // Ngẫu nhiên vị trí x, y bên trong ô TILE_SIZE
+        // Trừ đi một khoảng nhỏ (ví dụ 10-15) để cỏ không bị tràn sang ô bên cạnh
+        int offsetX = rand.nextInt(TILE_SIZE - 12);
+        int offsetY = rand.nextInt(TILE_SIZE - 12);
 
         g.drawImage(
-            MapAsset.objects[3],
-            drawX + offsetX,
-            drawY + objImg.getHeight() - offsetY,
-            MapAsset.objects[3].getWidth(),
-            MapAsset.objects[3].getHeight(),
-            null
-        );
+            MapAsset.objects[id], 
+            x * TILE_SIZE + offsetX, 
+            y * TILE_SIZE + offsetY, 
+            null);
+        }
     }
-}
+    
+            
+    public int getlevelID(){
+        return levelid;
+    }
 }

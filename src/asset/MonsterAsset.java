@@ -1,15 +1,10 @@
 package asset;
-import entity.EnemyState;
-import helpz.LoadSave;
 import java.awt.image.BufferedImage;
 import java.util.HashMap;
 import java.util.Map;
-<<<<<<< HEAD
 
 import entity.monster.EnemyState;
 import helpz.LoadSave;
-=======
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 import utils.Constants;
 import static utils.Constants.Monsters.*;
 
@@ -70,27 +65,17 @@ public class MonsterAsset {
 
         Map<EnemyState, Map<Integer, BufferedImage[]>> stateMap = new HashMap<>();
 
-<<<<<<< HEAD
         stateMap.putIfAbsent(EnemyState.DYING, new HashMap<>());
     	stateMap.get(EnemyState.DYING).put(Constants.Direction.UP, LoadSave.getSpriteFrames(deathUp, 48, 48));
         stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
         stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
-=======
+      
         // ===== WALK =====
         stateMap.put(EnemyState.WALK, new HashMap<>());
         stateMap.get(EnemyState.WALK).put(Constants.Direction.UP,    LoadSave.getSpriteFrames(walkUp,   48, 48));
         stateMap.get(EnemyState.WALK).put(Constants.Direction.DOWN,  LoadSave.getSpriteFrames(walkDown, 48, 48));
         stateMap.get(EnemyState.WALK).put(Constants.Direction.LEFT,  LoadSave.getSpriteFrames(walkSide, 48, 48));
         stateMap.get(EnemyState.WALK).put(Constants.Direction.RIGHT, LoadSave.getSpriteFrames(walkSide, 48, 48));
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
-
-        // ===== DEATH =====
-        // FIX: trước đây deathDown và deathLeft đều bị gán nhầm thành deathUp
-        stateMap.put(EnemyState.DEATH, new HashMap<>());
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.UP,    LoadSave.getSpriteFrames(deathUp,   48, 48));
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.DOWN,  LoadSave.getSpriteFrames(deathDown, 48, 48));
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.LEFT,  LoadSave.getSpriteFrames(deathSide, 48, 48));
-        stateMap.get(EnemyState.DEATH).put(Constants.Direction.RIGHT, LoadSave.getSpriteFrames(deathSide, 48, 48));
 
         // ===== ATTACK =====
         stateMap.put(EnemyState.ATTACK, new HashMap<>());
@@ -116,14 +101,11 @@ public class MonsterAsset {
         if (directionMap == null) return null;
 
         BufferedImage[] frames = directionMap.get(direction);
-<<<<<<< HEAD
-=======
 
         // Fallback về UP nếu hướng cụ thể không có
         if (frames == null) {
             return directionMap.get(Constants.Direction.UP);
         }
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 
         return frames;
     }

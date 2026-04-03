@@ -2,20 +2,14 @@ package render;
 
 import Manager.TowerManager;
 import asset.TowerAsset;
-import entity.Tower;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
-<<<<<<< HEAD
 
-import Manager.TowerManager;
-import asset.TowerAsset;
 import entity.tower.Tower;
-=======
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 import utils.Constants;
 import utils.Utilz;
 

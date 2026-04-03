@@ -1,6 +1,13 @@
 package utils;
+
+
 //Định nghĩa các hằng số dùng chung (ID của loại quái, loại trụ, loại gạch nền).
 public class Constants {
+
+    public static final int MAX_SCREEN_COL = 20;
+    public static final int MAX_CREEN_ROW = 12;
+    public static final int SCREEN_WIDTH = Tiles.TILE_SIZE * MAX_SCREEN_COL;
+    public static final int SCREEN_HEIGHT = Tiles.TILE_SIZE * MAX_CREEN_ROW;
 
     //Dan ban
     public static class Projectiles{
@@ -195,8 +202,6 @@ public class Constants {
         public static final int BUSH = 4;
         public static final int STONE1 = 5;
         public static final int STONE2 = 6;
-
-
     }
 
     public static class Projectile{

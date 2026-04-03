@@ -20,7 +20,7 @@ public class MapAsset {
     }
     public void load() {
         tiles = new BufferedImage[10];
-        objects = new BufferedImage[10];
+        objects = new BufferedImage[20];
         try {
             BufferedImage atlas = ImageIO.read(getClass().getResourceAsStream("/tile/1 Tiles/FieldsTileset.png"));
             tiles[0] = atlas.getSubimage(5 * ORIGIANLTILESIZE, 4 * ORIGIANLTILESIZE, ORIGIANLTILESIZE, ORIGIANLTILESIZE); // grass
@@ -31,13 +31,19 @@ public class MapAsset {
             tiles[5] = atlas.getSubimage(7 * ORIGIANLTILESIZE, 2 * ORIGIANLTILESIZE, ORIGIANLTILESIZE, ORIGIANLTILESIZE); // road right up
             tiles[6] = atlas.getSubimage(7 * ORIGIANLTILESIZE, 0 * ORIGIANLTILESIZE, ORIGIANLTILESIZE, ORIGIANLTILESIZE); // road right down
             
+            objects[0] = ImageIO.read(getClass().getResource("/tile/2 Objects/1.png"));
             objects[1] = ImageIO.read(getClass().getResource("/tile/2 Objects/Tree1.png")); 
             objects[2] = ImageIO.read(getClass().getResource("/tile/2 Objects/Tree2.png")); 
             objects[3] = ImageIO.read(getClass().getResource("/tile/2 Objects/Grass.png")); 
             objects[4] = ImageIO.read(getClass().getResource("/tile/2 Objects/Bush.png")); 
             objects[5] = ImageIO.read(getClass().getResource("/tile/2 Objects/Stone1.png")); 
             objects[6] = ImageIO.read(getClass().getResource("/tile/2 Objects/Stone2.png")); 
-            objects[7] = ImageIO.read(getClass().getResource("/tile/2 Objects/Shadow.png"));
+            objects[7] = ImageIO.read(getClass().getResource("/tile/2 Objects/Shadow1.png"));
+            objects[8] = ImageIO.read(getClass().getResource("/tile/2 Objects/Shadow2.png"));
+            objects[9] = ImageIO.read(getClass().getResource("/tile/2 Objects/Shadow3.png"));
+            objects[10] = ImageIO.read(getClass().getResource("/tile/2 Objects/Flower.png"));
+            objects[11] = ImageIO.read(getClass().getResource("/tile/2 Objects/Camp.png"));
+            objects[12] = ImageIO.read(getClass().getResource("/tile/2 Objects/Lamp.png"));
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -59,14 +59,10 @@ public class Tower {
     // ===== Select =====
     private boolean selected = false;
 
-<<<<<<< HEAD:src/entity/tower/Tower.java
-    public Tower(int x, int y, int id, int towerType, int cost) {
-=======
     // Flag báo hiệu cần spawn đạn khi PREATTACK → ATTACK
     private boolean shouldSpawnProjectile = false;
 
-    public Tower(int x, int y, int id, int towerType) {
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Tower.java
+    public Tower(int x, int y, int id, int towerType, int cost) {
         this.x = x;
         this.y = y;
         this.id = id;
@@ -186,7 +182,7 @@ public class Tower {
     public void upgrade() {
         if (!canUpgrade() || upgrading) return;
 
-        pendingLevel = towerLevel + 1;
+        towerLevel = towerLevel + 1;
         upgrading = true;
         upgradeTick = 0;
         towerAnimFrame = 0;
@@ -230,7 +226,7 @@ public class Tower {
         int cx = getCenterX();
         if (direction == UP || direction == DOWN)
             return cx;
-        return facingLeft ? cx - 10 : cx + 10;
+        return facingLeft ? cx + 20 : cx + 10;
     }
 
     public int getArrowSpawnY() {
@@ -258,7 +254,6 @@ public class Tower {
     public boolean isCooldownOver() { return cdTick >= cooldown; }
     public void resetCooldown() { cdTick = 0; }
     public int getTowerLevel() { return towerLevel; }
-    public int getPendingLevel() { return pendingLevel; }
     public int getDisplayLevel() { return towerLevel + 1; }
     public int getSellValue() { return 10 + towerLevel * 10; }
     public int getCenterX() { return x + 16; }

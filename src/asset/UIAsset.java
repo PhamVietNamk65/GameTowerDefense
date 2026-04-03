@@ -1,6 +1,8 @@
 package asset;
 
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+
 import javax.imageio.ImageIO;
 
 import helpz.LoadSave;
@@ -20,6 +22,8 @@ public class UIAsset {
     public static BufferedImage[] menuButtonsOver = new BufferedImage[3];
     public static BufferedImage[] menuButtonsPressed = new BufferedImage[3];
 
+    public static BufferedImage backGround_levelSelect ;
+    public static BufferedImage[] levelSelect = new BufferedImage[6];
     private UIAsset() {
     }
 
@@ -61,11 +65,21 @@ public class UIAsset {
             frame = ImageIO.read(getClass().getResourceAsStream("/icon/f.png"));
             heart = ImageIO.read(getClass().getResource("/icon/heart.png"));
             coin = LoadSave.getSprite("/icon/coin.png");
+
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     private void loadLevelAssets() { 
+        try {
+            backGround_levelSelect = ImageIO.read(getClass().getResource("/menu/backGround_levelSelect.png"));
+            levelSelect[1] = ImageIO.read(getClass().getResource("/menu/level1.png"));
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
    
 }

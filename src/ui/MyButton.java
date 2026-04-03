@@ -79,7 +79,7 @@ public class MyButton {
     }
 
     private void drawText(Graphics g){
-        Font myFont = new Font("Arial", Font.PLAIN, 22); 
+        Font myFont = new Font("Arial", Font.PLAIN, 21); 
         g.setFont(myFont); // Áp dụng Font này để vẽ
         g.setColor(Color.BLACK); // Đừng quên set màu chữ
         FontMetrics fm = g.getFontMetrics(); // lay thong tin cua text
@@ -136,5 +136,9 @@ public class MyButton {
         this.width = width2;
         this.height = buttonHeight;
         initBounds();
+    }
+
+    public void setText(String string) {
+        this.text = string;
     }
 }

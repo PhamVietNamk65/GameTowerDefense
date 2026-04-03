@@ -1,13 +1,13 @@
 package entity.monster;
 
-<<<<<<< HEAD:src/entity/monster/Monster.java
 import static utils.Constants.Direction.*;
 import static utils.Constants.Monsters.GetReward;
 
-=======
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
 import java.awt.Rectangle;
 import java.util.Random;
+
+import system.EnemyMovement;
+
 import static utils.Constants.Direction.*;
 
 public class Monster {
@@ -22,22 +22,20 @@ public class Monster {
     private int pathIndex = 0;
     protected float xOffset, yOffset;
     protected boolean reachedEnd = false;
-<<<<<<< HEAD:src/entity/monster/Monster.java
     //
-    public Monster(float x, float y, int ID, int enemyType) {
-=======
 
     // FIX: mỗi quái tự quản lý animation index riêng
     private int animTick  = 0;
     private int animIndex = 0;
     private static final int ANI_SPEED = 8; // tốc độ animation walk (tăng = chậm hơn)
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
 
     // FIX: death animation chạy 1 lần duy nhất, không loop
     private int deathAnimTick  = 0;
     private int deathAnimIndex = 0;
     private boolean deathDone  = false;
     private static final int DEATH_ANI_SPEED = 10; // tốc độ death animation
+
+    private EnemyMovement movement;
 
     public Monster(float x, float y, int ID, int enemyType) {
         this.x = x;
@@ -55,7 +53,7 @@ public class Monster {
 
     // FIX: update walk animation tick (gọi từ EnemyManager mỗi frame)
     public void updateAnim() {
-        if (state == EnemyState.DEATH) return;
+        if (state == EnemyState.DYING) return;
         animTick++;
         if (animTick >= ANI_SPEED) {
             animTick = 0;
@@ -65,7 +63,7 @@ public class Monster {
 
     // FIX: update death animation, chỉ chạy 1 lần đến frame cuối rồi dừng
     public void updateDeathAnim(int totalFrames) {
-        if (state != EnemyState.DEATH || deathDone) return;
+        if (state != EnemyState.DYING || deathDone) return;
         deathAnimTick++;
         if (deathAnimTick >= DEATH_ANI_SPEED) {
             deathAnimTick = 0;
@@ -87,7 +85,6 @@ public class Monster {
     }
 
     public void hurt(int dmg) {
-<<<<<<< HEAD:src/entity/monster/Monster.java
         if (state == EnemyState.DYING) return;
 
         health -= dmg;
@@ -95,42 +92,23 @@ public class Monster {
         if (health <= 0 && state != EnemyState.DYING) {
             setState(EnemyState.DYING);
             
-=======
-        if (state == EnemyState.DEATH) return;
-        health -= dmg;
-        if (health <= 0) {
-            setState(EnemyState.DEATH);
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
         }
     }
 
     public void setState(EnemyState newState) {
-<<<<<<< HEAD:src/entity/monster/Monster.java
         if (state == EnemyState.DYING) return;
-            this.state = newState;
-
-            // RESET ANIMATION (QUAN TRỌNG)
-            deathTick = 0;
-            deathDone = false;
-=======
-        if (state == EnemyState.DEATH) return;
         this.state = newState;
         // Reset death animation khi bắt đầu chết
         deathAnimTick  = 0;
         deathAnimIndex = 0;
         deathDone      = false;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
     }
 
     public EnemyState getState() { return state; }
 
     public void move(float speed, int dir) {
-<<<<<<< HEAD:src/entity/monster/Monster.java
         if (state == EnemyState.DYING) return;
 
-=======
-        if (state == EnemyState.DEATH) return;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
         direction = dir;
         switch (dir) {
             case LEFT  -> x -= speed;
@@ -142,12 +120,8 @@ public class Monster {
     }
 
     public void updateDirection(float dx, float dy) {
-<<<<<<< HEAD:src/entity/monster/Monster.java
         if (state == EnemyState.DYING) return;
 
-=======
-        if (state == EnemyState.DEATH) return;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
         if (Math.abs(dx) > Math.abs(dy)) {
             direction = (dx > 0) ? RIGHT : LEFT;
         } else {
@@ -162,17 +136,7 @@ public class Monster {
 
     // Giữ lại để tương thích với EnemyManager cũ nếu cần
     public void tickDeath(int totalFrames, int aniSpeed) {
-<<<<<<< HEAD:src/entity/monster/Monster.java
-        if (state != EnemyState.DYING) return;
-
-        deathTick++;
-
-        if (deathTick >= totalFrames * aniSpeed) {
-            deathDone = true;
-        }
-=======
         updateDeathAnim(totalFrames);
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d:src/entity/Monster.java
     }
 
     public boolean isDeathDone() { return deathDone; }
@@ -207,5 +171,13 @@ public class Monster {
 
     public int getReward(){
         return GetReward(enemyType);
+    }
+
+    public void setMovement(EnemyMovement movement) {
+        this.movement = movement;
+    }
+
+    public EnemyMovement getMovement() {
+        return movement;
     }
 }

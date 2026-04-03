@@ -1,19 +1,12 @@
 package asset;
 
-<<<<<<< HEAD
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 
 import javax.imageio.ImageIO;
 
 import entity.tower.Tower;
-=======
-import entity.Tower;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 import helpz.LoadSave;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import javax.imageio.ImageIO;
 
 public class TowerAsset {
     private static TowerAsset instance;

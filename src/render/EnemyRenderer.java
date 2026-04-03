@@ -2,22 +2,19 @@ package render;
 
 import Manager.EnemyManager;
 import asset.MonsterAsset;
-<<<<<<< HEAD
 import entity.monster.EnemyState;
 import entity.monster.Monster;
 
 import static utils.Constants.Direction.*;
 import static utils.Constants.Monsters.*;
-=======
-import entity.EnemyState;
-import entity.Monster;
-import java.awt.*;
+
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
-import static utils.Constants.Monsters.ENEMY_SIZE;
-import static utils.Constants.Monsters.HP_BAR_HEIGHT;
-import static utils.Constants.Monsters.HP_BAR_WIDTH;
-import static utils.Constants.Monsters.HP_BAR_Y_OFFSET;
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
 
 public class EnemyRenderer {
 
@@ -30,9 +27,9 @@ public class EnemyRenderer {
     public void draw(Graphics g) {
         for (Monster m : enemyManager.getMonsters()) {
             // FIX: mỗi quái tự update animation của mình
-            if (m.getState() == EnemyState.DEATH) {
+            if (m.getState() == EnemyState.DYING) {
                 BufferedImage[] df = MonsterAsset.getFrames(
-                    m.getEnemyType(), EnemyState.DEATH, m.getDirection());
+                    m.getEnemyType(), EnemyState.DYING, m.getDirection());
                 int totalFrames = (df != null) ? df.length : 1;
                 m.updateDeathAnim(totalFrames);
             } else {
@@ -53,31 +50,17 @@ public class EnemyRenderer {
 
         if (m.getState() == EnemyState.DYING) {
             frames = MonsterAsset.getFrames(
-<<<<<<< HEAD
-                m.getEnemyType(),
-                EnemyState.DYING,
-                m.getDirection()
-            );
-=======
-                m.getEnemyType(), EnemyState.DEATH, m.getDirection());
+                m.getEnemyType(), EnemyState.DYING, m.getDirection());
             if (frames == null || frames.length == 0) return;
             // FIX: dùng deathAnimIndex riêng → death chỉ chạy 1 lần, không loop
             index = m.getDeathAnimIndex();
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
         } else {
             int direction = m.getDirection() == RIGHT ? LEFT : m.getDirection(); // Nếu đang đi sang phải, lấy animation LEFT (vì sprite gốc hướng sang trái)
             frames = MonsterAsset.getFrames(
-<<<<<<< HEAD
-                m.getEnemyType(),
-                m.getState(),
-                direction
-            );
-=======
                 m.getEnemyType(), m.getState(), m.getDirection());
             if (frames == null || frames.length == 0) return;
             // Walk/attack animation loop bình thường
             index = m.getAnimIndex(frames.length);
->>>>>>> 6ef79cb00a50072b1f2aa9c3154e6643fc87d99d
         }
 
         // Clamp để chắc chắn không out of bounds

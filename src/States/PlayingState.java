@@ -21,6 +21,7 @@ import system.TowerUpdater;
 import ui.GameUI;
 import ui.TowerSlotUI;
 import ui.TowerUI;
+import utils.Constants;
 
 public class PlayingState implements GameState {
 
@@ -93,14 +94,13 @@ public class PlayingState implements GameState {
             }
             
         });
-        Point[] path = levelManager.getCurrentLevel().getPath();
-        enemyMovement = new EnemyMovement(path);
-        enemyManager = new EnemyManager(this,path,levelState);
+  
+        enemyManager = new EnemyManager(levelManager.getCurrentLevel(),levelState);
         enemyRenderer = new EnemyRenderer(enemyManager);
 
-        waveManager = new WaveManager(enemyManager,levelManager.getCurrentLevelData());
+        waveManager = new WaveManager(enemyManager,levelManager);
 
-        gameUI = new GameUI(levelState);
+        gameUI = new GameUI(levelState,waveManager);
     }
 
     @Override
@@ -110,8 +110,9 @@ public class PlayingState implements GameState {
         towerUpdater.update(towerManager.getTowers());
         enemyManager.update();
         waveManager.update();
+        towerUI.update();
         towerManager.update(enemyManager.getMonsters());
-        towerManager.getArrowManager().update(gamePanel.screenWidth, gamePanel.screenHeight);
+        towerManager.getArrowManager().update(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
     }
 
     @Override
@@ -120,12 +121,12 @@ public class PlayingState implements GameState {
         Graphics2D g2 = (Graphics2D) g;
         levelManager.render(g2);
         enemyRenderer.draw(g2);
+        towerUI.draw(g2);
         towerRenderer.draw(g2);
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
 
-        towerUI.draw(g2);
         slotUI.render(g2);
-        gameUI.render(g);
+        // gameUI.render(g);
     }
 
     @Override
