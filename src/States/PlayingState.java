@@ -135,7 +135,7 @@ public class PlayingState implements GameState {
         });
 
         menuPause.setOnExit(() -> {
-            gamePanel.getGameStateManager().setState(new MenuState(gamePanel));
+            gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
         });
 
         menuLost.setOnReplay(() -> {
