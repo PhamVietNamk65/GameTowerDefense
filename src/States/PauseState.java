@@ -1,4 +1,4 @@
-package States;
+package states;
 
 public class PauseState {
     

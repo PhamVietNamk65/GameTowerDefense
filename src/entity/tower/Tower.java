@@ -25,12 +25,14 @@ public class Tower {
     private int cdTick;
     private Rectangle bounds;
     private int cost;
+    private int value;
+
 
     // ===== Archer animation =====
     private int animState = IDLE;
     private int animIndex = 0;
     private int animTick  = 0;
-    private int animSpeed = 14; // FIX: tăng lên để IDLE/PREATTACK/ATTACK chậm hơn
+    private int animSpeed = 14;
     private int direction = SIDE;
 
     // ===== Level =====
@@ -42,9 +44,9 @@ public class Tower {
     // ===== Tower idle animation =====
     private int towerAnimFrame = 0;
     private int towerAnimTick  = 0;
-    private static final int TOWER_ANIM_SPEED = 18; // FIX: tăng lên để idle tháp chậm hơn
+    private static final int TOWER_ANIM_SPEED = 18; 
 
-    private static final int ATTACK_HOLD = 4; // FIX: giảm xuống để bắn xong chuyển về IDLE nhanh hơn
+    private static final int ATTACK_HOLD = 4;
     private int attackHoldTick = 0;
 
     // ===== Upgrade =====
@@ -68,6 +70,8 @@ public class Tower {
         this.id = id;
         this.towerType = towerType;
         this.cost = cost;
+        value = cost;
+
         initBounds();
         setDefaultStats();
     }
@@ -190,6 +194,8 @@ public class Tower {
 
         dmg += 3;
         range += 10;
+        value += Constants.Towers.GetCostUpdate(towerType, towerLevel);
+
         cooldown = Math.max(10, cooldown - 2);
     }
 
@@ -255,7 +261,6 @@ public class Tower {
     public void resetCooldown() { cdTick = 0; }
     public int getTowerLevel() { return towerLevel; }
     public int getDisplayLevel() { return towerLevel + 1; }
-    public int getSellValue() { return 10 + towerLevel * 10; }
     public int getCenterX() { return x + 16; }
     public int getCenterY() { return y + 16; }
     public int getX() { return x; }
@@ -275,4 +280,5 @@ public class Tower {
     public void setSelected(boolean selected) { this.selected = selected; }   
     public void setUpgrading(boolean b) { this.upgrading = b; }
     public int getCost() { return cost; }
+    public int getSellValue(){ return (int) (value * 0.6);}
 }

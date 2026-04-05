@@ -77,14 +77,11 @@ public class EnemyManager {
 
         if (m != null) {
 
-            // gán movement
             EnemyMovement movement = new EnemyMovement(chosenPath);
             m.setMovement(movement);
 
-            // offset
             m.createOffset();
 
-            // vị trí start
             Point start = movement.getStartPoint();
 
             m.setPos(

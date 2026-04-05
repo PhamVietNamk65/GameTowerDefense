@@ -6,7 +6,7 @@ import java.awt.Graphics2D;
 
 import entity.tower.Tower;
 import levels.LevelState;
-import system.TowerActionListener;
+import listeners.TowerActionListener;
 import utils.Constants;
 
 public class TowerUI {
@@ -23,7 +23,9 @@ public class TowerUI {
             int bx = selectedTower.getX() + Constants.Tiles.TILE_SIZE + 10;
             int by = selectedTower.getY();
             buttonBar.setPosition(bx, by);
-            buttonBar.buttons.get(0).setText("Upgrade: -" + Constants.Towers.GetCostUpdate(selectedTower.getTowerType(), selectedTower.getTowerLevel() + 1));
+            if( selectedTower.getTowerLevel() == 6 ) buttonBar.buttons.get(0).setText("Max Upgrade");
+            else buttonBar.buttons.get(0).setText("Upgrade: -" + Constants.Towers.GetCostUpdate(selectedTower.getTowerType(), selectedTower.getTowerLevel() + 1));
+            buttonBar.buttons.get(1).setText("Sell: +" + selectedTower.getSellValue());
         }
     }
 
@@ -38,7 +40,7 @@ public class TowerUI {
             }
         });
 
-        MyButton sell = new MyButton("Sell", 140,33);
+        MyButton sell = new MyButton("", 140,33);
         sell.setAction(()->{
              if (listener != null)
                 listener.onSell(selectedTower);
@@ -98,7 +100,7 @@ public class TowerUI {
 
         for (MyButton b : buttonBar.buttons) {
             if (b.getBounds().contains(x, y) && b.isMousePressed()) {
-                b.execute();
+                if( selectedTower.getTowerLevel() != 7) b.execute();
                 handled = true;
             }
         b.setMousePressed(false);

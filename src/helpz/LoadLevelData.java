@@ -6,7 +6,7 @@ import levels.LevelData;
 
 public class LoadLevelData {
 
-    public static LevelData LoadLevelData(int level) {
+    public static LevelData loadLevelData(int level) {
         List<int[]> waveList = new ArrayList<>();
         int sDelay = 90; // Giá trị mặc định
         int wDelay = 300;

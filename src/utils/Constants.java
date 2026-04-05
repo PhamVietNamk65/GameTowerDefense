@@ -9,6 +9,7 @@ public class Constants {
     public static final int SCREEN_WIDTH = Tiles.TILE_SIZE * MAX_SCREEN_COL;
     public static final int SCREEN_HEIGHT = Tiles.TILE_SIZE * MAX_CREEN_ROW;
 
+    public static final int TOTAL_LEVELS = 9;
     //Dan ban
     public static class Projectiles{
         public static final int ARROWS = 0;

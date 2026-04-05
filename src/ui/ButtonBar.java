@@ -38,41 +38,46 @@ public class ButtonBar {
 
         int currentX = x;
         int currentY = y;
-        
-        // Dùng để lưu độ lớn lớn nhất của một phần tử trong hàng/cột để nhảy bước tiếp theo
         int maxStepInLine = 0; 
 
         for (MyButton button : buttons) {
             int bW = button.getBounds().width;
             int bH = button.getBounds().height;
+
             if (orientation == 0) { // CHẾ ĐỘ HÀNG NGANG
-                // Kiểm tra nếu nút này nằm ngoài chiều rộng của thanh Bar
-                if (currentX + bW >= x + width && currentX >= x) {
-                    currentX = x;                 // Quay về lề trái
-                    currentY += maxStepInLine + gap; // Xuống dòng dựa trên nút cao nhất trước đó
-                    maxStepInLine = 0;            // Reset độ cao hàng mới
+                // 1. Kiểm tra: Nếu đặt nút này vào mà vượt quá chiều rộng của Bar
+                // VÀ đây không phải là nút đầu tiên của hàng (tránh lặp vô hạn)
+                if (currentX + bW > x + width && currentX > x) {
+                    currentX = x;                    // Quay về lề trái
+                    currentY += maxStepInLine + gap; // Xuống dòng
+                    maxStepInLine = 0;               // Reset chiều cao hàng mới
                 }
-                
+            
                 button.setButton(currentX, currentY, bW, bH);
+            
+                // Cập nhật tọa độ cho nút KẾ TIẾP
                 currentX += bW + gap;
+                // Lưu lại nút cao nhất trong hàng hiện tại
                 maxStepInLine = Math.max(maxStepInLine, bH);
 
             } else { // CHẾ ĐỘ HÀNG DỌC
-                // Kiểm tra nếu nút này nằm ngoài chiều cao của thanh Bar
-                if (currentY + bH >= y + height && currentY >= y) {
-                    currentY = y;                 // Quay về đỉnh
-                    currentX += maxStepInLine + gap; // Sang cột mới dựa trên nút rộng nhất trước đó
+                // Kiểm tra nếu vượt quá chiều cao
+                if (currentY + bH > y + height && currentY > y) {
+                    currentY = y;                    // Quay về đỉnh
+                    currentX += maxStepInLine + gap; // Sang cột mới
                     maxStepInLine = 0;
                 }
 
                 button.setButton(currentX, currentY, bW, bH);
+            
                 currentY += bH + gap;
                 maxStepInLine = Math.max(maxStepInLine, bW);
             }
-            
+        
             button.draw(g);
         }
     }
+    
 
     private void initBounds() {
         this.bounds = new Rectangle(x, y, width, height);

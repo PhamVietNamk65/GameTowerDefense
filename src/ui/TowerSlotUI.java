@@ -44,13 +44,6 @@ public class TowerSlotUI {
                 buildTower(1,level);
             }
         }
-
-        // Button 2: Cannon
-        if (isIn(mouseX, mouseY, x, y + 40, 120, 30)) {
-            if (click) {
-                buildTower(2,level);
-            }
-        }
     }
 
     private void buildTower(int type,Level level) {
@@ -75,10 +68,6 @@ public class TowerSlotUI {
         g.setColor(Color.WHITE);
         g.drawRect(x, y, 120, 30);
         g.drawString("1. Archer", x + 10, y + 20);
-
-        // button Cannon
-        g.drawRect(x, y + 40, 120, 30);
-        g.drawString("2. Cannon", x + 10, y + 60);
 
         if (errorTimer > 0) {
             g.setColor(Color.RED);

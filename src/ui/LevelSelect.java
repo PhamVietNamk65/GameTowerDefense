@@ -1,90 +1,75 @@
 package ui;
 
 import java.awt.Graphics;
+import java.util.List;
 
-import States.MenuState;
-import States.PlayingState;
+import Manager.ProgressManager;
 import asset.UIAsset;
+import entity.monster.Monster;
+import entity.tower.Tower;
+import levels.LevelNode;
 import main.GamePanel;
+import states.MenuState;
+import states.PlayingState;
 import utils.Constants;
 
 public class LevelSelect {
-    private UIAsset uiAsset;
     private GamePanel gamePanel;
-    private ButtonBar buttonBar1, buttonBar2;
+    private ButtonBar buttonBar;
+    private MyButton homeButton;
+
+    private ProgressManager progressManager;
     public LevelSelect(GamePanel gamePanel) {
         this.gamePanel = gamePanel;
-        uiAsset = UIAsset.getInstance();
+        progressManager = gamePanel.getProgressManager();
 
         initbutton();
     }
 
     private void initbutton() {
-        buttonBar1 = new ButtonBar(
-           (int) (Constants.SCREEN_WIDTH * 0.1), 
-           (int) (Constants.SCREEN_HEIGHT * 0.2),
-           (int) (Constants.SCREEN_WIDTH * 0.8),
-           (int) (Constants.SCREEN_HEIGHT * 0.3) );
-        buttonBar1.setOrientation(1, 20);
-        
-        buttonBar2 = new ButtonBar(
-           (int) (Constants.SCREEN_WIDTH * 0.1), 
-           (int) (Constants.SCREEN_HEIGHT * 0.5) + 20,
-           (int) (Constants.SCREEN_WIDTH * 0.8),
-           (int) (Constants.SCREEN_HEIGHT * 0.3) );
-        buttonBar2.setOrientation(1, 20);
-
-        // Level 1
-        MyButton lv1 = new MyButton(UIAsset.levelSelect[1],null,null, (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv1.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 1)
-            );
-        });
-
-        // Level 2
-        MyButton lv2 = new MyButton("LEVEL 2", (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv2.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 2)
-            );
-        });
-
-        MyButton lv3 = new MyButton("LEVEL 3", (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv3.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 3)
-            );
-        });
-
-        MyButton lv4 = new MyButton("LEVEL 4", (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv4.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 4)
-            );
-        });
-        MyButton lv5 = new MyButton("LEVEL 5", (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv5.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 5)
-            );
-        });
-        MyButton lv6 = new MyButton("LEVEL 6", (int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3));
-        lv6.setAction(() -> {
-            gamePanel.getGameStateManager().setState(
-                new PlayingState(gamePanel, 6)
-            );
-        });
-
-
-        buttonBar1.addButton(lv1);
-        buttonBar1.addButton(lv2);
-        buttonBar1.addButton(lv3);
-        buttonBar2.addButton(lv4);
-        buttonBar2.addButton(lv5);
-        buttonBar2.addButton(lv6);
-
-    
+        buttonBar = new ButtonBar(
+           (int) (Constants.SCREEN_WIDTH * 0.315) , 
+           (int) (Constants.SCREEN_HEIGHT * 0.25) ,
+           (int) (Constants.SCREEN_WIDTH * 0.5) - 20 ,
+           (int) (Constants.SCREEN_HEIGHT * 0.2) );
+        buttonBar.setOrientation(0, 5);
+        int btnW = (int)(Constants.SCREEN_WIDTH * 0.12);
+        int btnH = (int)(Constants.SCREEN_WIDTH * 0.12);
+        for( int i = 1; i < 10; i++){
+            int level = i ;
+            if(progressManager.isLevelUnlocked(level)){
+                MyButton lv = new MyButton(
+                    UIAsset.levelIcons.get(level)[0], 
+                    UIAsset.levelIcons.get(level)[1], 
+                    UIAsset.levelIcons.get(level)[2], 
+                    btnW, btnH 
+                );
+                lv.setAction(() -> {
+                gamePanel.getGameStateManager().setState( new PlayingState(gamePanel, level));
+                });
+                buttonBar.addButton(lv);
+            } else {
+                MyButton lv = new MyButton(
+                    UIAsset.levelLock[0], 
+                    UIAsset.levelLock[1], 
+                    UIAsset.levelLock[2], 
+                    btnW, btnH 
+                );
+                
+                buttonBar.addButton(lv);
+            }
+        }
+        homeButton = new MyButton(
+            UIAsset.quit[0],
+            UIAsset.quit[1],
+            UIAsset.quit[2],
+            Constants.SCREEN_WIDTH, 
+            Constants.SCREEN_HEIGHT);
+        homeButton.setButton(
+            19 * Constants.Tiles.TILE_SIZE - 32, 
+            11 * Constants.Tiles.TILE_SIZE - 32, 
+            Constants.Tiles.TILE_SIZE + 10, 
+            Constants.Tiles.TILE_SIZE + 10);
     }
 
     public static void update() {
@@ -93,65 +78,50 @@ public class LevelSelect {
 
     public void render(Graphics g) {
         drawBackground(g);
-        drawlevel(g);
         drawButtons(g);
     }
 
     private void drawButtons(Graphics g){
-        buttonBar1.drawButtons(g);
-        buttonBar2.drawButtons(g);
+        buttonBar.drawButtons(g);
+        homeButton.draw(g);
     }
     public void mousePressed(int x, int y) {
-        for (MyButton b : buttonBar1.buttons) {
+        for (MyButton b : buttonBar.buttons) {
         if (b.getBounds().contains(x, y)) {
             b.setMousePressed(true);
             }
         }
-        for (MyButton b : buttonBar2.buttons) {
-        if (b.getBounds().contains(x, y)) {
-            b.setMousePressed(true);
-            }
-        }
+        homeButton.setMousePressed(homeButton.getBounds().contains(x, y));
     }
 
     public void mouseReleased(int x, int y) {
-        for (MyButton b : buttonBar1.buttons) {
+        for (MyButton b : buttonBar.buttons) {
         if (b.getBounds().contains(x, y) && b.isMousePressed()) {
+            b.setMousePressed(false);
             b.execute();
             }
             b.setMousePressed(false);
         }
-        for (MyButton b : buttonBar2.buttons) {
-        if (b.getBounds().contains(x, y) && b.isMousePressed()) {
-            b.execute();
-            }
-            b.setMousePressed(false);
+        homeButton.setMousePressed(false);
+        if (homeButton.getBounds().contains(x, y)) {
+            gamePanel.getGameStateManager().setState(new MenuState(gamePanel));
         }
 
     }
 
     public void mouseMoved(int x, int y) {
-        for (MyButton b : buttonBar1.buttons) {
+        for (MyButton b : buttonBar.buttons) {
             if (b.getBounds().contains(x, y)) {
                 b.setMouseOver(true);
             } else {
                 b.setMouseOver(false);
             }
         }
-        for (MyButton b : buttonBar2.buttons) {
-            if (b.getBounds().contains(x, y)) {
-                b.setMouseOver(true);
-            } else {
-                b.setMouseOver(false);
-            }
-        }      
+        homeButton.setMouseOver(homeButton.getBounds().contains(x, y));
     }
     
     public void drawBackground(Graphics g){
         g.drawImage(UIAsset.backGround_levelSelect, 0, 0, Constants.SCREEN_WIDTH,Constants.SCREEN_HEIGHT,null);
     }
 
-    public void drawlevel(Graphics g){
-        g.drawImage(UIAsset.levelSelect[1],(int) (Constants.SCREEN_WIDTH * 0.1), (int) (Constants.SCREEN_HEIGHT * 0.2),(int)(Constants.SCREEN_WIDTH * 0.25), (int)(Constants.SCREEN_HEIGHT * 0.3),null );
-    }
 }

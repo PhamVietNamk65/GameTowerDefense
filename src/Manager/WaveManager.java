@@ -7,18 +7,17 @@ public class WaveManager {
 
     private int[][] waves;
 
-    private int spawnDelay;
-    private int waveDelay;
+    private int spawnDelay; // thời gian chờ giữa 2 lần spawn quái (tính bằng tick)
+    private int waveDelay;  // thời gian chờ giữa 2 wave (tính bằng tick)
 
-    private int currentWave = 0;
-    private int spawnIndex = 0;
-    private int tickCounter = 0;
-
-    private boolean waveActive = false;
-    private boolean waitingNext = false;
+    private int currentWave = 0;  // index của wave hiện tại (bắt đầu từ 0)
+    private int spawnIndex = 0; // index của quái tiếp theo trong wave hiện tại (bắt đầu từ 0)
+    private int tickCounter = 0;    // đếm số tick đã trôi qua kể từ lần spawn cuối cùng hoặc kể từ khi bắt đầu wave
+    private boolean waveActive = false; // flag báo hiệu đang trong quá trình spawn quái của wave hiện tại (true = đang spawn, false = đã spawn xong wave nhưng có thể
+    private boolean waitingNext = false; // flag báo hiệu đang trong thời gian chờ giữa 2 wave
+    private boolean spawnedAllEnemies = false; // flag báo hiệu đã spawn hết quái của wave hiện tại
+    
     private boolean wavesDone = false;
-    private boolean spawnedAllEnemies = false;
-
     private EnemyManager enemyManager;
 
     private LevelManager levelManager;

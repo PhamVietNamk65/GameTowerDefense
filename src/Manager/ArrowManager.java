@@ -31,4 +31,5 @@ public class ArrowManager {
     public ArrayList<Arrow> getArrows() {
         return arrows;
     }
+
 }

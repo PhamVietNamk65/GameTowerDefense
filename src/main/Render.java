@@ -1,7 +1,8 @@
 package main;
 
 import java.awt.Graphics;
-import States.GameStateManager;
+
+import states.GameStateManager;
 
     
 public class Render {

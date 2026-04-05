@@ -157,7 +157,9 @@ public class Monster {
     public Rectangle getBounds() { return bounds; }
     public int getEnemyType()  { return enemyType; }
     public int getDirection()  { return direction; }
-    public float getHealthBarFloat() { return health / (float) maxHealth; }
+    public float getHealthBarFloat() { 
+        return health / (float) maxHealth; 
+    }
 
     public void createOffset() {
         int maxOffset = 15;

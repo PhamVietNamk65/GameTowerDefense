@@ -4,7 +4,7 @@ import entity.TowerSlot;
 import entity.monster.EnemyState;
 import entity.monster.Monster;
 import entity.tower.ArcherTower;
-import entity.tower.CannonTower;
+
 import entity.tower.Tower;
 import levels.LevelState;
 import utils.Constants;
@@ -49,14 +49,6 @@ public class TowerManager {
                 towers.add(t);
                 return true;
             }
-        } else if (type == 2) {
-            Tower t = new CannonTower(x, y, towerId++);
-            int cost = t.getCost();
-            if( levelState.spendGold(cost) ){
-                t.setUpgrading(true);
-                towers.add(t);
-                return true;
-            }
         }
         return false;
     }
@@ -93,10 +85,7 @@ public class TowerManager {
                         dir = dy < 0 ? Tower.UP : Tower.DOWN;
                     }
 
-                    // FIX archer ngược hướng:
-                    // Sprite S_Attack nhìn sang PHẢI (→) mặc định
-                    // TowerRenderer: facingLeft=true → vẽ flip → archer nhìn TRÁI
-                    // Đã thử dx<0 bị ngược → đổi thành dx>0
+            
                     archer.setFacingLeft(dx > 0);
 
                     if (archer.getAnimState() == Tower.IDLE && archer.canAttack()) {

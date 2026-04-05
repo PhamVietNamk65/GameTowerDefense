@@ -1,4 +1,4 @@
-package States;
+package states;
 //trang thai cua game
 import java.awt.Graphics;
 public interface GameState {

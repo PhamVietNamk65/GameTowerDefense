@@ -1,29 +1,36 @@
-package States;
+package states;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.lang.runtime.SwitchBootstraps;
 
 import Manager.ArrowManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
+import Manager.ProgressManager;
 import Manager.TowerManager;
 import Manager.WaveManager;
 import entity.TowerSlot;
 import entity.tower.Tower;
 import levels.LevelState;
+import listeners.TowerActionListener;
 import main.GamePanel;
 import render.ArrowRenderer;
 import render.EnemyRenderer;
 import render.TowerRenderer;
 import system.EnemyMovement;
-import system.TowerActionListener;
 import system.TowerUpdater;
 import ui.GameUI;
+import ui.MenuLost;
+import ui.MenuPause;
+import ui.MenuWin;
 import ui.TowerSlotUI;
 import ui.TowerUI;
 import utils.Constants;
 
 public class PlayingState implements GameState {
+
+    private int winDelay = 120;
 
     public int level;
     private GamePanel gamePanel;
@@ -50,7 +57,16 @@ public class PlayingState implements GameState {
     private GameUI gameUI;
     private int mouseX, mouseY;
 
+    private MenuPause menuPause = new MenuPause();
+    private MenuWin menuWin = new MenuWin();
+    private MenuLost menuLost = new MenuLost();
+    
+    private PlayingStatus currentStatus = PlayingStatus.PLAYING;
+
+    private ProgressManager progressManager;
+
     public PlayingState(GamePanel gamePanel,int level){
+
         this.level = level;
         this.gamePanel = gamePanel;
 
@@ -66,6 +82,7 @@ public class PlayingState implements GameState {
 
         towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
+        progressManager = gamePanel.getProgressManager();
 
         towerUI.setListener(new TowerActionListener() {
 
@@ -88,31 +105,86 @@ public class PlayingState implements GameState {
                     
 
                     towerManager.removeTower(t);
+                    levelState.addGold(selectedTower.getSellValue());
+
                     selectedTower = null;
                     towerUI.setSelectedTower(null);
                 }
             }
             
         });
-  
+
+        menuWin.setOnNextLevel(() -> {
+            gamePanel.getGameStateManager().setState(new PlayingState(gamePanel, level + 1));
+        });
+
+        menuWin.setOnReplay(() -> {
+            gamePanel.getGameStateManager().setState(new PlayingState(gamePanel, level));
+        });
+
+        menuWin.setOnExit(() -> {
+            gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
+        });
+
+        menuPause.setOnResume(() -> {
+            currentStatus = PlayingStatus.PLAYING;
+        });
+
+        menuPause.setOnRestart(() -> {
+            gamePanel.getGameStateManager().setState(new PlayingState(gamePanel, level));
+        });
+
+        menuPause.setOnExit(() -> {
+            gamePanel.getGameStateManager().setState(new MenuState(gamePanel));
+        });
+
+        menuLost.setOnReplay(() -> {
+            gamePanel.getGameStateManager().setState(new PlayingState(gamePanel, level));
+        });
+
+        menuLost.setOnExit(() -> {
+            gamePanel.getGameStateManager().setState(new LevelSelectState(gamePanel));
+        });
         enemyManager = new EnemyManager(levelManager.getCurrentLevel(),levelState);
         enemyRenderer = new EnemyRenderer(enemyManager);
 
         waveManager = new WaveManager(enemyManager,levelManager);
+        gameUI = new GameUI(levelState, waveManager);
 
-        gameUI = new GameUI(levelState,waveManager);
+        gameUI.setGameListener(()->{
+            currentStatus = PlayingStatus.PAUSE;
+        });
+    
     }
 
     @Override
     public void update() {
+        if( currentStatus == PlayingStatus.PLAYING){
+            levelManager.update();
+            towerUpdater.update(towerManager.getTowers());
+            enemyManager.update();
+            waveManager.update();
+            towerUI.update();
+            towerManager.update(enemyManager.getMonsters());
+            towerManager.getArrowManager().update(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
 
-        levelManager.update();
-        towerUpdater.update(towerManager.getTowers());
-        enemyManager.update();
-        waveManager.update();
-        towerUI.update();
-        towerManager.update(enemyManager.getMonsters());
-        towerManager.getArrowManager().update(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
+            if(waveManager.getTotalWaves() <= waveManager.getCurrentWave() && enemyManager.getMonsters().isEmpty()){
+                winDelay--;
+                if (winDelay <= 0) {
+                    currentStatus = PlayingStatus.WIN;
+                }
+            }
+
+            if(levelState.getLives() <= 0){
+                currentStatus = PlayingStatus.LOST;
+            }
+        }
+        
+        if(currentStatus == PlayingStatus.WIN){
+            menuWin.update();
+            progressManager.unlockNextLevel(level);
+        }
+
     }
 
     @Override
@@ -121,16 +193,49 @@ public class PlayingState implements GameState {
         Graphics2D g2 = (Graphics2D) g;
         levelManager.render(g2);
         enemyRenderer.draw(g2);
-        towerUI.draw(g2);
         towerRenderer.draw(g2);
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
 
         slotUI.render(g2);
-        gameUI.render(g);
+        towerUI.draw(g2);
+
+        switch (currentStatus) {
+            case PLAYING:
+                gameUI.render(g);
+                break;
+            case PAUSE:
+                menuPause.render(g);
+                break;
+            case WIN:
+                menuWin.render(g);
+                break;
+            case LOST:
+                menuLost.render(g);
+                break;
+            default:
+                break;
+        }
+
+        
     }
 
     @Override
     public void mousePressed(int x, int y) {
+        if (currentStatus == PlayingStatus.PAUSE) {
+            menuPause.mousePressed(x, y);
+            return;
+        }
+        else if (currentStatus == PlayingStatus.WIN) {
+            menuWin.mousePressed(x, y);
+            return;
+        }
+        else if (currentStatus == PlayingStatus.LOST) {
+            menuLost.mousePressed(x, y);
+            return;
+        }
+
+        gameUI.mousePressed(x, y);
+
         // ===== Nếu đang mở TowerUI (upgrade/sell) =====
         if (towerUI.mousePressed(x, y)) {
             return;
@@ -168,6 +273,19 @@ public class PlayingState implements GameState {
 
     @Override
     public void mouseReleased(int x, int y) {
+        if (currentStatus == PlayingStatus.PAUSE) {
+            menuPause.mouseReleased(x, y);
+        return;
+        }else if (currentStatus == PlayingStatus.WIN) {
+            menuWin.mouseReleased(x, y);
+            return;
+        }else   if( currentStatus == PlayingStatus.LOST) {
+            menuLost.mouseReleased(x, y);
+            return;
+        }
+
+        gameUI.mouseReleased(x, y);
+
         // ===== 1. Nếu đang mở TowerSlotUI → không xử lý gì thêm =====
         if (slotUI.isVisible()) {
             return;
@@ -195,5 +313,16 @@ public class PlayingState implements GameState {
     public void mouseMoved(int x, int y) {
         mouseX = x;
         mouseY = y;
+        gameUI.mouseMoved(x, y);
+        if (currentStatus == PlayingStatus.PAUSE) {
+            menuPause.mouseMoved(x, y);
+        return;
+        }else if (currentStatus == PlayingStatus.WIN) {
+            menuWin.mouseMoved(x, y);
+            return;
+        }else   if( currentStatus == PlayingStatus.LOST) {
+            menuLost.mouseMoved(x, y);
+            return;
+        }
     }
 }

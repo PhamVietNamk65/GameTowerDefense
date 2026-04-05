@@ -1,4 +1,4 @@
-package States;
+package states;
 
 import java.awt.Graphics;
 
@@ -7,10 +7,6 @@ public class GameStateManager {
 
     public void setState(GameState state){
         this.currentState = state;
-    }
-
-    public GameState getCurrentState(){
-        return currentState;
     }
 
     public void update(){
@@ -37,5 +33,9 @@ public class GameStateManager {
     public void mouseMoved(int x, int y){
         if(currentState != null)
             currentState.mouseMoved(x, y);
+    }
+    
+    public GameState getCurrentState(){
+        return currentState;
     }
 }

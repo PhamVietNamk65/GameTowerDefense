@@ -9,6 +9,7 @@ import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
 
+import entity.monster.Monster;
 import entity.tower.Tower;
 import utils.Constants;
 import utils.Utilz;

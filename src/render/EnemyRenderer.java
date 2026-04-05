@@ -62,7 +62,6 @@ public class EnemyRenderer {
             // Walk/attack animation loop bình thường
             index = m.getAnimIndex(frames.length);
         }
-
         // Clamp để chắc chắn không out of bounds
         index = Math.min(index, frames.length - 1);
 

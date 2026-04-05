@@ -2,6 +2,8 @@ package asset;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.imageio.ImageIO;
 
@@ -17,13 +19,29 @@ public class UIAsset {
     public static BufferedImage frame;
     public static BufferedImage heart;
     public static BufferedImage coin;
-
+    public static BufferedImage victory;
+    public static BufferedImage defeat;
+    public static BufferedImage quitFrame;
     public static BufferedImage[] menuButtonsNormol = new BufferedImage[3];
     public static BufferedImage[] menuButtonsOver = new BufferedImage[3];
     public static BufferedImage[] menuButtonsPressed = new BufferedImage[3];
 
     public static BufferedImage backGround_levelSelect ;
     public static BufferedImage[] levelSelect = new BufferedImage[6];
+
+    public static BufferedImage[] PauseIcon = new BufferedImage[3];
+
+    public static Map<Integer, BufferedImage[]> levelIcons = new HashMap<>();
+
+    public static BufferedImage[] quit = new BufferedImage[3];
+    public static BufferedImage[] restart = new BufferedImage[3];
+    public static BufferedImage[] option = new BufferedImage[3];
+    public static BufferedImage[] nextLevel = new BufferedImage[3];
+    public static BufferedImage[] cancel = new BufferedImage[3];
+    public static BufferedImage[] levelLock = new BufferedImage[3];
+    public static BufferedImage[] yesButton = new BufferedImage[3];
+    public static BufferedImage[] noButton = new BufferedImage[3];
+
     private UIAsset() {
     }
 
@@ -36,6 +54,7 @@ public class UIAsset {
     public void load(){
         loadMenuAssets();
         loadLevelAssets();
+        loadMenuStatus();
     }
 
     public void loadMenuAssets() {
@@ -65,6 +84,13 @@ public class UIAsset {
             frame = ImageIO.read(getClass().getResourceAsStream("/icon/f.png"));
             heart = ImageIO.read(getClass().getResource("/icon/heart.png"));
             coin = LoadSave.getSprite("/icon/coin.png");
+            victory = ImageIO.read(getClass().getResource("/menu/victory.png")).getSubimage(355, 300, 637, 193);
+            defeat = ImageIO.read(getClass().getResource("/menu/defeat.png")).getSubimage(345, 300, 655, 195);
+            quitFrame = ImageIO.read(getClass().getResource("/menu/quitFrame.png")).getSubimage(330, 205, 680, 405);
+            //icon
+            atlas1 = ImageIO.read(getClass().getResourceAsStream("/ui/icon.png"));
+            for( int i = 0 ; i < 3; i++ )
+            PauseIcon[i] = atlas1.getSubimage( (3 + i) * 32, 8 * 32, 32, 32);
 
             
         } catch (Exception e) {
@@ -74,12 +100,40 @@ public class UIAsset {
     private void loadLevelAssets() { 
         try {
             backGround_levelSelect = ImageIO.read(getClass().getResource("/menu/backGround_levelSelect.png"));
-            levelSelect[1] = ImageIO.read(getClass().getResource("/menu/level1.png"));
+            BufferedImage atlas1 = ImageIO.read(getClass().getResourceAsStream("/ui/icon.png"));
+            for( int i = 1; i < 10; i++){
+                BufferedImage[] icons = new BufferedImage[3];
+                for(int j = 0 ; j < 3; j++ ){
+                    icons[j] = atlas1.getSubimage(( 12 + j )* 32, i * 32, 32, 32);
+                }
+                levelIcons.put(i, icons);
+            }
 
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
-   
+
+    private void loadMenuStatus(){
+        try {
+            BufferedImage atlas = ImageIO.read(getClass().getResourceAsStream("/ui/icon.png"));
+            BufferedImage atlas2 = ImageIO.read(getClass().getResourceAsStream("/ui/text.png"));
+            for(int i = 0 ; i < 3; i++){
+                quit[i] = atlas.getSubimage( (9 + i) * 32, 0, 32, 32) ;
+                restart[i] = atlas.getSubimage( ( 3 + i) * 32, 1 * 32, 32, 32);
+                option[i] = atlas.getSubimage((9 + i) * 32, 32,  32, 32);
+                nextLevel[i] = atlas.getSubimage(( 3 + i) * 32, 4 * 32, 32, 32);
+                cancel[i] = atlas.getSubimage((6 + i) * 32, 3 * 32, 32, 32);
+                levelLock[i] = atlas.getSubimage(( 9 + i) * 32, 4 * 32, 32, 32);
+                yesButton[i] = atlas2.getSubimage(( 3 + i) * 64, 32, 64, 32);
+                noButton[i] = atlas2.getSubimage((3 + i) * 64, 0, 64, 32);
+            }
+        } catch (Exception e) {
+             e.printStackTrace();
+        }
+        
+    }
+    
+
 }

@@ -2,14 +2,16 @@ package main;
 
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
+import states.GameStateManager;
+import states.MenuState;
+
 import java.awt.Color;
 import java.awt.Graphics;
 import javax.swing.JPanel;
 import javax.swing.plaf.DimensionUIResource;
+import javax.swing.plaf.ProgressBarUI;
 
-import States.GameStateManager;
-
-import States.MenuState;
+import Manager.ProgressManager;
 import asset.AssetLoad;
 import inputs.KeyHandler;
 import inputs.MyMouseListener;
@@ -38,6 +40,7 @@ public class GamePanel extends JPanel implements Runnable{
     private Render render;
     private GameStateManager gameStateManager;
 
+    private ProgressManager progressManager;
     public GamePanel(){
         this.setPreferredSize(new DimensionUIResource(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT));
         this.setBackground(Color.white);
@@ -46,7 +49,8 @@ public class GamePanel extends JPanel implements Runnable{
 
         
         keyH = new KeyHandler(this);
-        
+        progressManager = new ProgressManager(Constants.TOTAL_LEVELS);
+
         initClasses(); 
         initInputs();   
     }
@@ -126,5 +130,8 @@ public class GamePanel extends JPanel implements Runnable{
     public GameStateManager getGameStateManager(){
         return gameStateManager;
     }
-
+    
+    public ProgressManager getProgressManager() {
+        return progressManager;
+    }
 }
