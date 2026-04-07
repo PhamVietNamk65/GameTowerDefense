@@ -28,29 +28,29 @@ public class EnemyMovement {
 
         if(m.getEnemyType() == Constants.Monsters.BEE){
 
-        Point end = path[path.length - 1];
+            Point end = path[path.length - 1];
 
-        float targetX = end.x + m.getxOffset();
-        float targetY = end.y + m.getyOffset();
+            float targetX = end.x + m.getxOffset();
+            float targetY = end.y + m.getyOffset();
 
-        float dx = targetX - m.getX();
-        float dy = targetY - m.getY();
+            float dx = targetX - m.getX();
+            float dy = targetY - m.getY();
 
-        float distance = (float) Math.sqrt(dx * dx + dy * dy);
-        float speed = GetSpeed(m.getEnemyType());
+            float distance = (float) Math.sqrt(dx * dx + dy * dy);
+            float speed = GetSpeed(m.getEnemyType());
 
-        if (distance <= speed) {
-            m.setPos(targetX, targetY);
-            m.reachEnd();
-            return;
-        }
+            if (distance <= speed) {
+                m.setPos(targetX, targetY);
+                m.reachEnd();
+                return;
+            }
 
-        float moveX = (dx / distance) * speed;
-        float moveY = (dy / distance) * speed;
+            float moveX = (dx / distance) * speed;
+            float moveY = (dy / distance) * speed;
 
-        m.updateDirection(moveX, moveY);
+            m.updateDirection(moveX, moveY);
 
-        m.setPos(m.getX() + moveX, m.getY() + moveY);
+            m.setPos(m.getX() + moveX, m.getY() + moveY);
         }
         else {
             float targetX = path[m.getPathIndex()].x + m.getxOffset();

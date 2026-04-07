@@ -128,6 +128,9 @@ public class Constants {
         public static final int ORC = 1;
         public static final int WOLF = 2;
         public static final int BEE = 3;
+        public static final int RAT = 4;
+        public static final int RIDER = 5;
+        public static final int MAGE = 6;
 
         public static final int ENEMY_SIZE = 32 * 2;
 	    public static final int HP_BAR_WIDTH = 24;
@@ -158,6 +161,10 @@ public class Constants {
                     return 70;
                 case WOLF:
                     return 150;
+                case RAT:
+                    return 200;
+                case RIDER:
+                    return 350;
             }
             return 0;
         }
@@ -172,6 +179,10 @@ public class Constants {
                     return 10;
                 case WOLF:
                     return 25;
+                case RAT:
+                    return 50;
+                case RIDER:
+                    return 120;
             }
             return 0;
         }
@@ -195,15 +206,6 @@ public class Constants {
         
     }
 
-    private static class Objects{
-
-        public static final int TREE1 = 1;
-        public static final int TREE2 = 2;
-        public static final int GRASS = 3;
-        public static final int BUSH = 4;
-        public static final int STONE1 = 5;
-        public static final int STONE2 = 6;
-    }
 
     public static class Projectile{
         public static final float SPEED      = 6f;

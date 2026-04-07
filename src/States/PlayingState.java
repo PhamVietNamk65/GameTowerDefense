@@ -168,7 +168,7 @@ public class PlayingState implements GameState {
             towerManager.update(enemyManager.getMonsters());
             towerManager.getArrowManager().update(Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
 
-            if(waveManager.getTotalWaves() <= waveManager.getCurrentWave() && enemyManager.getMonsters().isEmpty()){
+            if(waveManager.isWavesDone() && enemyManager.getMonsters().isEmpty()){
                 winDelay--;
                 if (winDelay <= 0) {
                     currentStatus = PlayingStatus.WIN;

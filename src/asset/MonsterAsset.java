@@ -56,6 +56,26 @@ public class MonsterAsset {
             "enemies/4/D_Death.png",
             "enemies/4/S_Death.png",
             null);
+
+        loadEnemyAnimation(RAT,
+            "enemies/5/U_Run.png",
+            "enemies/5/D_Run.png",
+            "enemies/5/S_Run.png",
+            "enemies/5/U_Death.png",
+            "enemies/5/D_Death.png",
+            "enemies/5/S_Death.png",
+            "enemies/5/U_Attack.png");
+
+        loadEnemyAnimation(RIDER,
+            "enemies/6/U_Run.png",
+            "enemies/6/D_Run.png",
+            "enemies/6/S_Run.png",
+            "enemies/6/U_Death.png",
+            "enemies/6/D_Death.png",
+            "enemies/6/S_Death.png",
+            "enemies/6/U_Attack.png");
+
+
     }
 
     private void loadEnemyAnimation(int type,
@@ -66,21 +86,21 @@ public class MonsterAsset {
         Map<EnemyState, Map<Integer, BufferedImage[]>> stateMap = new HashMap<>();
 
         stateMap.putIfAbsent(EnemyState.DYING, new HashMap<>());
-    	stateMap.get(EnemyState.DYING).put(Constants.Direction.UP, LoadSave.getSpriteFrames(deathUp, 48, 48));
-        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
-        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, 48, 48));
+    	stateMap.get(EnemyState.DYING).put(Constants.Direction.UP, LoadSave.getSpriteFrames(deathUp, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
+        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
+        stateMap.get(EnemyState.DYING).put(Constants.Direction.DOWN, LoadSave.getSpriteFrames(deathUp, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
       
         // ===== WALK =====
         stateMap.put(EnemyState.WALK, new HashMap<>());
-        stateMap.get(EnemyState.WALK).put(Constants.Direction.UP,    LoadSave.getSpriteFrames(walkUp,   48, 48));
-        stateMap.get(EnemyState.WALK).put(Constants.Direction.DOWN,  LoadSave.getSpriteFrames(walkDown, 48, 48));
-        stateMap.get(EnemyState.WALK).put(Constants.Direction.LEFT,  LoadSave.getSpriteFrames(walkSide, 48, 48));
-        stateMap.get(EnemyState.WALK).put(Constants.Direction.RIGHT, LoadSave.getSpriteFrames(walkSide, 48, 48));
+        stateMap.get(EnemyState.WALK).put(Constants.Direction.UP,    LoadSave.getSpriteFrames(walkUp,   type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
+        stateMap.get(EnemyState.WALK).put(Constants.Direction.DOWN,  LoadSave.getSpriteFrames(walkDown, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
+        stateMap.get(EnemyState.WALK).put(Constants.Direction.LEFT,  LoadSave.getSpriteFrames(walkSide, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
+        stateMap.get(EnemyState.WALK).put(Constants.Direction.RIGHT, LoadSave.getSpriteFrames(walkSide, type < 4 ? 48 : 96, type <= 4 ? 48 : 96));
 
         // ===== ATTACK =====
         stateMap.put(EnemyState.ATTACK, new HashMap<>());
         if (attackPath != null) {
-            BufferedImage[] attackFrames = LoadSave.getSpriteFrames(attackPath, 48, 48);
+            BufferedImage[] attackFrames = LoadSave.getSpriteFrames(attackPath, type <= 4 ? 48 : 96, type <= 4 ? 48 : 96);
             stateMap.get(EnemyState.ATTACK).put(Constants.Direction.UP,    attackFrames);
             stateMap.get(EnemyState.ATTACK).put(Constants.Direction.DOWN,  attackFrames);
             stateMap.get(EnemyState.ATTACK).put(Constants.Direction.LEFT,  attackFrames);
