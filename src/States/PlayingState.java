@@ -1,18 +1,22 @@
 package states;
+import java.awt.AlphaComposite;
+import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.lang.runtime.SwitchBootstraps;
-
+import static utils.Constants.Tiles.*;
 import Manager.ArrowManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
 import Manager.ProgressManager;
 import Manager.TowerManager;
 import Manager.WaveManager;
+import asset.WallAsset;
 import entity.TowerSlot;
 import entity.tower.Tower;
 import levels.LevelState;
+import listeners.GameListener;
 import listeners.TowerActionListener;
 import main.GamePanel;
 import render.ArrowRenderer;
@@ -64,6 +68,8 @@ public class PlayingState implements GameState {
     private PlayingStatus currentStatus = PlayingStatus.PLAYING;
 
     private ProgressManager progressManager;
+
+    private boolean isPlacingWall = false;
 
     public PlayingState(GamePanel gamePanel,int level){
 
@@ -151,9 +157,17 @@ public class PlayingState implements GameState {
         waveManager = new WaveManager(enemyManager,levelManager);
         gameUI = new GameUI(levelState, waveManager);
 
-        gameUI.setGameListener(()->{
-            currentStatus = PlayingStatus.PAUSE;
-        });
+        gameUI.setGameListener(new GameListener(){
+                @Override
+                public void onPause() {
+                    currentStatus = PlayingStatus.PAUSE;
+                }
+
+                @Override
+                    public void onBuild() {
+                    isPlacingWall = true;
+                }
+                });
     
     }
 
@@ -215,8 +229,7 @@ public class PlayingState implements GameState {
             default:
                 break;
         }
-
-        
+        drawBuildWall(g);
     }
 
     @Override
@@ -233,7 +246,18 @@ public class PlayingState implements GameState {
             menuLost.mousePressed(x, y);
             return;
         }
+        if (isPlacingWall) {
 
+            int tileX = mouseX / TILE_SIZE;
+            int tileY = mouseY / TILE_SIZE;
+
+            if (levelManager.getCurrentLevel().canBuildWall(tileX, tileY)) { 
+                levelManager.getCurrentLevel().buildWall(tileX, tileY);
+                isPlacingWall = false; // nếu muốn build 1 lần
+            } else {
+                System.out.println("Không thể đặt ở đây");
+            }
+        }
         gameUI.mousePressed(x, y);
 
         // ===== Nếu đang mở TowerUI (upgrade/sell) =====
@@ -325,4 +349,33 @@ public class PlayingState implements GameState {
             return;
         }
     }
+
+    private void drawBuildWall(Graphics g){
+        if (isPlacingWall) {
+
+            int tileX = mouseX / Constants.Tiles.TILE_SIZE;
+            int tileY = mouseY / Constants.Tiles.TILE_SIZE;
+
+            int drawX = tileX * TILE_SIZE;
+            int drawY = tileY * TILE_SIZE;
+
+            boolean canBuild = levelManager.getCurrentLevel().canBuildWall(tileX, tileY);
+
+            Graphics2D g2 = (Graphics2D) g;
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+
+            if (canBuild) {
+                g.drawImage(WallAsset.wallBuild.get(3).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE, null);
+            } else {
+                g.drawImage(WallAsset.wallBuild.get(3).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE,null);
+                g.setColor(new Color(255, 0, 0, 100));
+                g.fillRect(drawX, drawY, TILE_SIZE, TILE_SIZE);
+            }
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }
+    }
+
+
 }

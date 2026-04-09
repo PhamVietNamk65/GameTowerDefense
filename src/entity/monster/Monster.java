@@ -1,12 +1,14 @@
 package entity.monster;
 
 import static utils.Constants.Direction.*;
-import static utils.Constants.Monsters.GetReward;
+import static utils.Constants.Monsters.*;
 
 import java.awt.Rectangle;
 import java.util.Random;
 
+import entity.trap.Wall;
 import system.EnemyMovement;
+import utils.Constants;
 
 import static utils.Constants.Direction.*;
 
@@ -36,6 +38,10 @@ public class Monster {
     private static final int DEATH_ANI_SPEED = 10; // tốc độ death animation
 
     private EnemyMovement movement;
+
+    private Wall targetWall;
+
+    private int attackCooldown = 0;
 
     public Monster(float x, float y, int ID, int enemyType) {
         this.x = x;
@@ -182,4 +188,27 @@ public class Monster {
     public EnemyMovement getMovement() {
         return movement;
     }
+
+    public void setTargetWall(Wall wall) {
+        this.targetWall = wall;
+    }
+
+    public Wall getTargetWall() {
+        return targetWall;
+    }
+
+    public void attackWall() {
+
+        if (attackCooldown > 0) {
+            attackCooldown--;
+            return;
+        }   
+
+        if (targetWall != null) {
+            targetWall.takeDamage(getDame(enemyType));
+        }
+
+        attackCooldown = getAttackSpeed(enemyType); 
+    }
+
 }

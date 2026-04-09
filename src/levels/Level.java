@@ -6,10 +6,12 @@ import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.Map;
 
 import asset.MapAsset;
 import entity.TowerSlot;
+import entity.trap.Wall;
 import system.PathFinder;
 import utils.Constants;
 
@@ -25,6 +27,10 @@ public class Level {
 
     private ArrayList<TowerSlot> allSlots = new ArrayList<>();
     private ArrayList<TowerSlot> activeSlots;
+
+    private Wall[][] wallGrid ;
+    private ArrayList<Wall> walls = new ArrayList<>();
+
     public Level(int levelid){
         this.levelid = levelid;
         loadLevel();
@@ -39,15 +45,29 @@ public class Level {
         paths.add(PathFinder.buildPath(pathMap));
         generateTowerSlots();
         activeSlots = new ArrayList<>(allSlots);
-
+        wallGrid = new Wall[groundMap.length][groundMap[0].length];
         try {
             int[][] pathMap1 = LoadMap.loadLevel("res/Map/Level" + levelid + "/path1.csv");
             paths.add(PathFinder.buildPath(pathMap1));
         } catch (Exception e) {}
     }
+
     public void update() {
-       
+
+        Iterator<Wall> it = walls.iterator();
+
+        while (it.hasNext()) {
+            Wall w = it.next();
+
+            w.update();
+
+            if (w.isDestroyed()) {
+                wallGrid[w.getY()][w.getX()] = null;
+                it.remove();
+            }
+        }
     }
+
     private void generateTowerSlots() {
         for (int y = 0; y < towerMap.length; y++) {
             for (int x = 0; x < towerMap[y].length; x++) {
@@ -90,11 +110,6 @@ public class Level {
             }
         }
 
-        // if( levelid == 3){
-        //     g.setColor(new Color(0,0,0,20));
-        //     g.fillRect(0, 0, Constants.SCREEN_WIDTH, Constants.SCREEN_HEIGHT);
-        // }
-
         for (int y = 0; y < objectsMap.length; y++) {
             for (int x = 0; x < objectsMap[0].length; x++) {
                 int tileId = objectsMap[y][x];
@@ -129,6 +144,10 @@ public class Level {
         for (TowerSlot slot : activeSlots) {
             slot.render(g);
         }
+        
+        for(Wall w : walls){
+            w.render(g);
+        }
     }
 
     public ArrayList<Point[]> getPaths() {
@@ -149,6 +168,7 @@ public class Level {
 
         return null;
     }
+
     private void drawMore(Graphics g, int x, int y, int id){
         // 1. Dùng tọa độ x, y để tạo Seed cố định cho ô này
         long seed = (long)x * 73856093 ^ (long)y * 19349663;
@@ -174,5 +194,68 @@ public class Level {
             
     public int getlevelID(){
         return levelid;
+    }
+
+    public void buildWall(int x, int y) {
+        int dir = getDirectionFromPath(x, y);
+        Wall w = new Wall(x, y, dir);
+
+        wallGrid[y][x] = w;
+        walls.add(w);
+    }
+
+    public boolean hasWall(int x, int y) {
+        
+        return wallGrid[y][x] != null;
+    }
+
+    public Wall getWallAt(int x, int y) {
+        return wallGrid[y][x];
+    }
+
+    public void removeWall(Wall w) {
+        wallGrid[w.getY()][w.getX()] = null;
+        walls.remove(w);
+    }
+
+    public boolean canBuildWall(int x, int y) {
+
+        if (x < 0 || y < 0 || y >= groundMap.length || x >= groundMap[0].length)
+            return false;
+
+        // đã có tường
+        if (hasWall(x, y)) return false;
+
+        // không phải ô build (ví dụ != 0)
+        if (pathMap[y][x] == 0) return false;
+
+        return true;
+    }
+
+    private int getDirectionFromPath(int x, int y) {
+
+        for (Point[] path : paths) {
+            for (int i = 1; i < path.length; i++) {
+
+                int px = path[i].x / TILE_SIZE;
+                int py = path[i].y / TILE_SIZE;
+
+                if (px == x && py == y) {
+
+                    int prevX = path[i - 1].x / TILE_SIZE;
+                    int prevY = path[i - 1].y / TILE_SIZE;
+
+                    int dx = px - prevX;
+                    int dy = py - prevY;
+
+                    if (dx == 1) return 2;   
+                    if (dx == -1) return 3;  
+                    if (dy == -1) return 1;   
+                    if (dy == 1) return 0;  
+                }
+            }
+        }
+
+        return 2; // default
     }
 }

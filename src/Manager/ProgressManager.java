@@ -13,8 +13,9 @@
                 levels[i] = new LevelNode(i, false);
             }
 
-            // mở level đầu tiên
             levels[1].unlock();
+            levels[2].unlock();
+            levels[3].unlock();
         }
 
         public boolean isLevelUnlocked(int levelId) {

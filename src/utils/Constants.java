@@ -136,6 +136,46 @@ public class Constants {
 	    public static final int HP_BAR_WIDTH = 24;
 	    public static final int HP_BAR_HEIGHT = 4;
 	    public static final int HP_BAR_Y_OFFSET = 8;
+
+        public static int getAttackSpeed(int monsterType){
+            switch (monsterType) {
+                case ORC:
+                    return 60;
+                case SLIME:
+                    return 100;
+                case BEE:
+                    return 0;
+                case WOLF:
+                    return 45;
+                case RAT:
+                    return 50;
+                case RIDER:
+                    return 40;
+                case MAGE:
+                    return 70;
+            }
+            return 0;
+        }
+        
+        public static int getDame(int monsterType){
+            switch (monsterType) {
+                case ORC:
+                    return 20;
+                case SLIME:
+                    return 1;
+                case BEE:
+                    return 0;
+                case WOLF:
+                    return 15;
+                case RAT:
+                    return 18;
+                case RIDER:
+                    return 25;
+                case MAGE:
+                    return 30;
+            }
+            return 0;
+        }
         
         public static float GetSpeed(int monsterType){
             switch (monsterType) {
@@ -147,6 +187,10 @@ public class Constants {
                     return 1.5f;
                 case WOLF:
                     return 2f;
+                case RAT:
+                    return 1.2f;
+                case RIDER:
+                    return 2.5f;
             }
             return 0;
         }
@@ -216,5 +260,25 @@ public class Constants {
     public static class Arrow{
         public static final int ARROW_DRAW_SIZE = 10;
         public static final int ARROW_ANIM_SPEED = 4;
+    }
+
+    public static class Walls{
+        public static int getStartHP(int level){
+            switch (level) {
+                case 0:
+                    return 100;
+                case 1:
+                    return 150;
+                case 2:
+                    return 200;
+                case 3:
+                    return 250;
+                case 4:
+                    return 400;
+                default:
+                    break;
+            }
+            return 0;
+        }
     }
 }

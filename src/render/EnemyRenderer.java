@@ -67,17 +67,17 @@ public class EnemyRenderer {
 
         if (m.getDirection() == utils.Constants.Direction.RIGHT) {
             g.drawImage(frames[index],
-                    (int) m.getX() + ENEMY_SIZE,
-                    (int) m.getY(),
-                    -ENEMY_SIZE,
-                    ENEMY_SIZE,
+                    (int) m.getX() + (m.getEnemyType() < 4 ? ENEMY_SIZE : 96),
+                    (int) m.getY() + (m.getEnemyType() < 4 ? 0 : -32),
+                    m.getEnemyType() < 4 ? -ENEMY_SIZE : -96,
+                    m.getEnemyType() < 4 ? ENEMY_SIZE : 96,
                     null);
         } else {
             g.drawImage(frames[index],
-                    (int) m.getX(),
-                    (int) m.getY(),
-                    ENEMY_SIZE,
-                    ENEMY_SIZE,
+                    (int) m.getX() ,
+                    (int) m.getY() + (m.getEnemyType() < 4 ? 0 : -32),
+                    m.getEnemyType() < 4 ? ENEMY_SIZE : 96,
+                    m.getEnemyType() < 4 ? ENEMY_SIZE : 96,
                     null);
         }
     }
@@ -86,9 +86,9 @@ public class EnemyRenderer {
         Graphics2D g = (Graphics2D) g0.create();
         g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int barWidth  = HP_BAR_WIDTH;
-        int barHeight = HP_BAR_HEIGHT;
-        int barX = (int) m.getX() + (ENEMY_SIZE - barWidth) / 2;
+        int barWidth  = m.getEnemyType() < 4 ? HP_BAR_WIDTH : 32;
+        int barHeight = HP_BAR_HEIGHT ;
+        int barX = (int) m.getX() + (m.getEnemyType() < 4 ? ENEMY_SIZE : 96 - barWidth) / 2;
         int barY = (int) m.getY() - HP_BAR_Y_OFFSET;
 
         float hpPercent   = m.getHealthBarFloat();
