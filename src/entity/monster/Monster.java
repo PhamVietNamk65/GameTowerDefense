@@ -1,14 +1,10 @@
 package entity.monster;
 
-import static utils.Constants.Direction.*;
-import static utils.Constants.Monsters.GetReward;
-
 import java.awt.Rectangle;
 import java.util.Random;
-
 import system.EnemyMovement;
-
 import static utils.Constants.Direction.*;
+import static utils.Constants.Monsters.GetReward;
 
 public class Monster {
     protected float x, y;
@@ -36,6 +32,8 @@ public class Monster {
     private static final int DEATH_ANI_SPEED = 10; // tốc độ death animation
 
     private EnemyMovement movement;
+    private StatusEffect statusEffect = new StatusEffect();
+    
 
     public Monster(float x, float y, int ID, int enemyType) {
         this.x = x;
@@ -72,6 +70,14 @@ public class Monster {
             } else {
                 deathDone = true; // đã chạy hết frame → đánh dấu xong
             }
+        }
+    }
+
+    public void update() {
+        // Cập nhật status effect trước khi di chuyển
+        int burnDmg = statusEffect.update();
+        if (burnDmg > 0) {
+            hurt(burnDmg);
         }
     }
 
@@ -182,4 +188,6 @@ public class Monster {
     public EnemyMovement getMovement() {
         return movement;
     }
+
+    public StatusEffect getStatusEffect() { return statusEffect; }
 }

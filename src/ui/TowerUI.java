@@ -23,8 +23,11 @@ public class TowerUI {
             int bx = selectedTower.getX() + Constants.Tiles.TILE_SIZE + 10;
             int by = selectedTower.getY();
             buttonBar.setPosition(bx, by);
-            if( selectedTower.getTowerLevel() == 6 ) buttonBar.buttons.get(0).setText("Max Upgrade");
-            else buttonBar.buttons.get(0).setText("Upgrade: -" + Constants.Towers.GetCostUpdate(selectedTower.getTowerType(), selectedTower.getTowerLevel() + 1));
+            if (selectedTower.isMaxLevel()) {
+                buttonBar.buttons.get(0).setText("Max Level");
+            } else {
+                buttonBar.buttons.get(0).setText("Upgrade: -" + selectedTower.getNextUpgradeCost());
+            }
             buttonBar.buttons.get(1).setText("Sell: +" + selectedTower.getSellValue());
         }
     }
@@ -35,7 +38,9 @@ public class TowerUI {
         
         MyButton upgrade = new MyButton("", 140,33);
         upgrade.setAction(()->{
-            if (listener != null && levelState.getGold() >= selectedTower.getCost()) {
+            if (listener != null
+                    && !selectedTower.isMaxLevel()
+                    && levelState.getGold() >= selectedTower.getNextUpgradeCost()) {
                 listener.onUpgrade(selectedTower);
             }
         });
@@ -100,7 +105,7 @@ public class TowerUI {
 
         for (MyButton b : buttonBar.buttons) {
             if (b.getBounds().contains(x, y) && b.isMousePressed()) {
-                if( selectedTower.getTowerLevel() != 7) b.execute();
+                b.execute();
                 handled = true;
             }
         b.setMousePressed(false);

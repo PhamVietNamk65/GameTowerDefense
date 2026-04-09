@@ -1,9 +1,4 @@
 package states;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.lang.runtime.SwitchBootstraps;
-
 import Manager.ArrowManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
@@ -12,12 +7,19 @@ import Manager.TowerManager;
 import Manager.WaveManager;
 import entity.TowerSlot;
 import entity.tower.Tower;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import levels.LevelState;
 import listeners.TowerActionListener;
 import main.GamePanel;
 import render.ArrowRenderer;
+import render.BombRenderer;
+import render.BulletRenderer;
+import render.CanonRenderer;
 import render.EnemyRenderer;
+import render.SniperRenderer;
 import render.TowerRenderer;
+import render.WirzardRenderer;
 import system.EnemyMovement;
 import system.TowerUpdater;
 import ui.GameUI;
@@ -45,6 +47,11 @@ public class PlayingState implements GameState {
     private ArrowRenderer arrowRenderer;
     private TowerSlotUI slotUI;
     private TowerUI towerUI;
+    private CanonRenderer canonRenderer;   
+    private BombRenderer    bombRender;
+    private WirzardRenderer wirzardRenderer;
+    private SniperRenderer  sniperRenderer;   // ← NEW
+    private BulletRenderer  bulletRenderer;   // ← NEW
 
     private EnemyManager enemyManager;
     private EnemyMovement enemyMovement;
@@ -79,6 +86,11 @@ public class PlayingState implements GameState {
         towerUpdater = new TowerUpdater();
         towerRenderer = new TowerRenderer(towerManager);
         arrowRenderer = new ArrowRenderer();
+        canonRenderer = new CanonRenderer();   
+        bombRender    = new BombRenderer();
+        wirzardRenderer = new WirzardRenderer();
+        sniperRenderer  = new SniperRenderer();    // ← NEW
+        bulletRenderer  = new BulletRenderer();    // ← NEW
 
         towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
@@ -101,7 +113,7 @@ public class PlayingState implements GameState {
                 else { 
                     levelManager.getCurrentLevel().addBackSlot(t.getX() / 64, t.getY() / 64);
                     TowerSlot slot = levelManager.getCurrentLevel().getSlotAt(t.getX(), t.getY());
-                    slot.setOccupied(false); // <--- QUAN TRỌNG: Mở khóa ô đất để xây lại
+                    slot.setOccupied(false);
                     
 
                     towerManager.removeTower(t);
@@ -195,6 +207,16 @@ public class PlayingState implements GameState {
         enemyRenderer.draw(g2);
         towerRenderer.draw(g2);
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
+        canonRenderer.draw(g2,towerManager.getTowers(),towerManager.getSelectedTower());      
+        bombRender.render(g2,towerManager.getBombManager().getBombs());
+        wirzardRenderer.drawTowers(g2, towerManager.getTowers(), towerManager.getSelectedTower());
+        wirzardRenderer.drawProjectiles(g2, towerManager.getFlameManager(), 
+        towerManager.getFrostManager(), towerManager.getLightningManager());
+        wirzardRenderer.drawStatusEffects(g2, enemyManager.getMonsters());
+
+        // ── Sniper + Bullet (NEW) ───────────────────────────────────────────
+        sniperRenderer.draw(g2, towerManager.getTowers(), towerManager.getSelectedTower());
+        bulletRenderer.render(g2, towerManager.getBulletManager().getBullets());
 
         slotUI.render(g2);
         towerUI.draw(g2);
@@ -236,11 +258,9 @@ public class PlayingState implements GameState {
 
         gameUI.mousePressed(x, y);
 
-        // ===== Nếu đang mở TowerUI (upgrade/sell) =====
         if (towerUI.mousePressed(x, y)) {
             return;
         }
-        // ===== Nếu đang mở TowerSlotUI =====
         if (slotUI.isVisible()) {
             if (slotUI.isInside(x, y)) {
                 slotUI.update(x, y, true,levelManager.getCurrentLevel());
@@ -250,7 +270,6 @@ public class PlayingState implements GameState {
             }
         }
 
-        // ===== Click vào Tower =====
         Tower t = towerManager.getTowerAt(x, y);
         if (t != null) {
             selectedTower = t;
@@ -258,7 +277,6 @@ public class PlayingState implements GameState {
             return;
         }
 
-        // ===== Click vào TowerSlot =====
         TowerSlot slot = levelManager.getCurrentLevel().getSlotAt(x, y);
 
         if (slot != null && !slot.isOccupied()) {
@@ -266,7 +284,6 @@ public class PlayingState implements GameState {
             return;
         }
 
-        // =====  Click ra ngoài → bỏ chọn tower =====
         selectedTower = null;
         towerUI.setSelectedTower(null);
     }
@@ -286,24 +303,20 @@ public class PlayingState implements GameState {
 
         gameUI.mouseReleased(x, y);
 
-        // ===== 1. Nếu đang mở TowerSlotUI → không xử lý gì thêm =====
         if (slotUI.isVisible()) {
             return;
         }
 
-        // ===== 2. Xử lý UI của Tower (upgrade / sell) =====
         if (towerUI.mouseReleased(x, y)) {
             return;
         }
 
-        // ===== 3. Click chọn Tower =====
         Tower t = towerManager.getTowerAt(x, y);
 
         if (t != null) {
             selectedTower = t;
             towerUI.setSelectedTower(t);
         } else {
-            // ===== 4. Click ra ngoài → bỏ chọn =====
             selectedTower = null;
             towerUI.setSelectedTower(null);
         }

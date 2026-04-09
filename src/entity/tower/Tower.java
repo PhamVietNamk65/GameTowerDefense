@@ -16,7 +16,6 @@ public class Tower {
     public static final int UP   = 1;
     public static final int DOWN = 2;
 
-    // Idle frame theo level
     public static final int[] IDLE_FRAME_COUNTS = {1, 4, 4, 6, 6, 6, 6};
 
     private int x, y, id, towerType;
@@ -27,29 +26,23 @@ public class Tower {
     private int cost;
     private int value;
 
-
-    // ===== Archer animation =====
     private int animState = IDLE;
     private int animIndex = 0;
     private int animTick  = 0;
     private int animSpeed = 14;
     private int direction = SIDE;
 
-    // ===== Level =====
     private int towerLevel = 0;
 
-    // ===== Facing =====
     private boolean facingLeft = false;
 
-    // ===== Tower idle animation =====
     private int towerAnimFrame = 0;
     private int towerAnimTick  = 0;
-    private static final int TOWER_ANIM_SPEED = 18; 
+    private static final int TOWER_ANIM_SPEED = 18;
 
     private static final int ATTACK_HOLD = 4;
     private int attackHoldTick = 0;
 
-    // ===== Upgrade =====
     private static final int UPGRADE_TOTAL_TICKS = 60;
     private boolean upgrading           = false;
     private int     upgradeTick         = 0;
@@ -58,10 +51,8 @@ public class Tower {
     private boolean justStartedUpgrade  = false;
     private boolean justFinishedUpgrade = false;
 
-    // ===== Select =====
     private boolean selected = false;
 
-    // Flag báo hiệu cần spawn đạn khi PREATTACK → ATTACK
     private boolean shouldSpawnProjectile = false;
 
     public Tower(int x, int y, int id, int towerType, int cost) {
@@ -76,7 +67,7 @@ public class Tower {
         setDefaultStats();
     }
 
-    private void initBounds(){
+    private void initBounds() {
         this.bounds = new Rectangle(x, y, TILE_SIZE, TILE_SIZE);
     }
 
@@ -90,11 +81,10 @@ public class Tower {
         }
     }
 
-    // ===== Idle animation =====
     private void updateTowerAnim() {
         if (upgrading) return;
 
-        int maxFrames = IDLE_FRAME_COUNTS[towerLevel];
+        int maxFrames = IDLE_FRAME_COUNTS[Math.min(towerLevel, IDLE_FRAME_COUNTS.length - 1)];
 
         if (maxFrames <= 1) {
             towerAnimFrame = 0;
@@ -108,7 +98,6 @@ public class Tower {
         }
     }
 
-    // ===== Upgrade =====
     private void updateUpgrade() {
         justStartedUpgrade  = false;
         justFinishedUpgrade = false;
@@ -138,7 +127,6 @@ public class Tower {
         }
     }
 
-    // ===== Archer animation =====
     public void updateAnimation() {
         int maxFrames = getFrameAmount(this);
         if (maxFrames <= 0) return;
@@ -148,7 +136,6 @@ public class Tower {
 
         animTick = 0;
 
-        // HOLD ATTACK FRAME
         if (animState == ATTACK && attackHoldTick < ATTACK_HOLD) {
             attackHoldTick++;
             return;
@@ -165,22 +152,33 @@ public class Tower {
                     attackHoldTick = 0;
                     shouldSpawnProjectile = true;
                     break;
-
                 case ATTACK:
                     animState = IDLE;
                     break;
-
                 case IDLE:
                     break;
             }
         }
     }
 
-    /** Trả về true MỘT LẦN khi cần spawn arrow, rồi tự reset. */
     public boolean shouldSpawnProjectile() {
         boolean v = shouldSpawnProjectile;
         shouldSpawnProjectile = false;
         return v;
+    }
+
+    // ── Max level is now per tower type ───────────────────────────────────────
+    public boolean isMaxLevel() {
+        return towerLevel >= Constants.Towers.GetMaxLevel(towerType);
+    }
+
+    public boolean canUpgrade() {
+        return towerLevel < Constants.Towers.GetMaxLevel(towerType);
+    }
+    // ─────────────────────────────────────────────────────────────────────────
+
+    public int getNextUpgradeCost() {
+        return Constants.Towers.GetCostUpdate(getTowerType(), getTowerLevel() + 1);
     }
 
     public void upgrade() {
@@ -218,16 +216,15 @@ public class Tower {
         cooldown = Constants.Towers.GetDefaultCoolDown(towerType);
     }
 
-    public Rectangle getBounds(){
+    public Rectangle getBounds() {
         return bounds;
     }
 
     public int getFrameAmount(Tower t) {
         BufferedImage[] frames = TowerAsset.archerAnimations[t.getDirection()][t.getAnimState()];
-        return frames==null ? 0 : frames.length;
+        return frames == null ? 0 : frames.length;
     }
 
-    // ===== Arrow spawn (GIỮ NGUYÊN CHUẨN) =====
     public int getArrowSpawnX() {
         int cx = getCenterX();
         if (direction == UP || direction == DOWN)
@@ -237,7 +234,6 @@ public class Tower {
 
     public int getArrowSpawnY() {
         int cy = getCenterY();
-
         switch (direction) {
             case UP:   return cy - 10;
             case DOWN: return cy + 10;
@@ -249,36 +245,34 @@ public class Tower {
         return cdTick >= cooldown;
     }
 
-    // ===== GETTER =====
-    public int getTowerAnimFrame() { return towerAnimFrame; }
-    public boolean isUpgrading() { return upgrading; }
-    public boolean isJustStartedUpgrade() { return justStartedUpgrade; }
-    public boolean isJustFinishedUpgrade() { return justFinishedUpgrade; }
-    public int getFlashAlpha() { return flashAlpha; }
-    public float getUpgradeProgress() { return upgrading ? (float)upgradeTick / UPGRADE_TOTAL_TICKS : 0f; }
-    public boolean canUpgrade() { return towerLevel < 6; }
-    public boolean isCooldownOver() { return cdTick >= cooldown; }
-    public void resetCooldown() { cdTick = 0; }
-    public int getTowerLevel() { return towerLevel; }
-    public int getDisplayLevel() { return towerLevel + 1; }
-    public int getCenterX() { return x + 16; }
-    public int getCenterY() { return y + 16; }
-    public int getX() { return x; }
-    public int getY() { return y; }
-    public int getId() { return id; }
-    public int getTowerType() { return towerType; }
-    public int getDmg() { return dmg; }
-    public float getRange() { return range; }
-    public float getCooldown() { return cooldown; }
-    public int getAnimState() { return animState; }
-    public int getAnimIndex() { return animIndex; }
-    public int getAnimTick() { return animTick; }
-    public int getDirection() { return direction; }
-    public boolean isFacingLeft() { return facingLeft; }
-    public void setFacingLeft(boolean l) { this.facingLeft = l; }
-    public boolean isSelected() { return selected; }
-    public void setSelected(boolean selected) { this.selected = selected; }   
-    public void setUpgrading(boolean b) { this.upgrading = b; }
-    public int getCost() { return cost; }
-    public int getSellValue(){ return (int) (value * 0.6);}
+    public int     getTowerAnimFrame()      { return towerAnimFrame; }
+    public boolean isUpgrading()            { return upgrading; }
+    public boolean isJustStartedUpgrade()   { return justStartedUpgrade; }
+    public boolean isJustFinishedUpgrade()  { return justFinishedUpgrade; }
+    public int     getFlashAlpha()          { return flashAlpha; }
+    public float   getUpgradeProgress()     { return upgrading ? (float)upgradeTick / UPGRADE_TOTAL_TICKS : 0f; }
+    public boolean isCooldownOver()         { return cdTick >= cooldown; }
+    public void    resetCooldown()          { cdTick = 0; }
+    public int     getTowerLevel()          { return towerLevel; }
+    public int     getDisplayLevel()        { return towerLevel + 1; }
+    public int     getCenterX()             { return x + 16; }
+    public int     getCenterY()             { return y + 16; }
+    public int     getX()                   { return x; }
+    public int     getY()                   { return y; }
+    public int     getId()                  { return id; }
+    public int     getTowerType()           { return towerType; }
+    public int     getDmg()                 { return dmg; }
+    public float   getRange()               { return range; }
+    public float   getCooldown()            { return cooldown; }
+    public int     getAnimState()           { return animState; }
+    public int     getAnimIndex()           { return animIndex; }
+    public int     getAnimTick()            { return animTick; }
+    public int     getDirection()           { return direction; }
+    public boolean isFacingLeft()           { return facingLeft; }
+    public void    setFacingLeft(boolean l) { this.facingLeft = l; }
+    public boolean isSelected()             { return selected; }
+    public void    setSelected(boolean s)   { this.selected = s; }
+    public void    setUpgrading(boolean b)  { this.upgrading = b; }
+    public int     getCost()                { return cost; }
+    public int     getSellValue()           { return (int)(value * 0.6); }
 }
