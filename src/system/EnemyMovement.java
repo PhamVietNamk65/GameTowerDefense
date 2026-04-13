@@ -21,7 +21,8 @@ public void move(Monster m, Level level) {
         m.reachEnd();
         return;
     }
-
+    if (m.getStatusEffect().isStunned()) return;
+    
     if (m.getState() == EnemyState.DYING) return;
 
     int tileSize = Constants.Tiles.TILE_SIZE;

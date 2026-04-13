@@ -251,7 +251,6 @@ public class Tower {
     public boolean isJustFinishedUpgrade() { return justFinishedUpgrade; }
     public int getFlashAlpha() { return flashAlpha; }
     public float getUpgradeProgress() { return upgrading ? (float)upgradeTick / UPGRADE_TOTAL_TICKS : 0f; }
-    public boolean canUpgrade() { return towerLevel < 6; }
     public boolean isCooldownOver() { return cdTick >= cooldown; }
     public void resetCooldown() { cdTick = 0; }
     public int getTowerLevel() { return towerLevel; }

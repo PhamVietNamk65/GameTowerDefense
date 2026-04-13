@@ -4,6 +4,7 @@ import Manager.BombManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
 import Manager.ProgressManager;
+import Manager.SkillBombManager;
 import Manager.TowerManager;
 import Manager.WaveManager;
 import asset.TrapAsset;
@@ -83,7 +84,7 @@ public class PlayingState implements GameState {
     private boolean isPlacingBomb = false;
     private boolean isPlacingSpikes = false;
 
-    private BombManager bombManager;
+    private SkillBombManager skillBombManager;
     public PlayingState(GamePanel gamePanel,int level){
 
         this.level = level;
@@ -107,7 +108,7 @@ public class PlayingState implements GameState {
         towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
         progressManager = gamePanel.getProgressManager();
-        bombManager = new BombManager();
+        skillBombManager = new SkillBombManager();
 
         towerUI.setListener(new TowerActionListener() {
 
@@ -227,7 +228,7 @@ public class PlayingState implements GameState {
             menuWin.update();
             progressManager.unlockNextLevel(level);
         }
-        bombManager.update(enemyManager.getMonsters());
+        skillBombManager.update(enemyManager.getMonsters());
         gameUI.update();
     }
 
@@ -272,7 +273,7 @@ public class PlayingState implements GameState {
         drawBuildWall(g);
         drawBuilBomb(g);
         drawBuilSpikes(g);
-        bombManager.render(g);
+        skillBombManager.render(g);
     }
 
     @Override
@@ -310,7 +311,7 @@ public class PlayingState implements GameState {
             int drawY = tileY * TILE_SIZE;
 
             if (levelManager.getCurrentLevel().canBuildWall(tileX, tileY)) { 
-                bombManager.addBomb(drawX,drawY);
+                skillBombManager.addBomb(drawX,drawY);
                 isPlacingBomb = false;
             } else {
                 

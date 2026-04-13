@@ -86,24 +86,6 @@ public class Monster {
     }
 
     // ── Di chuyển — dừng hoàn toàn khi bị stun ───────────────────────────────
-        health -= dmg;
-
-        if (health <= 0 && state != EnemyState.DYING) {
-            setState(EnemyState.DYING);
-            
-        }
-    }
-
-    public void setState(EnemyState newState) {
-        if (state == EnemyState.DYING) return;
-        this.state = newState;
-
-        deathAnimTick  = 0;
-        deathAnimIndex = 0;
-        deathDone      = false;
-    }
-
-    public EnemyState getState() { return state; }
 
     public void move(float speed, int dir) {
         if (state == EnemyState.DYING) return;
@@ -239,7 +221,5 @@ public class Monster {
         }
         attackCooldown = getAttackSpeed(enemyType);
     }
-    public void setDirectionInt(int dir) {
-        this.direction = dir;
-    }
+
 }
