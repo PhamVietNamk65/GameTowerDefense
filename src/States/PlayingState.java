@@ -200,6 +200,8 @@ public class PlayingState implements GameState {
                 @Override
                 public void onUpgradeSkill() {
                     levelManager.getCurrentLevel().upgradeTraps();
+                    levelState.spendGold(Constants.Walls.getCostUpgrade(levelManager.getCurrentLevel().getLevelWall()));
+                    gameUI.refreshButtonIcons();
                 }
                 });
                 

@@ -285,8 +285,8 @@ public class Level {
     }
 
     public void upgradeTraps() {
-    this.levelWall++;
-    this.levelSpikes++;
+        this.levelWall++;
+        this.levelSpikes++;
 
-}
+    }
 }

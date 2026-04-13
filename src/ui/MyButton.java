@@ -209,4 +209,10 @@ public class MyButton {
         mouseOver = false;
         mousePressed = false;
     }
+
+    public void setIcons(BufferedImage newWallIcon, BufferedImage newWallIcon2, BufferedImage newWallIcon3) {
+        this.pressedImage = newWallIcon;
+        this.normalImage = newWallIcon2;
+        this.overImage = newWallIcon3;
+    }
 }

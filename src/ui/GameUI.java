@@ -25,7 +25,7 @@ public class GameUI {
     private MyButton buttonPause;
     
     private ButtonBar skillBar;
-
+    private MyButton buttonupgade;
     private GameListener gameListener;
     public GameUI(LevelState levelState, WaveManager waveManager, LevelManager levelManager) {
         this.levelState = levelState;
@@ -68,14 +68,22 @@ public class GameUI {
                 gameListener.onBuildSpikes();
             }
         });
+        buttonupgade = new MyButton("Upgade: ", 50, 50);
+        buttonupgade.setButton(13 * Constants.Tiles.TILE_SIZE - 30, Constants.Tiles.TILE_SIZE - 10, 100, 50);
+        buttonupgade.setAction(()->{
+            if (gameListener != null && levelState.getGold() >= Constants.Walls.getCostUpgrade(levelManager.getCurrentLevel().getLevelWall()) && levelManager.getCurrentLevel().getLevelWall() < 4 ){
+                gameListener.onUpgradeSkill();
+            }
+        });
         buttonBuildWall.setType(MyButton.ButtonType.SKILL);
-        buttonBuildWall.setCooldown(12000);
+        buttonBuildWall.setCooldown(30000);
 
         buttonBuildBomd.setType(MyButton.ButtonType.SKILL);
-        buttonBuildBomd.setCooldown(5000);
+        buttonBuildBomd.setCooldown(15000);
 
         buttonBuildSpikes.setType(MyButton.ButtonType.SKILL);
-        buttonBuildSpikes.setCooldown(9000);
+        buttonBuildSpikes.setCooldown(20000);
+        
         skillBar.addButton(buttonBuildWall);
         skillBar.addButton(buttonBuildBomd);
         skillBar.addButton(buttonBuildSpikes);
@@ -152,6 +160,7 @@ public class GameUI {
     private void drawButtons(Graphics g){
         buttonPause.draw(g);
         skillBar.draw(g);
+        buttonupgade.draw(g);
     }
     
     public void mousePressed(int x, int y) {
@@ -162,6 +171,9 @@ public class GameUI {
         if(buttonPause.getBounds().contains(x, y)){
             buttonPause.setMousePressed(true);
         }
+        if(buttonupgade.getBounds().contains(x, y)){
+            buttonupgade.setMousePressed(true);
+        }
     }
 
     public void mouseReleased(int x, int y) {
@@ -169,14 +181,37 @@ public class GameUI {
             if( b.getBounds().contains(x,y) && b.isMousePressed() ){
                 b.setMousePressed(false);
                 b.execute();
+            } else {
+                b.setMousePressed(false);
             }
-            else b.setMousePressed(false);
         }
+
         if(buttonPause.getBounds().contains(x, y) && buttonPause.isMousePressed()){
             buttonPause.setMousePressed(false);
             buttonPause.execute();
+        } else {
+            buttonPause.setMousePressed(false);
         }
-        else buttonPause.setMousePressed(false);
+
+        if(buttonupgade.getBounds().contains(x, y) && buttonupgade.isMousePressed()){
+            buttonupgade.setMousePressed(false);
+            buttonupgade.execute(); 
+        } else {
+            buttonupgade.setMousePressed(false);
+        }
+    }
+
+    public void refreshButtonIcons() {
+        int wallLvl = levelManager.getCurrentLevel().getLevelWall();
+        int spikeLvl = levelManager.getCurrentLevel().getLevelSpikes();
+
+
+        BufferedImage newWallIcon = TrapAsset.wallBuild.get(wallLvl).get(2)[2];
+        skillBar.buttons.get(0).setIcons(newWallIcon, newWallIcon, newWallIcon);
+
+
+        BufferedImage newSpikeIcon = TrapAsset.spikes.get(spikeLvl)[3];
+        skillBar.buttons.get(2).setIcons(newSpikeIcon, newSpikeIcon, newSpikeIcon);
     }
 
     public void mouseMoved(int x, int y) {
@@ -191,6 +226,10 @@ public class GameUI {
             buttonPause.setMouseOver(true);
         }
         else buttonPause.setMouseOver(false);
+        if( buttonupgade.getBounds().contains(x, y)){
+            buttonupgade.setMouseOver(true);
+        }
+        else buttonupgade.setMouseOver(false);
     }
 
     public void setGameListener(GameListener listener) {

@@ -283,6 +283,21 @@ public class Constants {
     }
 
     public static class Walls{
+        public static int getCostUpgrade(int level){
+            switch (level) {
+                case 1:
+                    return 300;
+                case 2:
+                    return 450;
+                case 3:
+                    return 600;
+                case 4:
+                    return 1050;
+                default:
+                    break;
+            }
+            return 0;
+        }
         public static int getStartHP(int level){
             switch (level) {
                 case 0:
@@ -334,4 +349,5 @@ public class Constants {
             return 0;
         }
     }
+
 }
