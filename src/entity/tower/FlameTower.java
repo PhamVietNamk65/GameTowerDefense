@@ -18,12 +18,17 @@ public class FlameTower extends Tower {
     private static final float COOLDOWN      = 80f;
 
     /** Level hiển thị: 1, 2, 3. */
-    private int wizLevel = 1;
+    private int wizLevel    = 1;
+    /** Level TRƯỚC khi bấm upgrade — dùng cho progress bar label. */
+    private int prevWizLevel = 0; // 0 = chưa xây xong lần đầu
 
     private boolean fireFlag = false;
 
     public FlameTower(int x, int y, int id) {
         super(x, y, id, Constants.Towers.WIZARD, COST);
+        // Khi vừa tạo ra, TowerManager sẽ gọi setUpgrading(true) ngay
+        // → lần đầu prevWizLevel=0, wizLevel=1 → label "LV0 → LV1" (Đang xây)
+        prevWizLevel = 0;
     }
 
     @Override
@@ -49,8 +54,9 @@ public class FlameTower extends Tower {
     @Override
     public void upgrade() {
         if (!canUpgrade() || isUpgrading()) return;
-        wizLevel++;
-        super.upgrade();
+        prevWizLevel = wizLevel;   // lưu level cũ cho label
+        super.upgrade();            // bật isUpgrading=true TRƯỚC (canUpgrade() vẫn còn true)
+        wizLevel++;                 // tăng SAU để canUpgrade() không bị false sớm
     }
 
     // ── Stats ─────────────────────────────────────────────────────────────────
@@ -63,6 +69,9 @@ public class FlameTower extends Tower {
     public int getBurnDuration() { return BURN_DURATION; }
     public int getSplashRadius() { return SPLASH_RADIUS; }
 
-    /** Level 1-3, dùng cho FlameRenderer. */
+    /** Level hiện tại 1-3, dùng cho renderer chọn sprite. */
     public int getLevel() { return wizLevel; }
+
+    /** Level trước khi upgrade — dùng cho progress bar label. */
+    public int getPrevLevel() { return prevWizLevel; }
 }

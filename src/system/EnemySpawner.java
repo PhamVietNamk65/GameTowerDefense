@@ -32,6 +32,9 @@ public class EnemySpawner {
             case RIDER:
                 m = new Rider(0, 0, 0);
                 break;
+            case MAGE:
+                m = new Mage(0, 0, 0);
+                break;
         }
 
         return m;

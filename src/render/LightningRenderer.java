@@ -55,14 +55,8 @@ public class LightningRenderer {
     private static final int HIT_FRAME_MS   = 60;
 
     /** Kích thước sprite hit effect tại điểm trúng quái — giữ đúng tỉ lệ 64x160. */
-    private static final int HIT_W          = 64;
-    private static final int HIT_H          = 160;
-
-    /** Thời gian mỗi frame stun effect trên đầu quái (ms). */
-    private static final int STUN_FRAME_MS  = 100;
-
-    /** Kích thước sprite stun effect trên đầu quái (px). */
-    private static final int STUN_SIZE      = 32;
+    private static final int HIT_W          = 32;
+    private static final int HIT_H          = 80;
     // ═════════════════════════════════════════════════════════════════════════
 
     // ── Draw tower ─────────────────────────────────────────────────────────────
@@ -91,8 +85,21 @@ public class LightningRenderer {
         int th = TOWER_H[idx];
         int tx = t.getX() + (TILE - tw) / 2;
         int ty = t.getY() + (TILE - th);
+        // Flash khi đang upgrade
+        if (t.isUpgrading() && t.getFlashAlpha() > 0) {
+            Composite old2 = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    t.getFlashAlpha() / 255f * 0.5f));
+            g2.setColor(new Color(255, 255, 80));
+            g2.fillRoundRect(tx, ty, tw, th, 6, 6);
+            g2.setComposite(old2);
+        }
+
         g2.drawImage(img, tx, ty, tw, th, null);
         drawWizard(g2, t, lv);
+
+        // Thanh tiến độ upgrade
+        if (t.isUpgrading()) drawUpgradeBar(g2, t, tx, ty, tw);
     }
 
     private void drawWizard(Graphics2D g2, LightningTower t, int lv) {
@@ -184,10 +191,10 @@ public class LightningRenderer {
                 BufferedImage hitImg = hitFrames[frameIdx];
                 if (hitImg != null) {
                     g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, alpha));
-                    // Căn giữa ngang, đáy sprite chạm điểm trúng quái
+                    // Căn giữa ngang, đỉnh sprite chạm điểm trúng → sprite mọc xuống dưới chân quái
                     g2.drawImage(hitImg,
                             (int) bolt.x2 - HIT_W / 2,
-                            (int) bolt.y2 - HIT_H,
+                            (int) bolt.y2 - HIT_H / 2,
                             HIT_W, HIT_H, null);
                 }
             } else {
@@ -236,44 +243,54 @@ public class LightningRenderer {
         int cx = (int) m.getX() + 16;
         int cy = (int) m.getY() - 2;
 
-        BufferedImage[] hitFrames = WirzardLightningAsset.lightningHitFrames;
         Composite old = g2.getComposite();
 
-        if (hitFrames != null && hitFrames.length > 0) {
-            // Frame chạy theo thời gian, tốc độ STUN_FRAME_MS
-            int frameIdx = (int)((System.currentTimeMillis() / STUN_FRAME_MS) % hitFrames.length);
-            BufferedImage hitImg = hitFrames[frameIdx];
-            if (hitImg != null) {
-                g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
-                // Vẽ nhỏ hơn trên đầu quái, giữ tỉ lệ 64:160 → STUN_SIZE x (STUN_SIZE*160/64)
-                int sw = STUN_SIZE;
-                int sh = STUN_SIZE * HIT_H / HIT_W; // giữ tỉ lệ
-                g2.drawImage(hitImg,
-                        cx - sw / 2,
-                        cy - sh,
-                        sw, sh, null);
-            }
-        } else {
-            // Fallback: vòng vàng + sao quay
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.80f));
-            g2.setColor(new Color(255, 255, 60));
-            g2.setStroke(new BasicStroke(2f));
-            g2.drawOval(cx - 10, cy - 10, 20, 20);
-            long t = System.currentTimeMillis();
-            for (int i = 0; i < 3; i++) {
-                double angle = Math.toRadians(i * 120 + (t / 8) % 360);
-                int sx = cx + (int)(Math.cos(angle) * 9);
-                int sy = cy + (int)(Math.sin(angle) * 9) - 6;
-                g2.setColor(new Color(255, 240, 60));
-                g2.fillOval(sx - 3, sy - 3, 6, 6);
-            }
-            g2.setStroke(new BasicStroke(1f));
+        // Chỉ vẽ sao vàng quay trên đầu quái, KHÔNG dùng sprite lightning
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.90f));
+        long t = System.currentTimeMillis();
+        for (int i = 0; i < 3; i++) {
+            double angle = Math.toRadians(i * 120 + (t / 6) % 360);
+            int sx = cx + (int)(Math.cos(angle) * 8);
+            int sy = cy - 10 + (int)(Math.sin(angle) * 4);
+            g2.setColor(new Color(255, 240, 60));
+            g2.fillOval(sx - 3, sy - 3, 6, 6);
         }
 
         g2.setComposite(old);
+
         g2.setColor(new Color(255, 240, 60, 210));
         g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
-        int labelH = STUN_SIZE * HIT_H / HIT_W;
-        g2.drawString("STUN", cx - 8, cy - labelH - 2);
+        g2.drawString("STUN", cx - 8, cy - 18);
+    }
+
+    // ── Upgrade progress bar ──────────────────────────────────────────────────
+    private void drawUpgradeBar(Graphics2D g2, Tower t, int tx, int ty, int tw) {
+        int barW = tw;
+        int barH = 5;
+        int barX = tx;
+        int barY = ty - 40;
+        float progress = t.getUpgradeProgress();
+
+        g2.setColor(new Color(20, 20, 20, 200));
+        g2.fillRoundRect(barX - 1, barY - 1, barW + 2, barH + 2, 3, 3);
+
+        int filled = (int)(barW * progress);
+        if (filled > 0) {
+            g2.setColor(Color.getHSBColor(0.17f - progress * 0.05f, 0.9f, 1.0f));
+            g2.fillRoundRect(barX, barY, filled, barH, 2, 2);
+        }
+
+        java.awt.Stroke os = g2.getStroke();
+        g2.setStroke(new BasicStroke(0.5f));
+        g2.setColor(new Color(200, 200, 200, 120));
+        g2.drawRoundRect(barX, barY, barW, barH, 2, 2);
+        g2.setStroke(os);
+
+        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
+        g2.setColor(new Color(255, 255, 160));
+        LightningTower wt = (LightningTower) t;
+        String label = "LV" + wt.getPrevLevel() + " \u2192 LV" + wt.getLevel();
+        int lw = g2.getFontMetrics().stringWidth(label);
+        g2.drawString(label, barX + (barW - lw) / 2, barY - 2);
     }
 }

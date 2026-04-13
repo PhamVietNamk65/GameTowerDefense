@@ -68,8 +68,21 @@ public class FrostRenderer {
         int tx = t.getX() + (TILE - tw) / 2;
         int ty = t.getY() + (TILE - th);
 
+        // Flash khi đang upgrade
+        if (t.isUpgrading() && t.getFlashAlpha() > 0) {
+            Composite old2 = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    t.getFlashAlpha() / 255f * 0.5f));
+            g2.setColor(new Color(100, 200, 255));
+            g2.fillRoundRect(tx, ty, tw, th, 6, 6);
+            g2.setComposite(old2);
+        }
+
         g2.drawImage(img, tx, ty, tw, th, null);
         drawWizard(g2, t, lv);
+
+        // Thanh tiến độ upgrade
+        if (t.isUpgrading()) drawUpgradeBar(g2, t, tx, ty, tw);
     }
 
     /**
@@ -224,5 +237,36 @@ public class FrostRenderer {
         g2.setColor(new Color(160, 220, 255, 210));
         g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
         g2.drawString("SLOW", cx - 8, cy - 12);
+    }
+
+    // ── Upgrade progress bar ──────────────────────────────────────────────────
+    private void drawUpgradeBar(Graphics2D g2, Tower t, int tx, int ty, int tw) {
+        int barW = tw;
+        int barH = 5;
+        int barX = tx;
+        int barY = ty - 40;
+        float progress = t.getUpgradeProgress();
+
+        g2.setColor(new Color(20, 20, 20, 200));
+        g2.fillRoundRect(barX - 1, barY - 1, barW + 2, barH + 2, 3, 3);
+
+        int filled = (int)(barW * progress);
+        if (filled > 0) {
+            g2.setColor(Color.getHSBColor(0.55f + progress * 0.05f, 0.9f, 1.0f));
+            g2.fillRoundRect(barX, barY, filled, barH, 2, 2);
+        }
+
+        java.awt.Stroke os = g2.getStroke();
+        g2.setStroke(new BasicStroke(0.5f));
+        g2.setColor(new Color(200, 200, 200, 120));
+        g2.drawRoundRect(barX, barY, barW, barH, 2, 2);
+        g2.setStroke(os);
+
+        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
+        g2.setColor(new Color(160, 230, 255));
+        FrostTower wt = (FrostTower) t;
+        String label = "LV" + wt.getPrevLevel() + " \u2192 LV" + wt.getLevel();
+        int lw = g2.getFontMetrics().stringWidth(label);
+        g2.drawString(label, barX + (barW - lw) / 2, barY - 2);
     }
 }

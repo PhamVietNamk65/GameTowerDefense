@@ -178,7 +178,7 @@ public class Constants {
                 case ORC:
                     return 20;
                 case SLIME:
-                    return 1;
+                    return 5;
                 case BEE:
                     return 0;
                 case WOLF:
@@ -207,6 +207,8 @@ public class Constants {
                     return 1.2f;
                 case RIDER:
                     return 2.5f;
+                case MAGE:
+                    return 1.8f;
             }
             return 0;
         }
@@ -225,6 +227,8 @@ public class Constants {
                     return 200;
                 case RIDER:
                     return 350;
+                case MAGE:
+                    return 300;
             }
             return 0;
         }
@@ -243,6 +247,8 @@ public class Constants {
                     return 50;
                 case RIDER:
                     return 120;
+                case MAGE:
+                    return 100;
             }
             return 0;
         }

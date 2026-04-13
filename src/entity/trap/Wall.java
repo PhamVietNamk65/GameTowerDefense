@@ -10,7 +10,7 @@ public class Wall {
     private int x, y;
 
     private int hp, maxHp;
-    private int level = 3;
+    private int level = 1;
     private int direction;
 
     private int buildProgress = 0;

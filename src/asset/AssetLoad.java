@@ -30,5 +30,11 @@ public class AssetLoad {
         uiAsset.load();
         towerAsset.load();
         monsterAsset.load();
+        wallAsset.load();
+        canonAsset.load();
+        wirzardFlameAsset.load();
+        wirzardFrostAsset.load();
+        wirzardLightningAsset.load();
+        sniperAsset.load();
     }
 }

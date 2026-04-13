@@ -79,10 +79,23 @@ public class FlameRenderer {
         // Đáy tháp chạm đáy tile (tháp mọc từ dưới lên)
         int ty = t.getY() + (TILE - th);
 
+        // Flash khi đang upgrade
+        if (t.isUpgrading() && t.getFlashAlpha() > 0) {
+            Composite old2 = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    t.getFlashAlpha() / 255f * 0.5f));
+            g2.setColor(new Color(255, 160, 0));
+            g2.fillRoundRect(tx, ty, tw, th, 6, 6);
+            g2.setComposite(old2);
+        }
+
         g2.drawImage(img, tx, ty, tw, th, null);
 
         // Wizard ngồi trên đỉnh tháp
         drawWizard(g2, t, lv);
+
+        // Thanh tiến độ upgrade
+        if (t.isUpgrading()) drawUpgradeBar(g2, t, tx, ty, tw);
     }
 
     /**
@@ -226,5 +239,40 @@ public class FlameRenderer {
         g2.setColor(new Color(255, 140, 0, 200));
         g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
         g2.drawString("BURN", cx - 8, cy - 14);
+    }
+
+    // ── Upgrade progress bar ──────────────────────────────────────────────────
+    private void drawUpgradeBar(Graphics2D g2, Tower t, int tx, int ty, int tw) {
+        int barW = tw;
+        int barH = 5;
+        int barX = tx;
+        int barY = ty - 40;
+        float progress = t.getUpgradeProgress();
+
+        // Nền tối
+        g2.setColor(new Color(20, 20, 20, 200));
+        g2.fillRoundRect(barX - 1, barY - 1, barW + 2, barH + 2, 3, 3);
+
+        // Thanh tiến độ màu cam→vàng
+        int filled = (int)(barW * progress);
+        if (filled > 0) {
+            g2.setColor(Color.getHSBColor(0.12f - progress * 0.05f, 0.95f, 1.0f));
+            g2.fillRoundRect(barX, barY, filled, barH, 2, 2);
+        }
+
+        // Viền
+        java.awt.Stroke os = g2.getStroke();
+        g2.setStroke(new BasicStroke(0.5f));
+        g2.setColor(new Color(200, 200, 200, 120));
+        g2.drawRoundRect(barX, barY, barW, barH, 2, 2);
+        g2.setStroke(os);
+
+        // Label LV
+        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
+        g2.setColor(new Color(255, 230, 120));
+        FlameTower wt = (FlameTower) t;
+        String label = "LV" + wt.getPrevLevel() + " \u2192 LV" + wt.getLevel();
+        int lw = g2.getFontMetrics().stringWidth(label);
+        g2.drawString(label, barX + (barW - lw) / 2, barY - 2);
     }
 }

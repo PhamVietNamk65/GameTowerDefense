@@ -19,6 +19,9 @@ public class SniperTower extends Tower {
     private static final int MC_ANIM_SPEED  = 12;
     private static final int MC_FRAME_COUNT = 4;
 
+    // ── level tracking cho progress bar ──────────────────────────────────────
+    private int prevLevel = 0;
+
     // ── shoot state ───────────────────────────────────────────────────────────
     private boolean readyToShoot = false;
 
@@ -66,6 +69,14 @@ public class SniperTower extends Tower {
 
     // ── getters / setters ─────────────────────────────────────────────────────
     public int     getMcAnimFrame()               { return mcAnimFrame; }
+    @Override
+    public void upgrade() {
+        prevLevel = getTowerLevel();   // lưu level cũ TRƯỚC khi upgrade
+        super.upgrade();               // Tower cha tăng towerLevel + bật isUpgrading
+    }
+
+    public int getPrevLevel() { return prevLevel; }
+
     public boolean isFacingLeftSniper()           { return facingLeftSniper; }
     public void    setFacingLeftSniper(boolean v) { facingLeftSniper = v; }
 }

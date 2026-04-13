@@ -6,121 +6,115 @@ package entity.monster;
  *  BURN    – Flame Tower: gây dmg theo thời gian mỗi BURN_TICK_RATE tick.
  *  SLOW    – Frost Tower: giảm tốc độ di chuyển xuống còn SLOW_FACTOR%.
  *  STUNNED – Lightning Tower: quái đứng yên trong STUN_DURATION tick.
- *
- * Cách dùng trong Monster:
- *   monster.applyBurn(dmgPerTick, durationTicks);
- *   monster.applySlow(durationTicks);
- *   monster.applyStun(durationTicks);
- *   // Gọi monster.updateEffects() mỗi tick trong Monster.update()
  */
 public class StatusEffect {
 
     // ── Burn ─────────────────────────────────────────────────────────────────
-    public static final int BURN_TICK_RATE = 30;  // cứ 30 tick (0.5s) gây dmg 1 lần
-    public static final int BURN_DURATION  = 180; // 3 giây mặc định
+    public static final int   BURN_TICK_RATE = 30;   // cứ 30 tick (0.5s) gây dmg 1 lần
+    public static final int   BURN_DURATION  = 180;  // 3 giây mặc định
 
     // ── Slow ──────────────────────────────────────────────────────────────────
-    public static final float SLOW_FACTOR   = 0.4f;  // còn 40% tốc độ gốc
-    public static final int   SLOW_DURATION = 150;   // 2.5 giây
+    public static final float SLOW_FACTOR    = 0.4f; // còn 40% tốc độ gốc
+    public static final int   SLOW_DURATION  = 150;  // 2.5 giây
 
     // ── Stun ──────────────────────────────────────────────────────────────────
-    public static final int STUN_DURATION = 90;  // 1.5 giây
+    public static final int   STUN_DURATION  = 90;   // 1.5 giây
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // Trạng thái instance (gắn vào mỗi Monster)
-    // ─────────────────────────────────────────────────────────────────────────
+    // ── Instance state ────────────────────────────────────────────────────────
 
     // Burn
-    private boolean burning     = false;
-    private int     burnTick    = 0;
-    private int     burnDuration= 0;
-    private int     burnDmg     = 0;
-    private int     burnTimer   = 0; // đếm interval
+    private boolean burning      = false;
+    private int     burnTick     = 0;
+    private int     burnDuration = 0;
+    private int     burnDmg      = 0;
+    private int     burnTimer    = 0; // đếm interval giữa các lần gây dmg
 
     // Slow
-    private boolean slowed      = false;
-    private int     slowTick    = 0;
+    private boolean slowed       = false;
+    private int     slowTick     = 0;
+    private int     slowDuration = SLOW_DURATION;
 
     // Stun
-    private boolean stunned     = false;
-    private int     stunTick    = 0;
+    private boolean stunned      = false;
+    private int     stunTick     = 0;
+    private int     stunDuration = STUN_DURATION;
 
-    // ─────────────────────────────────────────────────────────────────────────
+    // ── Update (gọi mỗi game tick trong Monster.update()) ─────────────────────
 
-    /** @return damage cần trừ khỏi monster tick này (0 nếu không bị burn tick) */
+    /** @return damage cần trừ khỏi monster tick này (0 nếu không có burn tick) */
     public int update() {
         int dmgThisTick = 0;
 
-        // ── Burn update ──
+        // ── Burn ──
         if (burning) {
             burnTick++;
             burnTimer++;
             if (burnTimer >= BURN_TICK_RATE) {
-                burnTimer = 0;
+                burnTimer   = 0;
                 dmgThisTick = burnDmg;
             }
             if (burnTick >= burnDuration) {
                 burning   = false;
                 burnTick  = 0;
                 burnTimer = 0;
+                burnDmg   = 0;
             }
         }
 
-        // ── Slow update ──
+        // ── Slow ──
         if (slowed) {
             slowTick++;
-            if (slowTick >= slowTick) { // chỉ reset khi hết
-            }
-            if (slowTick >= SLOW_DURATION) {
-                slowed   = false;
-                slowTick = 0;
+            if (slowTick >= slowDuration) {
+                slowed       = false;
+                slowTick     = 0;
+                slowDuration = SLOW_DURATION;
             }
         }
 
-        // ── Stun update ──
+        // ── Stun ──
         if (stunned) {
             stunTick++;
-            if (stunTick >= STUN_DURATION) {
-                stunned  = false;
-                stunTick = 0;
+            if (stunTick >= stunDuration) {
+                stunned      = false;
+                stunTick     = 0;
+                stunDuration = STUN_DURATION;
             }
         }
 
         return dmgThisTick;
     }
 
-    // ── Apply effects (gọi từ Wizard towers) ─────────────────────────────────
+    // ── Apply effects ─────────────────────────────────────────────────────────
 
+    /** Áp burn — refresh nếu đang cháy, lấy dmg cao hơn */
     public void applyBurn(int dmgPerTick, int durationTicks) {
-        burning      = true;
-        burnDmg      = Math.max(burnDmg, dmgPerTick); // lấy giá trị cao hơn nếu đang cháy
-        burnDuration = Math.max(burnDuration - burnTick, durationTicks); // refresh
+        burnDmg      = Math.max(burnDmg, dmgPerTick);
+        burnDuration = durationTicks;
         burnTick     = 0;
         burnTimer    = 0;
+        burning      = true;
     }
 
+    /** Áp slow với duration mặc định, refresh nếu đang slow */
     public void applySlow(int durationTicks) {
-        slowed   = true;
-        slowTick = 0; // refresh
+        slowDuration = durationTicks;
+        slowTick     = 0;
+        slowed       = true;
     }
 
-    /** Slow duration tuỳ chỉnh */
-    public void applySlowDuration(int durationTicks) {
-        slowed   = true;
-        slowTick = Math.max(0, SLOW_DURATION - durationTicks);
-    }
-
+    /** Áp stun với duration tuỳ chỉnh, refresh nếu đang stun */
     public void applyStun(int durationTicks) {
-        stunned  = true;
-        stunTick = Math.max(0, STUN_DURATION - durationTicks); // refresh
+        stunDuration = durationTicks;
+        stunTick     = 0;
+        stunned      = true;
     }
 
     // ── Getters ───────────────────────────────────────────────────────────────
-    public boolean isBurning()  { return burning;  }
-    public boolean isSlowed()   { return slowed;   }
-    public boolean isStunned()  { return stunned;  }
+    public boolean isBurning() { return burning; }
+    public boolean isSlowed()  { return slowed;  }
+    public boolean isStunned() { return stunned; }
 
-    /** Tỉ lệ tốc độ hiện tại (1.0 = bình thường, SLOW_FACTOR nếu bị slow/stun) */
+    /** Tỉ lệ tốc độ hiện tại: 0 nếu stun, SLOW_FACTOR nếu slow, 1 nếu bình thường */
     public float getSpeedMultiplier() {
         if (stunned) return 0f;
         if (slowed)  return SLOW_FACTOR;
@@ -134,6 +128,11 @@ public class StatusEffect {
 
     /** Tiến độ stun (0..1) */
     public float getStunProgress() {
-        return stunned ? (float) stunTick / STUN_DURATION : 0f;
+        return stunned ? (float) stunTick / stunDuration : 0f;
+    }
+
+    /** Tiến độ slow (0..1) */
+    public float getSlowProgress() {
+        return slowed ? (float) slowTick / slowDuration : 0f;
     }
 }
