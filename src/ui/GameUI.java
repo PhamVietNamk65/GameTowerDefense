@@ -23,6 +23,7 @@ public class GameUI {
     private int aniIndex;
     private final int aniSpeed = 20;
     private MyButton buttonPause;
+    
     private ButtonBar skillBar;
 
     private GameListener gameListener;

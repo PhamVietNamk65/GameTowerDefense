@@ -5,4 +5,5 @@ public interface GameListener {
     void onBuildWall();
     void placeBomb();
     void onBuildSpikes();
+    void onUpgradeSkill();
 } 

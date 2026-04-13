@@ -73,7 +73,6 @@ public class Monster {
         }
     }
 
-    // ── Update mỗi tick ───────────────────────────────────────────────────────
 
     public void update() {
         if (state == EnemyState.DYING) return;
@@ -84,8 +83,6 @@ public class Monster {
             hurt(burnDmg);
         }
     }
-
-    // ── Di chuyển — dừng hoàn toàn khi bị stun ───────────────────────────────
 
     public void move(float speed, int dir) {
         if (state == EnemyState.DYING) return;
@@ -220,6 +217,10 @@ public class Monster {
             targetWall.takeDamage(getDame(enemyType));
         }
         attackCooldown = getAttackSpeed(enemyType);
+    }
+
+    public void setDirectionInt(int i) {
+        this.direction = i;
     }
 
 }

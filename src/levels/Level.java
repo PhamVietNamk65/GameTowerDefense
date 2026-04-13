@@ -283,4 +283,10 @@ public class Level {
     public Wall getWallAt(int tileX, int tileY) {
         return wallGrid[tileY][tileX];
     }
+
+    public void upgradeTraps() {
+    this.levelWall++;
+    this.levelSpikes++;
+
+}
 }

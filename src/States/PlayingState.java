@@ -196,6 +196,11 @@ public class PlayingState implements GameState {
                 public void onBuildSpikes() {
                     isPlacingSpikes = true;
                 }
+
+                @Override
+                public void onUpgradeSkill() {
+                    levelManager.getCurrentLevel().upgradeTraps();
+                }
                 });
                 
     
