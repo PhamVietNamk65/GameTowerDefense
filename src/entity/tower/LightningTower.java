@@ -9,12 +9,12 @@ import utils.Constants;
 public class LightningTower extends Tower {
 
     private static final int   COST             = 130;
-    private static final int   DIRECT_DMG       = 20;
+    private static final int   DIRECT_DMG       = 10;
     private static final int   STUN_DURATION    = 90;
     private static final int   CHAIN_TARGETS    = 3;
     private static final float CHAIN_DMG_FACTOR = 0.6f;
     private static final float RANGE            = 140f;
-    private static final float COOLDOWN         = 100f;
+    private static final float COOLDOWN         = 300f;
 
     private int wizLevel     = 1;
     private int prevWizLevel = 0;

@@ -79,8 +79,8 @@ public class Constants {
             switch (towerType) {
                 case CANNON:  return 120;
                 case ARCHER:  return 25;
-                case WIZARD:  return 40;
-                case SNIPER:  return 90;
+                case WIZARD:  return 300;
+                case SNIPER:  return 150;
             }
             return 0;
         }
