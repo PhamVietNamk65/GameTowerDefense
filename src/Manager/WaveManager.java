@@ -1,8 +1,5 @@
 package Manager;
 
-import helpz.LoadLevelData;
-import levels.LevelData;
-
 public class WaveManager {
 
     private int[][] waves;
@@ -118,11 +115,11 @@ public class WaveManager {
     }
 
     public int getCurrentWave() {
-        return Math.min(currentWave + 1, waves.length);
+        return Math.min(currentWave + 1, waves.length + 1);
     }
 
     public int getTotalWaves() {
-        return waves.length;
+        return waves.length + 1;
     }
 
     public boolean isWavesDone() {

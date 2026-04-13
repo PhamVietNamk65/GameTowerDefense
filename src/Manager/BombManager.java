@@ -1,43 +1,49 @@
 package Manager;
 
-import entity.trap.Bomb;
+import entity.Projectile.Bomb;
 import entity.monster.Monster;
-
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
+import entity.tower.CanonTower;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.List;
 
+/**
+ * Quản lý vòng đời của tất cả Bomb đang bay / đang nổ.
+ */
 public class BombManager {
 
-    private List<Bomb> bombs = new ArrayList<>();
+    private final ArrayList<Bomb> bombs = new ArrayList<>();
 
+    // ─────────────────────────────────────────────────────────────────────────
 
-    public BombManager() {
-
+    /**
+     * Spawn một quả bom từ vị trí nòng pháo của canon đến target.
+     */
+    public void spawnBomb(CanonTower canon, Monster target) {
+        if (target == null) return;
+        Bomb bomb = new Bomb(
+                canon.getBombSpawnX(),
+                canon.getBombSpawnY(),
+                target,
+                canon.getDmg(),
+                canon.getSplashRadius());
+        bombs.add(bomb);
     }
 
-    public void addBomb(float x, float y) {
-        bombs.add(new Bomb(x, y));
-    }
-
-    public void update(List<Monster> monsters) {
+    /**
+     * Update tất cả bombs mỗi tick.
+     * @param monsters danh sách monster đang sống (dùng splash).
+     * @param screenW / screenH kích thước màn hình để cull bom ra ngoài.
+     */
+    public void update(ArrayList<Monster> monsters, int screenW, int screenH) {
         Iterator<Bomb> it = bombs.iterator();
-
         while (it.hasNext()) {
             Bomb b = it.next();
-            b.update(monsters);
-
-            if (b.isFinished()) {
+            if (!b.update(monsters, screenW, screenH)) {
                 it.remove();
             }
         }
     }
 
-    public void render(Graphics g) {
-        for (Bomb b : bombs) {
-            b.render(g);
-        }
-    }
+    // ── Getters ───────────────────────────────────────────────────────────────
+    public ArrayList<Bomb> getBombs() { return bombs; }
 }

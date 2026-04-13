@@ -1,16 +1,11 @@
 package entity.monster;
 
-import static utils.Constants.Direction.*;
-import static utils.Constants.Monsters.*;
-
+import entity.trap.Wall;
 import java.awt.Rectangle;
 import java.util.Random;
-
-import entity.trap.Wall;
 import system.EnemyMovement;
-import utils.Constants;
-
 import static utils.Constants.Direction.*;
+import static utils.Constants.Monsters.*;
 
 public class Monster {
     protected float x, y;
@@ -35,9 +30,9 @@ public class Monster {
     private static final int DEATH_ANI_SPEED = 10;
 
     private EnemyMovement movement;
+    private StatusEffect statusEffect = new StatusEffect();
 
     private Wall targetWall;
-
     private int attackCooldown = 0;
 
     public Monster(float x, float y, int ID, int enemyType) {
@@ -50,12 +45,14 @@ public class Monster {
     }
 
     private void setStartHealth() {
-        health = utils.Constants.Monsters.GetStartHealth(enemyType);
+        health    = utils.Constants.Monsters.GetStartHealth(enemyType);
         maxHealth = health;
     }
 
     public void updateAnim() {
         if (state == EnemyState.DYING) return;
+        // Nếu đang bị stun → không chạy walk animation
+        if (statusEffect.isStunned()) return;
         animTick++;
         if (animTick >= ANI_SPEED) {
             animTick = 0;
@@ -76,18 +73,19 @@ public class Monster {
         }
     }
 
-    public int getAnimIndex(int totalFrames) {
-        if (totalFrames <= 0) return 0;
-        return animIndex % totalFrames;
-    }
+    // ── Update mỗi tick ───────────────────────────────────────────────────────
 
-    public int getDeathAnimIndex() {
-        return deathAnimIndex;
-    }
-
-    public void hurt(int dmg) {
+    public void update() {
         if (state == EnemyState.DYING) return;
 
+        // Cập nhật status effect — trả về burn dmg tick này
+        int burnDmg = statusEffect.update();
+        if (burnDmg > 0) {
+            hurt(burnDmg);
+        }
+    }
+
+    // ── Di chuyển — dừng hoàn toàn khi bị stun ───────────────────────────────
         health -= dmg;
 
         if (health <= 0 && state != EnemyState.DYING) {
@@ -110,25 +108,71 @@ public class Monster {
     public void move(float speed, int dir) {
         if (state == EnemyState.DYING) return;
 
+        // Stun → đứng yên
+        if (statusEffect.isStunned()) return;
+
+        // Slow → giảm tốc độ
+        float actualSpeed = speed * statusEffect.getSpeedMultiplier();
+
         direction = dir;
         switch (dir) {
-            case LEFT  -> x -= speed;
-            case UP    -> y -= speed;
-            case RIGHT -> x += speed;
-            case DOWN  -> y += speed;
+            case LEFT  -> x -= actualSpeed;
+            case UP    -> y -= actualSpeed;
+            case RIGHT -> x += actualSpeed;
+            case DOWN  -> y += actualSpeed;
         }
         updateHitBox();
     }
 
     public void updateDirection(float dx, float dy) {
         if (state == EnemyState.DYING) return;
-
         if (Math.abs(dx) > Math.abs(dy)) {
             direction = (dx > 0) ? RIGHT : LEFT;
         } else {
             direction = (dy > 0) ? DOWN : UP;
         }
     }
+
+    // ── Damage ────────────────────────────────────────────────────────────────
+
+    public void hurt(int dmg) {
+        if (state == EnemyState.DYING) return;
+        health -= dmg;
+        if (health <= 0) {
+            setState(EnemyState.DYING);
+        }
+    }
+
+    // ── Apply status effects (gọi từ Projectile khi trúng quái) ──────────────
+
+    /** Flame Tower: cháy, mất máu mỗi BURN_TICK_RATE tick */
+    public void applyBurn(int dmgPerTick, int durationTicks) {
+        statusEffect.applyBurn(dmgPerTick, durationTicks);
+    }
+
+    /** Frost Tower: giảm tốc độ còn SLOW_FACTOR% */
+    public void applySlow(int durationTicks) {
+        statusEffect.applySlow(durationTicks);
+    }
+
+    /** Lightning Tower: đứng yên hoàn toàn */
+    public void applyStun(int durationTicks) {
+        statusEffect.applyStun(durationTicks);
+    }
+
+    // ── State ─────────────────────────────────────────────────────────────────
+
+    public void setState(EnemyState newState) {
+        if (state == EnemyState.DYING) return;
+        this.state     = newState;
+        deathAnimTick  = 0;
+        deathAnimIndex = 0;
+        deathDone      = false;
+    }
+
+    public EnemyState getState() { return state; }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
 
     private void updateHitBox() {
         bounds.x = (int) x;
@@ -139,12 +183,18 @@ public class Monster {
         updateDeathAnim(totalFrames);
     }
 
-    public boolean isDeathDone() { return deathDone; }
+    public int getAnimIndex(int totalFrames) {
+        if (totalFrames <= 0) return 0;
+        return animIndex % totalFrames;
+    }
 
-    public int getPathIndex()  { return pathIndex; }
-    public void nextPath()     { pathIndex++; }
-    public void reachEnd()     { reachedEnd = true; }
-    public boolean hasReachedEnd() { return reachedEnd; }
+    public int getDeathAnimIndex() { return deathAnimIndex; }
+    public boolean isDeathDone()   { return deathDone; }
+
+    public int   getPathIndex()        { return pathIndex; }
+    public void  nextPath()            { pathIndex++; }
+    public void  reachEnd()            { reachedEnd = true; }
+    public boolean hasReachedEnd()     { return reachedEnd; }
 
     public void setPos(float x, float y) {
         this.x = x;
@@ -152,14 +202,12 @@ public class Monster {
         updateHitBox();
     }
 
-    public float getX() { return x; }
-    public float getY() { return y; }
-    public Rectangle getBounds() { return bounds; }
-    public int getEnemyType()  { return enemyType; }
-    public int getDirection()  { return direction; }
-    public float getHealthBarFloat() { 
-        return health / (float) maxHealth; 
-    }
+    public float     getX()               { return x; }
+    public float     getY()               { return y; }
+    public Rectangle getBounds()          { return bounds; }
+    public int       getEnemyType()       { return enemyType; }
+    public int       getDirection()       { return direction; }
+    public float     getHealthBarFloat()  { return health / (float) maxHealth; }
 
     public void createOffset() {
         int maxOffset = 15;
@@ -171,38 +219,25 @@ public class Monster {
     public float getxOffset() { return xOffset; }
     public float getyOffset() { return yOffset; }
 
-    public int getReward(){
-        return GetReward(enemyType);
-    }
+    public int getReward() { return GetReward(enemyType); }
 
-    public void setMovement(EnemyMovement movement) {
-        this.movement = movement;
-    }
+    public void setMovement(EnemyMovement movement) { this.movement = movement; }
+    public EnemyMovement getMovement()              { return movement; }
 
-    public EnemyMovement getMovement() {
-        return movement;
-    }
+    public StatusEffect getStatusEffect() { return statusEffect; }
 
-    public void setTargetWall(Wall wall) {
-        this.targetWall = wall;
-    }
-
-    public Wall getTargetWall() {
-        return targetWall;
-    }
+    public void setTargetWall(Wall wall)  { this.targetWall = wall; }
+    public Wall getTargetWall()           { return targetWall; }
 
     public void attackWall() {
-
         if (attackCooldown > 0) {
             attackCooldown--;
             return;
-        }   
-
+        }
         if (targetWall != null) {
             targetWall.takeDamage(getDame(enemyType));
         }
-
-        attackCooldown = getAttackSpeed(enemyType); 
+        attackCooldown = getAttackSpeed(enemyType);
     }
     public void setDirectionInt(int dir) {
         this.direction = dir;

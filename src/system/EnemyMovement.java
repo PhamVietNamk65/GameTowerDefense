@@ -1,13 +1,11 @@
 package system;
 
-import java.awt.Point;
-
 import entity.monster.EnemyState;
 import entity.monster.Monster;
 import entity.trap.Wall;
+import java.awt.Point;
 import levels.Level;
 import utils.Constants;
-
 import static utils.Constants.Monsters.*;
 
 public class EnemyMovement {

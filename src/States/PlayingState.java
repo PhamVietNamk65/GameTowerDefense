@@ -1,11 +1,4 @@
 package states;
-import java.awt.AlphaComposite;
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.lang.runtime.SwitchBootstraps;
-import static utils.Constants.Tiles.*;
 import Manager.ArrowManager;
 import Manager.BombManager;
 import Manager.EnemyManager;
@@ -17,13 +10,22 @@ import asset.TrapAsset;
 import entity.TowerSlot;
 import entity.monster.Monster;
 import entity.tower.Tower;
+import java.awt.AlphaComposite;
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import levels.LevelState;
 import listeners.GameListener;
 import listeners.TowerActionListener;
 import main.GamePanel;
 import render.ArrowRenderer;
+import render.BombRenderer;
+import render.BulletRenderer;
+import render.CanonRenderer;
 import render.EnemyRenderer;
+import render.SniperRenderer;
 import render.TowerRenderer;
+import render.WirzardRenderer;
 import system.EnemyMovement;
 import system.TowerUpdater;
 import ui.GameUI;
@@ -33,6 +35,7 @@ import ui.MenuWin;
 import ui.TowerSlotUI;
 import ui.TowerUI;
 import utils.Constants;
+import static utils.Constants.Tiles.*;
 
 public class PlayingState implements GameState {
 
@@ -51,6 +54,11 @@ public class PlayingState implements GameState {
     private ArrowRenderer arrowRenderer;
     private TowerSlotUI slotUI;
     private TowerUI towerUI;
+    private CanonRenderer canonRenderer;   
+    private BombRenderer    bombRender;
+    private WirzardRenderer wirzardRenderer;
+    private SniperRenderer  sniperRenderer;   // ← NEW
+    private BulletRenderer  bulletRenderer;   // ← NEW
 
     private EnemyManager enemyManager;
     private EnemyMovement enemyMovement;
@@ -90,6 +98,11 @@ public class PlayingState implements GameState {
         towerUpdater = new TowerUpdater();
         towerRenderer = new TowerRenderer(towerManager);
         arrowRenderer = new ArrowRenderer();
+        canonRenderer = new CanonRenderer();   
+        bombRender    = new BombRenderer();
+        wirzardRenderer = new WirzardRenderer();
+        sniperRenderer  = new SniperRenderer();    // ← NEW
+        bulletRenderer  = new BulletRenderer();    // ← NEW
 
         towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
@@ -113,7 +126,7 @@ public class PlayingState implements GameState {
                 else { 
                     levelManager.getCurrentLevel().addBackSlot(t.getX() / 64, t.getY() / 64);
                     TowerSlot slot = levelManager.getCurrentLevel().getSlotAt(t.getX(), t.getY());
-                    slot.setOccupied(false); // <--- QUAN TRỌNG: Mở khóa ô đất để xây lại
+                    slot.setOccupied(false);
                     
 
                     towerManager.removeTower(t);
@@ -226,6 +239,16 @@ public class PlayingState implements GameState {
         enemyRenderer.draw(g2);
         towerRenderer.draw(g2);
         arrowRenderer.render(g2,towerManager.getArrowManager().getArrows());
+        canonRenderer.draw(g2,towerManager.getTowers(),towerManager.getSelectedTower());      
+        bombRender.render(g2,towerManager.getBombManager().getBombs());
+        wirzardRenderer.drawTowers(g2, towerManager.getTowers(), towerManager.getSelectedTower());
+        wirzardRenderer.drawProjectiles(g2, towerManager.getFlameManager(), 
+        towerManager.getFrostManager(), towerManager.getLightningManager());
+        wirzardRenderer.drawStatusEffects(g2, enemyManager.getMonsters());
+
+        // ── Sniper + Bullet (NEW) ───────────────────────────────────────────
+        sniperRenderer.draw(g2, towerManager.getTowers(), towerManager.getSelectedTower());
+        bulletRenderer.render(g2, towerManager.getBulletManager().getBullets());
 
         slotUI.render(g2);
         towerUI.draw(g2);

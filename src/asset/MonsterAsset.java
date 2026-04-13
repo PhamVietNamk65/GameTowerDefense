@@ -82,7 +82,17 @@ public class MonsterAsset {
             "enemies/6/U_Attack.png",
             "enemies/6/D_Attack.png",
             "enemies/6/S_Attack.png");
-
+        
+        loadEnemyAnimation(MAGE,
+            "enemies/7/U_Fly.png",
+            "enemies/7/D_Fly.png",
+            "enemies/7/S_Fly.png",
+            "enemies/7/U_Death.png",
+            "enemies/7/D_Death.png",
+            "enemies/7/S_Death.png",
+            "enemies/7/U_Attack.png",
+            "enemies/7/D_Attack.png",
+            "enemies/7/S_Attack.png");
 
     }
 

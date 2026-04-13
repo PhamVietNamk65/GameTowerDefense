@@ -2,15 +2,18 @@ package render;
 
 import Manager.TowerManager;
 import asset.TowerAsset;
+import entity.tower.CanonTower;
+import entity.tower.FlameTower;
+import entity.tower.FrostTower;
+import entity.tower.LightningTower;
+import entity.tower.SniperTower;
+import entity.tower.Tower;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
-
-import entity.monster.Monster;
-import entity.tower.Tower;
 import utils.Constants;
 import utils.Utilz;
 
@@ -26,7 +29,6 @@ public class TowerRenderer {
 
     public TowerRenderer(TowerManager towerManager) {
         this.towerManager = towerManager;
-        // FIX: bỏ arrowManager — arrow giờ chỉ vẽ trong ArrowRenderer
     }
 
     public void draw(Graphics2D g) {
@@ -37,10 +39,16 @@ public class TowerRenderer {
         if (towerManager.getSelectedTower() != null) {
             drawSelected(g, towerManager.getSelectedTower());
         }
-        // FIX: đã xóa drawArrows() ở đây — tránh vẽ 2 lần đè lên ArrowRenderer
     }
 
     private void drawTower(Graphics2D g2, Tower t) {
+        // These tower types have their own dedicated renderers — skip here
+        if (t instanceof CanonTower)    return;
+        if (t instanceof FlameTower)    return;
+        if (t instanceof FrostTower)    return;
+        if (t instanceof LightningTower) return;
+        if (t instanceof SniperTower)   return;  // ← SniperRenderer handles this
+
         int lv    = Utilz.clamp(t.getTowerLevel(), 0, 6);
         int frame = t.getTowerAnimFrame();
 
