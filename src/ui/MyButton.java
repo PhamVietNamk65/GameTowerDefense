@@ -1,144 +1,212 @@
 package ui;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.FontMetrics;
-import java.awt.Font;
 
 public class MyButton {
 
-    private int x,y,width,height;
+    private int x, y, width, height;
     private String text;
-    private Rectangle bounds; // khung va cham cho 1 doi tuong (hitbox)
-    private boolean mouseOver, mousePressed, mouseReleased; // kiem tra xem chuot co chi vao khong 
+    private Rectangle bounds;
 
-    private BufferedImage normalImage, pressedImage, overImage;
+    private boolean mouseOver, mousePressed;
 
+    private BufferedImage normalImage, overImage, pressedImage;
     private Runnable action;
 
-    boolean type ;
-    public MyButton(String text , int width, int height) {
-        this.width = width;
-        this.height = height;
+    private boolean isImageButton;
+
+    public enum ButtonType {
+        UI, 
+        SKILL   
+    }
+
+    private ButtonType type = ButtonType.UI;
+
+
+    private long lastUsedTime = 0;
+    private long cooldown = 0;
+    private boolean onCooldown = false;
+
+    public MyButton(String text, int width, int height) {
         this.text = text;
-        this.type = false;
-        initBounds();
-    }
-
-    public MyButton(BufferedImage normal,BufferedImage over,BufferedImage pressed,int width, int height ) {
-        this.normalImage = normal;
-        this.pressedImage = pressed;
-        this.overImage = over;
         this.width = width;
         this.height = height;
-        this.type = true;
+        this.isImageButton = false;
         initBounds();
     }
 
-    private void initBounds(){
-        this.bounds = new Rectangle(x, y, width, height);
+    public MyButton(BufferedImage normal, BufferedImage over, BufferedImage pressed, int width, int height) {
+        this.normalImage = normal;
+        this.overImage = over;
+        this.pressedImage = pressed;
+        this.width = width;
+        this.height = height;
+        this.isImageButton = true;
+        initBounds();
     }
 
-    public void setAction(Runnable action){
+    private void initBounds() {
+        bounds = new Rectangle(x, y, width, height);
+    }
+
+    public void setButton(int x, int y, int width, int height) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        initBounds();
+    }
+
+    public void setText(String text) {
+        this.text = text;
+    }
+
+    public void setAction(Runnable action) {
         this.action = action;
     }
 
-    public void draw(Graphics g){
-        if(type){
-            drawImageButton(g);
+    public void setType(ButtonType type) {
+        this.type = type;
+    }
+
+    public void setCooldown(long cooldown) {
+        this.cooldown = cooldown;
+    }
+
+    public void execute() {
+        if (type == ButtonType.SKILL && onCooldown) return;
+
+        if (action != null) {
+            action.run();
+
+            if (type == ButtonType.SKILL && cooldown > 0) {
+                startCooldown();
+            }
         }
-        else{
-            //body 
+    }
+
+    private void startCooldown() {
+        onCooldown = true;
+        lastUsedTime = System.currentTimeMillis();
+    }
+
+    public void update() {
+        if (type == ButtonType.SKILL && onCooldown) {
+            long now = System.currentTimeMillis();
+
+            if (now - lastUsedTime >= cooldown) {
+                onCooldown = false; // 🔥 đảm bảo tắt đúng lúc
+            }
+        }
+    }
+
+    public void draw(Graphics g) {
+        if (isImageButton) drawImageButton(g);
+        else {
             drawBody(g);
-
-            //Border    // vien
             drawBorder(g);
-
-            //TEXT
             drawText(g);
         }
-        
+
+        drawCooldownOverlay(g);
     }
-    private void drawBody(Graphics g){
-        if( mouseOver )
-            g.setColor(Color.GRAY);
-        else 
-            g.setColor(Color.WHITE);
+
+    private void drawBody(Graphics g) {
+        if (mouseOver) g.setColor(Color.GRAY);
+        else g.setColor(Color.WHITE);
+
         g.fillRect(x, y, width, height);
     }
 
-    private void drawBorder(Graphics g){
-        g.setColor(Color.black);
+    private void drawBorder(Graphics g) {
+        g.setColor(Color.BLACK);
         g.drawRect(x, y, width, height);
-        if( mousePressed ){
+
+        if (mousePressed) {
             g.drawRect(x + 1, y + 1, width - 2, height - 2);
-            g.drawRect(x + 2, y + 2, width - 2, height - 4);
         }
     }
 
-    private void drawText(Graphics g){
-        Font myFont = new Font("Arial", Font.PLAIN, 21); 
-        g.setFont(myFont); // Áp dụng Font này để vẽ
-        g.setColor(Color.BLACK); // Đừng quên set màu chữ
-        FontMetrics fm = g.getFontMetrics(); // lay thong tin cua text
-        
-        int stringWidth = fm.stringWidth(text); //chieu dai cua text
-        int stringHeight = fm.getHeight(); //chieu cao cua text
-        int ascent = fm.getAscent(); // khoang cach tu duong co so den dinh cua text
+    private void drawText(Graphics g) {
+        g.setFont(new Font("Arial", Font.BOLD, 20));
+        g.setColor(Color.BLACK);
 
-        // Công thức căn giữa chuẩn
-        int textX = x + (width - stringWidth) / 2;
-        int textY = y + ((height - stringHeight) / 2) + ascent;
-        
+        FontMetrics fm = g.getFontMetrics();
+
+        int textX = x + (width - fm.stringWidth(text)) / 2;
+        int textY = y + ((height - fm.getHeight()) / 2) + fm.getAscent();
+
         g.drawString(text, textX, textY);
     }
 
-    public void drawImageButton(Graphics g){
-         if(mousePressed){
-            g.drawImage(pressedImage, x, y,width,height, null);
+    private void drawImageButton(Graphics g) {
+        if (type == ButtonType.SKILL && onCooldown) {
+            g.drawImage(normalImage, x, y, width, height, null);
+            return;
         }
-        else if(mouseOver){
+
+        if (mousePressed)
+            g.drawImage(pressedImage, x, y, width, height, null);
+        else if (mouseOver)
             g.drawImage(overImage, x, y, width, height, null);
-        }
-        else g.drawImage(normalImage, x, y, width, height, null);
+        else
+            g.drawImage(normalImage, x, y, width, height, null);
     }
 
-    public void execute(){
-        if( action != null ) action.run();
+    private void drawCooldownOverlay(Graphics g) {
+        if (type != ButtonType.SKILL || !onCooldown) return;
+
+        long now = System.currentTimeMillis();
+        long elapsed = now - lastUsedTime;
+
+        float progress = (float) elapsed / cooldown;
+        progress = Math.min(progress, 1f);
+
+
+        int overlayHeight = (int) (height * (1 - progress));
+
+        g.setColor(new Color(0, 0, 0, 160));
+        g.fillRect(x, y, width, overlayHeight);
+
+        long timeLeft = cooldown - elapsed;
+        int remaining = (int) Math.ceil(timeLeft / 1000.0);
+        remaining = Math.max(0, remaining);
+
+        if (remaining > 0) {
+            g.setColor(Color.WHITE);
+            g.setFont(new Font("Arial", Font.BOLD, 18));
+
+            String txt = String.valueOf(remaining);
+            FontMetrics fm = g.getFontMetrics();
+
+            int tx = x + (width - fm.stringWidth(txt)) / 2;
+            int ty = y + height / 2;
+
+            g.drawString(txt, tx, ty);
+        }
     }
-    
-    public void setMouseOver(boolean mouseOver){    // ham de gan gia tri cho mouseOver
+
+    public void setMouseOver(boolean mouseOver) {
+        if (type == ButtonType.SKILL && onCooldown) return;
         this.mouseOver = mouseOver;
     }
 
     public void setMousePressed(boolean mousePressed) {
+        if (type == ButtonType.SKILL && onCooldown) return;
         this.mousePressed = mousePressed;
     }
 
     public boolean isMousePressed() {
         return mousePressed;
     }
-    
-    public Rectangle getBounds(){
+
+    public Rectangle getBounds() {
         return bounds;
     }
 
     public void resetBooleans() {
-        this.mouseOver = false;
-        this.mousePressed = false;
-    }
-
-    public void setButton(int x2, int y, int width2, int buttonHeight) {
-        this.x = x2;
-        this.y = y;
-        this.width = width2;
-        this.height = buttonHeight;
-        initBounds();
-    }
-
-    public void setText(String string) {
-        this.text = string;
+        mouseOver = false;
+        mousePressed = false;
     }
 }

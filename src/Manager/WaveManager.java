@@ -107,8 +107,7 @@ public class WaveManager {
         int type = wave[spawnIndex];
         int pathIndex = 0;
 
-        if (levelManager.getCurrentLevel().getlevelID() == 3) {
-        // wave 2 và 4 (index 1 và 3)
+        if (levelManager.getCurrentLevel().getLevelID() == 3) {
             if (currentWave == 1 || currentWave == 3) {
                 pathIndex = spawnIndex % 2; 
             }

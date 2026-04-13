@@ -24,18 +24,15 @@ public class Monster {
     private int pathIndex = 0;
     protected float xOffset, yOffset;
     protected boolean reachedEnd = false;
-    //
-
-    // FIX: mỗi quái tự quản lý animation index riêng
+ 
     private int animTick  = 0;
     private int animIndex = 0;
-    private static final int ANI_SPEED = 8; // tốc độ animation walk (tăng = chậm hơn)
+    private static final int ANI_SPEED = 8; 
 
-    // FIX: death animation chạy 1 lần duy nhất, không loop
     private int deathAnimTick  = 0;
     private int deathAnimIndex = 0;
     private boolean deathDone  = false;
-    private static final int DEATH_ANI_SPEED = 10; // tốc độ death animation
+    private static final int DEATH_ANI_SPEED = 10;
 
     private EnemyMovement movement;
 
@@ -57,7 +54,6 @@ public class Monster {
         maxHealth = health;
     }
 
-    // FIX: update walk animation tick (gọi từ EnemyManager mỗi frame)
     public void updateAnim() {
         if (state == EnemyState.DYING) return;
         animTick++;
@@ -67,7 +63,6 @@ public class Monster {
         }
     }
 
-    // FIX: update death animation, chỉ chạy 1 lần đến frame cuối rồi dừng
     public void updateDeathAnim(int totalFrames) {
         if (state != EnemyState.DYING || deathDone) return;
         deathAnimTick++;
@@ -76,7 +71,7 @@ public class Monster {
             if (deathAnimIndex < totalFrames - 1) {
                 deathAnimIndex++;
             } else {
-                deathDone = true; // đã chạy hết frame → đánh dấu xong
+                deathDone = true; 
             }
         }
     }
@@ -104,7 +99,7 @@ public class Monster {
     public void setState(EnemyState newState) {
         if (state == EnemyState.DYING) return;
         this.state = newState;
-        // Reset death animation khi bắt đầu chết
+
         deathAnimTick  = 0;
         deathAnimIndex = 0;
         deathDone      = false;
@@ -140,7 +135,6 @@ public class Monster {
         bounds.y = (int) y;
     }
 
-    // Giữ lại để tương thích với EnemyManager cũ nếu cần
     public void tickDeath(int totalFrames, int aniSpeed) {
         updateDeathAnim(totalFrames);
     }
@@ -210,5 +204,7 @@ public class Monster {
 
         attackCooldown = getAttackSpeed(enemyType); 
     }
-
+    public void setDirectionInt(int dir) {
+        this.direction = dir;
+    }
 }

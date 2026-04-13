@@ -15,7 +15,6 @@ public class LevelData {
         this.startLives = starLives;
     }
 
-    // Getters
     public int[][] getWaves() { 
         return waves; 
     }

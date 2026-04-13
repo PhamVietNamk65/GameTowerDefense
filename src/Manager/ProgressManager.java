@@ -16,6 +16,7 @@
             levels[1].unlock();
             levels[2].unlock();
             levels[3].unlock();
+            levels[4].unlock();
         }
 
         public boolean isLevelUnlocked(int levelId) {

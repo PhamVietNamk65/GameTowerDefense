@@ -7,13 +7,15 @@ import java.awt.Point;
 import java.lang.runtime.SwitchBootstraps;
 import static utils.Constants.Tiles.*;
 import Manager.ArrowManager;
+import Manager.BombManager;
 import Manager.EnemyManager;
 import Manager.LevelManager;
 import Manager.ProgressManager;
 import Manager.TowerManager;
 import Manager.WaveManager;
-import asset.WallAsset;
+import asset.TrapAsset;
 import entity.TowerSlot;
+import entity.monster.Monster;
 import entity.tower.Tower;
 import levels.LevelState;
 import listeners.GameListener;
@@ -70,7 +72,10 @@ public class PlayingState implements GameState {
     private ProgressManager progressManager;
 
     private boolean isPlacingWall = false;
+    private boolean isPlacingBomb = false;
+    private boolean isPlacingSpikes = false;
 
+    private BombManager bombManager;
     public PlayingState(GamePanel gamePanel,int level){
 
         this.level = level;
@@ -89,6 +94,7 @@ public class PlayingState implements GameState {
         towerUI = new TowerUI(selectedTower, levelState);
         slotUI = new TowerSlotUI(towerManager);
         progressManager = gamePanel.getProgressManager();
+        bombManager = new BombManager();
 
         towerUI.setListener(new TowerActionListener() {
 
@@ -155,7 +161,7 @@ public class PlayingState implements GameState {
         enemyRenderer = new EnemyRenderer(enemyManager);
 
         waveManager = new WaveManager(enemyManager,levelManager);
-        gameUI = new GameUI(levelState, waveManager);
+        gameUI = new GameUI(levelState, waveManager,levelManager);
 
         gameUI.setGameListener(new GameListener(){
                 @Override
@@ -164,19 +170,29 @@ public class PlayingState implements GameState {
                 }
 
                 @Override
-                    public void onBuild() {
+                public void onBuildWall() {
                     isPlacingWall = true;
                 }
+                @Override
+                public void placeBomb(){
+                    isPlacingBomb = true;
+                }
+
+                @Override
+                public void onBuildSpikes() {
+                    isPlacingSpikes = true;
+                }
                 });
+                
     
     }
 
     @Override
     public void update() {
         if( currentStatus == PlayingStatus.PLAYING){
-            levelManager.update();
             towerUpdater.update(towerManager.getTowers());
             enemyManager.update();
+            levelManager.update(enemyManager.getMonsters());
             waveManager.update();
             towerUI.update();
             towerManager.update(enemyManager.getMonsters());
@@ -198,7 +214,8 @@ public class PlayingState implements GameState {
             menuWin.update();
             progressManager.unlockNextLevel(level);
         }
-
+        bombManager.update(enemyManager.getMonsters());
+        gameUI.update();
     }
 
     @Override
@@ -230,6 +247,9 @@ public class PlayingState implements GameState {
                 break;
         }
         drawBuildWall(g);
+        drawBuilBomb(g);
+        drawBuilSpikes(g);
+        bombManager.render(g);
     }
 
     @Override
@@ -253,18 +273,44 @@ public class PlayingState implements GameState {
 
             if (levelManager.getCurrentLevel().canBuildWall(tileX, tileY)) { 
                 levelManager.getCurrentLevel().buildWall(tileX, tileY);
-                isPlacingWall = false; // nếu muốn build 1 lần
+                isPlacingWall = false;
             } else {
-                System.out.println("Không thể đặt ở đây");
+                
+            }
+        }
+        if (isPlacingBomb) {
+
+            int tileX = mouseX / TILE_SIZE;
+            int tileY = mouseY / TILE_SIZE;
+
+            int drawX = tileX * TILE_SIZE;
+            int drawY = tileY * TILE_SIZE;
+
+            if (levelManager.getCurrentLevel().canBuildWall(tileX, tileY)) { 
+                bombManager.addBomb(drawX,drawY);
+                isPlacingBomb = false;
+            } else {
+                
+            }
+        }
+        if (isPlacingSpikes) {
+
+            int tileX = mouseX / TILE_SIZE;
+            int tileY = mouseY / TILE_SIZE;
+
+            if (levelManager.getCurrentLevel().canBuildSpikes(tileX, tileY)) { 
+                levelManager.getCurrentLevel().buildSpikes(tileX, tileY);
+                isPlacingSpikes = false;
+            } else {
+                
             }
         }
         gameUI.mousePressed(x, y);
 
-        // ===== Nếu đang mở TowerUI (upgrade/sell) =====
         if (towerUI.mousePressed(x, y)) {
             return;
         }
-        // ===== Nếu đang mở TowerSlotUI =====
+
         if (slotUI.isVisible()) {
             if (slotUI.isInside(x, y)) {
                 slotUI.update(x, y, true,levelManager.getCurrentLevel());
@@ -274,7 +320,6 @@ public class PlayingState implements GameState {
             }
         }
 
-        // ===== Click vào Tower =====
         Tower t = towerManager.getTowerAt(x, y);
         if (t != null) {
             selectedTower = t;
@@ -282,7 +327,6 @@ public class PlayingState implements GameState {
             return;
         }
 
-        // ===== Click vào TowerSlot =====
         TowerSlot slot = levelManager.getCurrentLevel().getSlotAt(x, y);
 
         if (slot != null && !slot.isOccupied()) {
@@ -290,7 +334,6 @@ public class PlayingState implements GameState {
             return;
         }
 
-        // =====  Click ra ngoài → bỏ chọn tower =====
         selectedTower = null;
         towerUI.setSelectedTower(null);
     }
@@ -299,7 +342,7 @@ public class PlayingState implements GameState {
     public void mouseReleased(int x, int y) {
         if (currentStatus == PlayingStatus.PAUSE) {
             menuPause.mouseReleased(x, y);
-        return;
+            return;
         }else if (currentStatus == PlayingStatus.WIN) {
             menuWin.mouseReleased(x, y);
             return;
@@ -310,24 +353,21 @@ public class PlayingState implements GameState {
 
         gameUI.mouseReleased(x, y);
 
-        // ===== 1. Nếu đang mở TowerSlotUI → không xử lý gì thêm =====
+
         if (slotUI.isVisible()) {
             return;
         }
 
-        // ===== 2. Xử lý UI của Tower (upgrade / sell) =====
         if (towerUI.mouseReleased(x, y)) {
             return;
         }
 
-        // ===== 3. Click chọn Tower =====
         Tower t = towerManager.getTowerAt(x, y);
 
         if (t != null) {
             selectedTower = t;
             towerUI.setSelectedTower(t);
         } else {
-            // ===== 4. Click ra ngoài → bỏ chọn =====
             selectedTower = null;
             towerUI.setSelectedTower(null);
         }
@@ -366,9 +406,63 @@ public class PlayingState implements GameState {
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
 
             if (canBuild) {
-                g.drawImage(WallAsset.wallBuild.get(3).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE, null);
+                g.drawImage(TrapAsset.wallBuild.get(levelManager.getCurrentLevel().getLevelWall()).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE, null);
             } else {
-                g.drawImage(WallAsset.wallBuild.get(3).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE,null);
+                g.drawImage(TrapAsset.wallBuild.get(levelManager.getCurrentLevel().getLevelWall()).get(1)[1], drawX, drawY, TILE_SIZE, TILE_SIZE,null);
+                g.setColor(new Color(255, 0, 0, 100));
+                g.fillRect(drawX, drawY, TILE_SIZE, TILE_SIZE);
+            }
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }
+    }
+
+    private void drawBuilBomb(Graphics g){
+        if (isPlacingBomb) {
+
+            int tileX = mouseX / Constants.Tiles.TILE_SIZE;
+            int tileY = mouseY / Constants.Tiles.TILE_SIZE;
+
+            int drawX = tileX * TILE_SIZE;
+            int drawY = tileY * TILE_SIZE;
+
+            boolean canBuild = levelManager.getCurrentLevel().canBuildWall(tileX, tileY);
+
+            Graphics2D g2 = (Graphics2D) g;
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+
+            if (canBuild) {
+                g.drawImage(TrapAsset.bombPlaced[3], drawX, drawY, TILE_SIZE, TILE_SIZE, null);
+            } else {
+                g.drawImage(TrapAsset.bombPlaced[3], drawX, drawY, TILE_SIZE, TILE_SIZE,null);
+                g.setColor(new Color(255, 0, 0, 100));
+                g.fillRect(drawX, drawY, TILE_SIZE, TILE_SIZE);
+            }
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        }
+    }
+
+    private void drawBuilSpikes(Graphics g) {
+        if (isPlacingSpikes) {
+
+            int tileX = mouseX / Constants.Tiles.TILE_SIZE;
+            int tileY = mouseY / Constants.Tiles.TILE_SIZE;
+
+            int drawX = tileX * TILE_SIZE;
+            int drawY = tileY * TILE_SIZE;
+
+            boolean canBuild = levelManager.getCurrentLevel().canBuildSpikes(tileX, tileY);
+
+            Graphics2D g2 = (Graphics2D) g;
+
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.5f));
+
+            if (canBuild) {
+                g.drawImage(TrapAsset.spikes.get(levelManager.getCurrentLevel().getLevelSpikes())[2], drawX, drawY, TILE_SIZE, TILE_SIZE, null);
+            } else {
+                g.drawImage(TrapAsset.spikes.get(levelManager.getCurrentLevel().getLevelSpikes())[2], drawX, drawY, TILE_SIZE, TILE_SIZE,null);
                 g.setColor(new Color(255, 0, 0, 100));
                 g.fillRect(drawX, drawY, TILE_SIZE, TILE_SIZE);
             }

@@ -5,7 +5,9 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
+import Manager.LevelManager;
 import Manager.WaveManager;
+import asset.TrapAsset;
 import asset.UIAsset;
 import levels.LevelState;
 import listeners.GameListener;
@@ -15,18 +17,19 @@ import utils.Constants;
 public class GameUI {
     private LevelState levelState;
     private WaveManager waveManager;
+    private LevelManager levelManager;
 
     private int aniTick;
     private int aniIndex;
     private final int aniSpeed = 20;
     private MyButton buttonPause;
-    private MyButton buttonBuild;
+    private ButtonBar skillBar;
 
     private GameListener gameListener;
-    public GameUI(LevelState levelState, WaveManager waveManager) {
+    public GameUI(LevelState levelState, WaveManager waveManager, LevelManager levelManager) {
         this.levelState = levelState;
         this.waveManager = waveManager;
-
+        this.levelManager = levelManager;
         initbutton();
     }
     
@@ -38,27 +41,76 @@ public class GameUI {
                 gameListener.onPause();
             }
         });
-        buttonBuild = new MyButton("Build wall", 64, 64);
-        buttonBuild.setButton(18 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
-        buttonBuild.setAction(()->{
+        skillBar = new ButtonBar(15 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, 4 * Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        skillBar.setOrientation(1, 10);
+
+        MyButton buttonBuildWall = new MyButton(TrapAsset.wallBuild.get(levelManager.getCurrentLevel().getLevelWall()).get(2)[2], TrapAsset.wallBuild.get(levelManager.getCurrentLevel().getLevelWall()).get(2)[2],TrapAsset.wallBuild.get(levelManager.getCurrentLevel().getLevelWall()).get(2)[2], 64, 64);
+        buttonBuildWall.setButton(18 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        buttonBuildWall.setAction(()->{
             if (gameListener != null) {
-                gameListener.onBuild();
+                gameListener.onBuildWall();
             }
         });
+
+        MyButton buttonBuildBomd = new MyButton(TrapAsset.bombPlaced[3], TrapAsset.bombPlaced[3],TrapAsset.bombPlaced[3], 64, 64);
+        buttonBuildBomd.setButton(19 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+            buttonBuildBomd.setAction(()->{
+            if (gameListener != null) {
+                gameListener.placeBomb();
+            }
+        });
+
+        MyButton buttonBuildSpikes = new MyButton(TrapAsset.spikes.get(levelManager.getCurrentLevel().getLevelSpikes())[3],TrapAsset.spikes.get(levelManager.getCurrentLevel().getLevelSpikes())[3],TrapAsset.spikes.get(levelManager.getCurrentLevel().getLevelSpikes())[3], 64, 64);
+        buttonBuildSpikes.setButton(17 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+            buttonBuildSpikes.setAction(()->{
+            if (gameListener != null) {
+                gameListener.onBuildSpikes();
+            }
+        });
+        buttonBuildWall.setType(MyButton.ButtonType.SKILL);
+        buttonBuildWall.setCooldown(12000);
+
+        buttonBuildBomd.setType(MyButton.ButtonType.SKILL);
+        buttonBuildBomd.setCooldown(5000);
+
+        buttonBuildSpikes.setType(MyButton.ButtonType.SKILL);
+        buttonBuildSpikes.setCooldown(9000);
+        skillBar.addButton(buttonBuildWall);
+        skillBar.addButton(buttonBuildBomd);
+        skillBar.addButton(buttonBuildSpikes);
     }
 
+    public void update(){
+        for (MyButton b : skillBar.buttons) {
+            b.update();
+        }
+    }
     public void render(Graphics g){
         g.setColor(new Color(0,0,0,150));
         g.fillRect(20, 20, 140, 50);
         g.fillRect(170, 20,100,50);
         g.fillRect(20, 80, 250, 50);
+
+        g.setColor(new Color(255,255,255,150));
+        g.fillRect(17 * Constants.Tiles.TILE_SIZE - 12 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        g.fillRect(16 * Constants.Tiles.TILE_SIZE - 23 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        g.fillRect(15 * Constants.Tiles.TILE_SIZE - 32 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+
+        g.setColor(Color.BLACK);
+        g.drawRect(17 * Constants.Tiles.TILE_SIZE - 12 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        g.drawRect(16 * Constants.Tiles.TILE_SIZE - 23 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        g.drawRect(15 * Constants.Tiles.TILE_SIZE - 32 , 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+
         drawIcon(g);
+
+
         // text
         g.setColor(Color.WHITE);
         g.setFont(new Font("Arial", Font.BOLD, 30));
         g.drawString("" + levelState.getGold(), 80, 55);
         g.drawString("" + levelState.getLives(), 220, 55);
         g.drawString("Wave: " + waveManager.getCurrentWave() + "/" + levelState.getMaxWaves(), 30, 115);
+
 
         drawButtons(g);
     }
@@ -68,16 +120,13 @@ public class GameUI {
         updateAnimation();
         if (coinFrames == null || coinFrames.length == 0) return;
 
-        // Tính toán index hiện tại
         int index = aniIndex % coinFrames.length;
 
-        // Kích thước hiển thị mong muốn (ví dụ 32x32)
         int size = 32; 
 
-        // Vẽ đồng xu
         g.drawImage(coinFrames[index], 40, 30 , 32, 30, null);
         g.drawImage(UIAsset.heart, 180, 30,30,30, null);
-        }
+    }
 
     public BufferedImage[] loadCoinFrames(BufferedImage atlas) {
         int count = 6; // Số lượng frame trong ảnh của bạn
@@ -101,42 +150,46 @@ public class GameUI {
 
     private void drawButtons(Graphics g){
         buttonPause.draw(g);
-        buttonBuild.draw(g);
+        skillBar.draw(g);
     }
     
     public void mousePressed(int x, int y) {
-        if (buttonPause.getBounds().contains(x, y)) {
-            buttonPause.setMousePressed(true);
+        for(MyButton b : skillBar.buttons){
+            if(b.getBounds().contains(x, y))
+                b.setMousePressed(true);
         }
-        if (buttonBuild.getBounds().contains(x, y)) {
-            buttonBuild.setMousePressed(true);
+        if(buttonPause.getBounds().contains(x, y)){
+            buttonPause.setMousePressed(true);
         }
     }
 
     public void mouseReleased(int x, int y) {
-        if (buttonPause.getBounds().contains(x, y) && buttonPause.isMousePressed()) {
-            buttonPause.execute();
-        } else {
+        for(MyButton b : skillBar.buttons){
+            if( b.getBounds().contains(x,y) && b.isMousePressed() ){
+                b.setMousePressed(false);
+                b.execute();
+            }
+            else b.setMousePressed(false);
+        }
+        if(buttonPause.getBounds().contains(x, y) && buttonPause.isMousePressed()){
             buttonPause.setMousePressed(false);
+            buttonPause.execute();
         }
-        if (buttonBuild.getBounds().contains(x, y) && buttonBuild.isMousePressed()) {
-            buttonBuild.execute();
-        } else {
-            buttonBuild.setMousePressed(false);
-        }
+        else buttonPause.setMousePressed(false);
     }
 
     public void mouseMoved(int x, int y) {
-        if (buttonPause.getBounds().contains(x,y)) {
+        for( MyButton b : skillBar.buttons){
+            if( b.getBounds().contains(x, y)){
+                b.setMouseOver(true);
+            }
+            else 
+                b.setMouseOver(false);
+        }
+        if( buttonPause.getBounds().contains(x, y)){
             buttonPause.setMouseOver(true);
-        }else{
-            buttonPause.setMouseOver(false);
         }
-        if (buttonBuild.getBounds().contains(x,y)) {
-            buttonBuild.setMouseOver(true);
-        }else{
-            buttonBuild.setMouseOver(false);
-        }
+        else buttonPause.setMouseOver(false);
     }
 
     public void setGameListener(GameListener listener) {

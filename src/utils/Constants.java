@@ -116,10 +116,10 @@ public class Constants {
     }
 
     public static class Direction{
-        public static final int UP = 0;
-        public static final int DOWN = 1;
-        public static final int LEFT = 3;
-        public static final int RIGHT = 4;
+        public static final int LEFT = 0;
+        public static final int UP = 1;
+        public static final int RIGHT = 2;
+        public static final int DOWN = 3;
         
     }
 
@@ -247,7 +247,6 @@ public class Constants {
         public static final int ROAD_RIGHT_UP = 5;
         public static final int ROAD_RIGHT_DOWN = 6;
         
-        
     }
 
 
@@ -275,6 +274,39 @@ public class Constants {
                     return 250;
                 case 4:
                     return 400;
+                default:
+                    break;
+            }
+            return 0;
+        }
+    }
+
+    public static class Spikes {
+        public static int getMaxUse(int level){
+            switch (level) {
+                case 1:
+                    return 5; 
+                case 2:
+                    return 10;
+                case 3:
+                    return 15;
+                case 4:
+                    return 25;   
+                default:
+                    break;
+            }
+            return 0;
+        }
+        public static int getDame(int level){
+            switch (level) {
+                case 1:
+                    return 20; 
+                case 2:
+                    return 35;
+                case 3:
+                    return 55;
+                case 4:
+                    return 85;   
                 default:
                     break;
             }

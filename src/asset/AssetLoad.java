@@ -5,13 +5,13 @@ public class AssetLoad {
     private UIAsset uiAsset;
     private TowerAsset towerAsset;
     private MonsterAsset monsterAsset;
-    private WallAsset wallAsset;
+    private TrapAsset wallAsset;
     public AssetLoad() {
         mapAsset = MapAsset.getInstance();
         uiAsset = UIAsset.getInstance();
         towerAsset = TowerAsset.getInstance();
         monsterAsset = MonsterAsset.getInstance();
-        wallAsset = WallAsset.getInstance();
+        wallAsset = TrapAsset.getInstance();
     }
 
     public void loadAllAssets() {

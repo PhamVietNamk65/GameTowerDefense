@@ -3,14 +3,14 @@ package entity.trap;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 
-import asset.WallAsset;
+import asset.TrapAsset;
 import utils.Constants;
 
 public class Wall {
     private int x, y;
 
     private int hp, maxHp;
-    private int level = 3;
+    private int level;
     private int direction;
 
     private int buildProgress = 0;
@@ -18,10 +18,10 @@ public class Wall {
 
     private int animTick, animIndex;
 
-    public Wall(int x, int y, int direction) {
+    public Wall(int x, int y, int direction, int levelWall) {
         this.x = x;
         this.y = y;
-
+        this.level = levelWall;
         this.maxHp = Constants.Walls.getStartHP(level);
 
         this.hp = maxHp;
@@ -79,13 +79,13 @@ public class Wall {
         BufferedImage img;
 
         if (isBuilding) {
-            BufferedImage[] frames = WallAsset.wallBuild.get(level).get(direction);
+            BufferedImage[] frames = TrapAsset.wallBuild.get(level).get(direction);
             img = frames[animIndex % frames.length];
         } 
         else {
             float percent = (float) hp / maxHp;
 
-            BufferedImage[] frames = WallAsset.wallDestroyed.get(level).get(direction);
+            BufferedImage[] frames = TrapAsset.wallDestroyed.get(level).get(direction);
 
             if (percent > 0.8f) img = frames[0];
             else if (percent > 0.6f) img = frames[1];
@@ -104,4 +104,5 @@ public class Wall {
     public int getX() {
         return x;
     }
+
 }

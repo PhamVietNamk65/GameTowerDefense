@@ -1,22 +1,25 @@
 package levels;
+
 import static utils.Constants.Tiles.TILE_SIZE;
 
-import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.Map;
 
 import asset.MapAsset;
+import asset.MapType;
 import entity.TowerSlot;
+import entity.monster.Monster;
+import entity.trap.Spikes;
 import entity.trap.Wall;
 import system.PathFinder;
-import utils.Constants;
 
 public class Level {
+
     private int levelid;
+    private MapType mapType;
 
     private int[][] pathMap;
     private int[][] towerMap;
@@ -27,38 +30,49 @@ public class Level {
 
     private ArrayList<TowerSlot> allSlots = new ArrayList<>();
     private ArrayList<TowerSlot> activeSlots;
-
-    private Wall[][] wallGrid ;
+ 
+    private int levelWall = 1;
+    private Wall[][] wallGrid;
     private ArrayList<Wall> walls = new ArrayList<>();
 
-    public Level(int levelid){
+    private int levelSpikes = 1;
+    private Spikes[][] spikesGrid;
+    private ArrayList<Spikes> spikes = new ArrayList<>();
+
+    public Level(int levelid, MapType mapType){
         this.levelid = levelid;
+        this.mapType = mapType;
         loadLevel();
     }
+
     private void loadLevel() {
-        groundMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/ground.csv");
-        pathMap  = LoadMap.loadLevel("res/Map/Level" + levelid + "/path.csv");
-        
-        towerMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/tower.csv");
+
+        groundMap  = LoadMap.loadLevel("res/Map/Level" + levelid + "/ground.csv");
+        pathMap    = LoadMap.loadLevel("res/Map/Level" + levelid + "/path.csv");
+        towerMap   = LoadMap.loadLevel("res/Map/Level" + levelid + "/tower.csv");
         objectsMap = LoadMap.loadLevel("res/Map/Level" + levelid + "/objects.csv");
 
         paths.add(PathFinder.buildPath(pathMap));
-        generateTowerSlots();
-        activeSlots = new ArrayList<>(allSlots);
-        wallGrid = new Wall[groundMap.length][groundMap[0].length];
+
         try {
             int[][] pathMap1 = LoadMap.loadLevel("res/Map/Level" + levelid + "/path1.csv");
             paths.add(PathFinder.buildPath(pathMap1));
-        } catch (Exception e) {}
+        } catch (Exception e) {
+
+        }
+
+        generateTowerSlots();
+        activeSlots = new ArrayList<>(allSlots);
+
+        wallGrid = new Wall[groundMap.length][groundMap[0].length];
+        spikesGrid = new Spikes[groundMap.length][groundMap[0].length];
     }
 
-    public void update() {
+    public void update(ArrayList<Monster> monsters) {
 
         Iterator<Wall> it = walls.iterator();
-
         while (it.hasNext()) {
             Wall w = it.next();
-
             w.update();
 
             if (w.isDestroyed()) {
@@ -66,12 +80,78 @@ public class Level {
                 it.remove();
             }
         }
+
+        Iterator<Spikes> its = spikes.iterator();
+        while (its.hasNext()) {
+            Spikes s = its.next();
+            s.update(monsters);
+
+            if (!s.isActive()) {
+                spikesGrid[s.getY()][s.getX()] = null;
+                its.remove();
+            }
+        }
+    }
+
+    public void render(Graphics g) {
+
+        BufferedImage[] tiles = MapAsset.getInstance().tiles.get(mapType);
+        BufferedImage[] objects = MapAsset.getInstance().objects.get(mapType);
+
+        for (int y = 0; y < groundMap.length; y++) {
+            for (int x = 0; x < groundMap[0].length; x++) {
+
+                int tileId = groundMap[y][x];
+
+                if (tileId >= 0 && tileId < tiles.length) {
+                    g.drawImage(tiles[tileId], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
+                }
+            }
+        }
+
+        for (int y = 0; y < objectsMap.length; y++) {
+            for (int x = 0; x < objectsMap[0].length; x++) {
+
+                int tileId = objectsMap[y][x];
+
+                if (tileId > 0 && tileId < objects.length) {
+
+                    if (tileId == 1 || tileId == 8) {
+                        g.drawImage(objects[7], x * TILE_SIZE - 18, y * TILE_SIZE + 38, null);
+                    }
+
+                    else if (tileId == 6) {
+                        g.drawImage(objects[8], x * TILE_SIZE - 11, y * TILE_SIZE - 3, null);
+                        g.drawImage(objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
+                        g.drawImage(objects[5], x * TILE_SIZE - 8, y * TILE_SIZE + 20, null);
+                        continue;
+                    }
+
+                    else if (tileId == 4) {
+                        g.drawImage(objects[9], x * TILE_SIZE - 5, y * TILE_SIZE - 3, null);
+                    }
+
+                    g.drawImage(objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
+                }
+            }
+        }
+
+        for (TowerSlot slot : activeSlots) {
+            slot.render(g);
+        }
+
+        for (Spikes s : spikes) {
+            s.render(g);
+        }
+
+        for (Wall w : walls) {
+            w.render(g);
+        }
     }
 
     private void generateTowerSlots() {
         for (int y = 0; y < towerMap.length; y++) {
             for (int x = 0; x < towerMap[y].length; x++) {
-
                 if (towerMap[y][x] == 1) {
                     allSlots.add(new TowerSlot(x, y));
                 }
@@ -79,12 +159,24 @@ public class Level {
         }
     }
 
+    public ArrayList<TowerSlot> getTowerSlots() {
+        return activeSlots;
+    }
+
+    public TowerSlot getSlotAt(int mouseX, int mouseY) {
+        for (TowerSlot slot : activeSlots) {
+            if (slot.isClicked(mouseX, mouseY)) {
+                return slot;
+            }
+        }
+        return null;
+    }
+
     public void removeSlot(TowerSlot slot) {
         if (slot == null) return;
-        // Xóa tất cả slot có cùng tọa độ x, y với slot được chọn
         activeSlots.removeIf(s -> s.getX() == slot.getX() && s.getY() == slot.getY());
     }
-    
+
     public void addBackSlot(int x, int y) {
         for (TowerSlot s : allSlots) {
             if (s.getX() == x && s.getY() == y) {
@@ -96,140 +188,31 @@ public class Level {
         }
     }
 
-    public void render(Graphics g) {
-        // ===== VẼ DOUND =====
-        for (int y = 0; y < groundMap.length; y++) {
-            for (int x = 0; x < groundMap[0].length; x++) {
-                int tileId = groundMap[y][x];
-                
-                g.drawImage(MapAsset.tiles[tileId], x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE, null);
-                if( levelid == 3){
-                    drawMore(g, x, y, 10);
-                    
-                }
-            }
-        }
-
-        for (int y = 0; y < objectsMap.length; y++) {
-            for (int x = 0; x < objectsMap[0].length; x++) {
-                int tileId = objectsMap[y][x];
-                if (tileId > 0 && tileId < MapAsset.objects.length) {
-                    if( tileId == 1 || tileId == 8) {
-                        g.drawImage(
-                            MapAsset.objects[7], 
-                            x * TILE_SIZE - 18, 
-                            y * TILE_SIZE + 38, 
-                            null
-                        );
-                        g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE,MapAsset.objects[tileId].getWidth() , MapAsset.objects[tileId].getHeight(), null);
-                    }
-                    else if( tileId == 6){
-                        g.drawImage(MapAsset.objects[8], x * TILE_SIZE - 11 , y * TILE_SIZE - 3 , null);
-                        g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
-                        g.drawImage(MapAsset.objects[5], x * TILE_SIZE - 8, y * TILE_SIZE + 20, null);
-                    }
-                    else if( tileId == 4){
-                        g.drawImage(MapAsset.objects[9], x * TILE_SIZE - 5 , y * TILE_SIZE - 3 , null);
-                        g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
-                    }
-                    else if( tileId == 7 ) {
-                        drawMore(g, x, y, tileId);
-                    }
-                    else g.drawImage(MapAsset.objects[tileId], x * TILE_SIZE, y * TILE_SIZE, null);
-                }
-
-            }
-        }
-        // ===== VẼ TOWER SLOT (debug) =====
-        for (TowerSlot slot : activeSlots) {
-            slot.render(g);
-        }
-        
-        for(Wall w : walls){
-            w.render(g);
-        }
-    }
-
     public ArrayList<Point[]> getPaths() {
         return paths;
     }
 
-    public ArrayList<TowerSlot> getTowerSlots() {
-        return activeSlots;
-    }
-
-    public TowerSlot getSlotAt(int mouseX, int mouseY) {
-
-        for (TowerSlot slot : activeSlots) {
-            if (slot.isClicked(mouseX, mouseY)) {
-                return slot;
-            }
-        }
-
-        return null;
-    }
-
-    private void drawMore(Graphics g, int x, int y, int id){
-        // 1. Dùng tọa độ x, y để tạo Seed cố định cho ô này
-        long seed = (long)x * 73856093 ^ (long)y * 19349663;
-        java.util.Random rand = new java.util.Random(seed);
-
-        // 2. Ngẫu nhiên số lượng khóm cỏ (ví dụ từ 3 đến 6 khóm)
-        int grassCount = 2 + rand.nextInt(3); 
-
-         for (int i = 0; i < grassCount; i++) {
-        // Ngẫu nhiên vị trí x, y bên trong ô TILE_SIZE
-        // Trừ đi một khoảng nhỏ (ví dụ 10-15) để cỏ không bị tràn sang ô bên cạnh
-        int offsetX = rand.nextInt(TILE_SIZE - 12);
-        int offsetY = rand.nextInt(TILE_SIZE - 12);
-
-        g.drawImage(
-            MapAsset.objects[id], 
-            x * TILE_SIZE + offsetX, 
-            y * TILE_SIZE + offsetY, 
-            null);
-        }
-    }
-    
-            
-    public int getlevelID(){
-        return levelid;
-    }
-
     public void buildWall(int x, int y) {
         int dir = getDirectionFromPath(x, y);
-        Wall w = new Wall(x, y, dir);
+        Wall w = new Wall(x, y, dir, levelWall);
 
         wallGrid[y][x] = w;
         walls.add(w);
     }
 
     public boolean hasWall(int x, int y) {
-        
         return wallGrid[y][x] != null;
     }
 
-    public Wall getWallAt(int x, int y) {
-        return wallGrid[y][x];
+    public boolean canBuildWall(int x, int y) {
+        if (!inBound(x, y)) return false;
+        if (hasWall(x, y) || hasSpikes(x, y)) return false;
+        return pathMap[y][x] != 0;
     }
 
     public void removeWall(Wall w) {
         wallGrid[w.getY()][w.getX()] = null;
         walls.remove(w);
-    }
-
-    public boolean canBuildWall(int x, int y) {
-
-        if (x < 0 || y < 0 || y >= groundMap.length || x >= groundMap[0].length)
-            return false;
-
-        // đã có tường
-        if (hasWall(x, y)) return false;
-
-        // không phải ô build (ví dụ != 0)
-        if (pathMap[y][x] == 0) return false;
-
-        return true;
     }
 
     private int getDirectionFromPath(int x, int y) {
@@ -248,14 +231,56 @@ public class Level {
                     int dx = px - prevX;
                     int dy = py - prevY;
 
-                    if (dx == 1) return 2;   
-                    if (dx == -1) return 3;  
-                    if (dy == -1) return 1;   
-                    if (dy == 1) return 0;  
+                    if (dx == 1) return 2;
+                    if (dx == -1) return 3;
+                    if (dy == -1) return 1;
+                    if (dy == 1) return 0;
                 }
             }
         }
 
-        return 2; // default
+        return 2;
+    }
+
+    public void buildSpikes(int x, int y) {
+        Spikes s = new Spikes(x * TILE_SIZE, y * TILE_SIZE, levelSpikes);
+
+        spikesGrid[y][x] = s;
+        spikes.add(s);
+    }
+
+    public boolean hasSpikes(int x, int y) {
+        return spikesGrid[y][x] != null;
+    }
+
+    public boolean canBuildSpikes(int x, int y) {
+        if (!inBound(x, y)) return false;
+        if (hasSpikes(x, y) || hasWall(x, y)) return false;
+        return pathMap[y][x] != 0;
+    }
+
+    private boolean inBound(int x, int y) {
+        return !(x < 0 || y < 0 || y >= groundMap.length || x >= groundMap[0].length);
+    }
+
+    public int getLevelID(){
+        return levelid;
+    }
+
+    public void upgradeWall(){
+        levelWall++;
+        levelSpikes++;
+    }
+
+    public int getLevelWall(){
+        return levelWall;
+    }
+
+    public int getLevelSpikes(){
+        return levelSpikes;
+    }
+
+    public Wall getWallAt(int tileX, int tileY) {
+        return wallGrid[tileY][tileX];
     }
 }

@@ -2,5 +2,7 @@ package listeners;
 
 public interface GameListener {
     void onPause();
-    void onBuild();
+    void onBuildWall();
+    void placeBomb();
+    void onBuildSpikes();
 } 

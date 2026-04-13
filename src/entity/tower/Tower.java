@@ -227,7 +227,6 @@ public class Tower {
         return frames==null ? 0 : frames.length;
     }
 
-    // ===== Arrow spawn (GIỮ NGUYÊN CHUẨN) =====
     public int getArrowSpawnX() {
         int cx = getCenterX();
         if (direction == UP || direction == DOWN)
@@ -249,7 +248,6 @@ public class Tower {
         return cdTick >= cooldown;
     }
 
-    // ===== GETTER =====
     public int getTowerAnimFrame() { return towerAnimFrame; }
     public boolean isUpgrading() { return upgrading; }
     public boolean isJustStartedUpgrade() { return justStartedUpgrade; }
