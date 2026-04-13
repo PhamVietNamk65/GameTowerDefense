@@ -1,9 +1,11 @@
 package ui;
 
 import asset.UIAsset;
-import java.awt.*;
 import main.GamePanel;
-import utils.Constants;
+
+import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.geom.*;
 
 /**
  * Settings screen for Tower Defense game.
@@ -19,9 +21,9 @@ public class Setting {
 
     // ── Layout constants ──────────────────────────────────────────────────────
     private static final int PANEL_X      = 0;
-    private static final int PANEL_Y      = 0;
-    private static final int PANEL_W      = Constants.SCREEN_WIDTH;
-    private static final int PANEL_H      = Constants.SCREEN_HEIGHT;
+    private static final int PANEL_Y      = 0;    
+    private static final int PANEL_W      = 1280;
+    private static final int PANEL_H      = 768;
     private static final int TAB_NAV_W    = 130;
     private static final int CONTENT_X    = PANEL_X + TAB_NAV_W;
     private static final int CONTENT_Y    = PANEL_Y + 54;
@@ -331,7 +333,10 @@ public class Setting {
         g2.setColor(COL_BORDER);
         g2.drawLine(PANEL_X, FOOTER_Y, PANEL_X + PANEL_W, FOOTER_Y);
 
-        // Buttons
+        // Left: back to menu button (danger-tinted)
+        drawTextButton(g2, "\u2190  Menu",     PANEL_X + 14,            FOOTER_Y + 10, 100, 26, false, 52);
+
+        // Right: reset & save
         drawTextButton(g2, "Reset Defaults", PANEL_X + PANEL_W - 280, FOOTER_Y + 10, 120, 26, false, 50);
         drawTextButton(g2, "Save Changes",   PANEL_X + PANEL_W - 148, FOOTER_Y + 10, 128, 26, true,  51);
     }
@@ -519,7 +524,13 @@ public class Setting {
     private void drawTextButton(Graphics2D g2, String label, int x, int y,
                                 int w, int h, boolean primary, int slotId) {
         boolean hover = (hoveredCtrl == slotId);
-        if (primary) {
+        boolean isBack = (slotId == 52);
+
+        if (isBack) {
+            g2.setColor(hover ? new Color(192, 57, 43, 55) : new Color(192, 57, 43, 25));
+            g2.fillRoundRect(x, y, w, h, 3, 3);
+            g2.setColor(hover ? new Color(192, 57, 43, 180) : COL_BORDER);
+        } else if (primary) {
             g2.setColor(hover ? new Color(200, 169, 74, 60) : new Color(200, 169, 74, 38));
             g2.fillRoundRect(x, y, w, h, 3, 3);
             g2.setColor(COL_GOLD);
@@ -534,7 +545,9 @@ public class Setting {
         Font bf = new Font("Serif", Font.BOLD, 12);
         g2.setFont(bf);
         FontMetrics fm = g2.getFontMetrics();
-        g2.setColor(primary ? COL_GOLD_LIGHT : COL_TEXT_DIM);
+        if (isBack)        g2.setColor(hover ? new Color(231, 76, 60) : COL_TEXT_DIM);
+        else if (primary)  g2.setColor(COL_GOLD_LIGHT);
+        else               g2.setColor(COL_TEXT_DIM);
         g2.drawString(label, x + (w - fm.stringWidth(label)) / 2, y + h / 2 + 4);
     }
 
@@ -569,6 +582,7 @@ public class Setting {
         }
         // Footer buttons
         if (y >= FOOTER_Y + 10 && y <= FOOTER_Y + 36) {
+            if (x >= PANEL_X + 14            && x <= PANEL_X + 114)             goToMenu();
             if (x >= PANEL_X + PANEL_W - 280 && x <= PANEL_X + PANEL_W - 160) resetDefaults();
             if (x >= PANEL_X + PANEL_W - 148 && x <= PANEL_X + PANEL_W - 20)  saveSettings();
         }
@@ -590,6 +604,7 @@ public class Setting {
         // Button hover
         hoveredCtrl = -1;
         if (y >= FOOTER_Y + 10 && y <= FOOTER_Y + 36) {
+            if (x >= PANEL_X + 14          && x <= PANEL_X + 114)             hoveredCtrl = 52;
             if (x >= PANEL_X + PANEL_W - 280 && x <= PANEL_X + PANEL_W - 160) hoveredCtrl = 50;
             if (x >= PANEL_X + PANEL_W - 148 && x <= PANEL_X + PANEL_W - 20)  hoveredCtrl = 51;
         }
@@ -645,6 +660,10 @@ public class Setting {
         // TODO: persist to file / GamePanel config
         toastAlpha  = 255;
         toastExpiry = System.currentTimeMillis() + 1600;
+    }
+
+    private void goToMenu() {
+        gp.getGameStateManager().setState(new states.MenuState(gp));
     }
 
     // ── Getters (used by GamePanel / other systems) ───────────────────────────
