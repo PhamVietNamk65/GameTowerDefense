@@ -26,6 +26,12 @@ public class EnemySpawner {
             case WOLF:
                 m = new Wolf(0, 0, 0);
                 break;
+            case RAT:
+                m = new Rat(0, 0, 0);
+                break;
+            case RIDER:
+                m = new Rider(0, 0, 0);
+                break;
         }
 
         return m;

@@ -88,7 +88,6 @@ public class WaveManager {
         waitingNext = false;
         spawnedAllEnemies = false;
 
-        System.out.println("Wave " + (currentWave + 1) + " bắt đầu!");
         spawnNext(); // spawn ngay con đầu tiên
     }
 

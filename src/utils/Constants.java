@@ -141,41 +141,108 @@ public class Constants {
 
     public static class Monsters {
         public static final int SLIME = 0;
-        public static final int ORC   = 1;
-        public static final int WOLF  = 2;
-        public static final int BEE   = 3;
+        public static final int ORC = 1;
+        public static final int WOLF = 2;
+        public static final int BEE = 3;
+        public static final int RAT = 4;
+        public static final int RIDER = 5;
+        public static final int MAGE = 6;
 
-        public static final int ENEMY_SIZE    = 32 * 2;
-        public static final int HP_BAR_WIDTH  = 24;
-        public static final int HP_BAR_HEIGHT = 4;
-        public static final int HP_BAR_Y_OFFSET = 8;
+        public static final int ENEMY_SIZE = 32 * 2;
+	    public static final int HP_BAR_WIDTH = 24;
+	    public static final int HP_BAR_HEIGHT = 4;
+	    public static final int HP_BAR_Y_OFFSET = 8;
 
-        public static float GetSpeed(int monsterType) {
+        public static int getAttackSpeed(int monsterType){
             switch (monsterType) {
-                case ORC:   return 1f;
-                case SLIME: return 0.8f;
-                case BEE:   return 1.5f;
-                case WOLF:  return 2f;
+                case ORC:
+                    return 60;
+                case SLIME:
+                    return 100;
+                case BEE:
+                    return 0;
+                case WOLF:
+                    return 45;
+                case RAT:
+                    return 50;
+                case RIDER:
+                    return 40;
+                case MAGE:
+                    return 70;
+            }
+            return 0;
+        }
+        
+        public static int getDame(int monsterType){
+            switch (monsterType) {
+                case ORC:
+                    return 20;
+                case SLIME:
+                    return 1;
+                case BEE:
+                    return 0;
+                case WOLF:
+                    return 15;
+                case RAT:
+                    return 18;
+                case RIDER:
+                    return 25;
+                case MAGE:
+                    return 30;
+            }
+            return 0;
+        }
+        
+        public static float GetSpeed(int monsterType){
+            switch (monsterType) {
+                case ORC:
+                    return 1f;
+                case SLIME:
+                    return 0.8f;
+                case BEE:
+                    return 1.5f;
+                case WOLF:
+                    return 2f;
+                case RAT:
+                    return 1.2f;
+                case RIDER:
+                    return 2.5f;
             }
             return 0;
         }
 
         public static int GetStartHealth(int monsterType) {
             switch (monsterType) {
-                case ORC:   return 250;
-                case SLIME: return 100;
-                case BEE:   return 70;
-                case WOLF:  return 150;
+                case ORC:
+                    return 250;
+                case SLIME:
+                    return 100;
+                case BEE:
+                    return 70;
+                case WOLF:
+                    return 150;
+                case RAT:
+                    return 200;
+                case RIDER:
+                    return 350;
             }
             return 0;
         }
 
         public static int GetReward(int monsterType) {
             switch (monsterType) {
-                case ORC:   return 60;
-                case SLIME: return 20;
-                case BEE:   return 10;
-                case WOLF:  return 25;
+                case ORC:
+                    return 60;
+                case SLIME:
+                    return 20;
+                case BEE:
+                    return 10;
+                case WOLF:
+                    return 25;
+                case RAT:
+                    return 50;
+                case RIDER:
+                    return 120;
             }
             return 0;
         }
@@ -195,14 +262,6 @@ public class Constants {
         public static final int ROAD_RIGHT_DOWN = 6;
     }
 
-    private static class Objects {
-        public static final int TREE1  = 1;
-        public static final int TREE2  = 2;
-        public static final int GRASS  = 3;
-        public static final int BUSH   = 4;
-        public static final int STONE1 = 5;
-        public static final int STONE2 = 6;
-    }
 
     public static class Projectile {
         public static final float SPEED      = 6f;
@@ -213,5 +272,25 @@ public class Constants {
     public static class Arrow {
         public static final int ARROW_DRAW_SIZE  = 10;
         public static final int ARROW_ANIM_SPEED = 4;
+    }
+
+    public static class Walls{
+        public static int getStartHP(int level){
+            switch (level) {
+                case 0:
+                    return 100;
+                case 1:
+                    return 150;
+                case 2:
+                    return 200;
+                case 3:
+                    return 250;
+                case 4:
+                    return 400;
+                default:
+                    break;
+            }
+            return 0;
+        }
     }
 }

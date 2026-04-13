@@ -3,6 +3,10 @@ package render;
 import asset.SniperAsset;
 import entity.tower.SniperTower;
 import entity.tower.Tower;
+import java.awt.AlphaComposite;
+import java.awt.BasicStroke;
+import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
@@ -79,7 +83,17 @@ public class SniperRenderer {
                 g2.drawImage(base, tx, ty, BASE_DRAW_W, BASE_DRAW_H, null);
         }
 
-        // ── 2. MC idle on top of base ─────────────────────────────────────────
+        // ── 2. Flash overlay khi đang upgrade ───────────────────────────────────
+        if (s.isUpgrading() && s.getFlashAlpha() > 0) {
+            Composite oldC = g2.getComposite();
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,
+                    s.getFlashAlpha() / 255f * 0.5f));
+            g2.setColor(new Color(180, 140, 80));
+            g2.fillRoundRect(tx, ty, BASE_DRAW_W, BASE_DRAW_H, 6, 6);
+            g2.setComposite(oldC);
+        }
+
+        // ── 3. MC idle on top of base ─────────────────────────────────────────
         if (asset.mcIdleFrames != null) {
             int frame = s.getMcAnimFrame();
             if (frame < asset.mcIdleFrames.length) {
@@ -99,5 +113,42 @@ public class SniperRenderer {
                 }
             }
         }
+
+        // ── 4. Thanh tiến độ upgrade ──────────────────────────────────────────
+        if (s.isUpgrading()) drawUpgradeBar(g2, s, tx, ty);
+    }
+
+    // ── Upgrade progress bar ──────────────────────────────────────────────────
+    private void drawUpgradeBar(Graphics2D g2, SniperTower s, int tx, int ty) {
+        int barW = BASE_DRAW_W;
+        int barH = 5;
+        int barX = tx;
+        int barY = ty - 40;
+        float progress = s.getUpgradeProgress();
+
+        // Nền tối
+        g2.setColor(new Color(20, 20, 20, 200));
+        g2.fillRoundRect(barX - 1, barY - 1, barW + 2, barH + 2, 3, 3);
+
+        // Thanh fill màu nâu vàng (theme sniper)
+        int filled = (int)(barW * progress);
+        if (filled > 0) {
+            g2.setColor(Color.getHSBColor(0.10f - progress * 0.03f, 0.85f, 0.95f));
+            g2.fillRoundRect(barX, barY, filled, barH, 2, 2);
+        }
+
+        // Viền
+        java.awt.Stroke os = g2.getStroke();
+        g2.setStroke(new BasicStroke(0.5f));
+        g2.setColor(new Color(200, 200, 200, 120));
+        g2.drawRoundRect(barX, barY, barW, barH, 2, 2);
+        g2.setStroke(os);
+
+        // Label LV x → LV y
+        g2.setFont(new java.awt.Font("Arial", java.awt.Font.BOLD, 8));
+        g2.setColor(new Color(255, 220, 140));
+        String label = "LV" + s.getPrevLevel() + " → LV" + (s.getPrevLevel() + 1);
+        int lw = g2.getFontMetrics().stringWidth(label);
+        g2.drawString(label, barX + (barW - lw) / 2, barY - 2);
     }
 }

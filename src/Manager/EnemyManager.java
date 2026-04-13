@@ -6,6 +6,7 @@ import system.EnemySpawner;
 import asset.MonsterAsset;
 import entity.monster.EnemyState;
 import entity.monster.Monster;
+import entity.trap.Wall;
 import levels.Level;
 import levels.LevelState;
 
@@ -62,9 +63,19 @@ public class EnemyManager {
                 }
 
             } 
-            // ===== ALIVE =====
+            if (m.getState() == EnemyState.ATTACK) {
+
+                Wall w = m.getTargetWall();
+
+                if (w == null || w.isDestroyed()) {
+                    m.setState(EnemyState.WALK);
+                    m.setTargetWall(null);
+                } else {
+                    m.attackWall();
+                }
+            }
             else {
-                m.getMovement().move(m);
+                m.getMovement().move(m, level);
             }
         }
     }

@@ -5,6 +5,7 @@ public class AssetLoad {
     private UIAsset               uiAsset;
     private TowerAsset            towerAsset;
     private MonsterAsset          monsterAsset;
+    private WallAsset             wallAsset;    
     private CanonAsset            canonAsset;
     private WirzardFlameAsset     wirzardFlameAsset;
     private WirzardFrostAsset     wirzardFrostAsset;
@@ -21,6 +22,7 @@ public class AssetLoad {
         wirzardFrostAsset     = WirzardFrostAsset.getInstance();
         wirzardLightningAsset = WirzardLightningAsset.getInstance();
         sniperAsset           = SniperAsset.getInstance();  // ← NEW
+        wallAsset             = WallAsset.getInstance();
     }
 
     public void loadAllAssets() {
@@ -28,10 +30,5 @@ public class AssetLoad {
         uiAsset.load();
         towerAsset.load();
         monsterAsset.load();
-        canonAsset.load();
-        wirzardFlameAsset.load();
-        wirzardFrostAsset.load();
-        wirzardLightningAsset.load();
-        sniperAsset.load();                               // ← NEW
     }
 }

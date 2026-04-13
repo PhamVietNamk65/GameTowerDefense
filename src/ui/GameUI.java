@@ -20,6 +20,7 @@ public class GameUI {
     private int aniIndex;
     private final int aniSpeed = 20;
     private MyButton buttonPause;
+    private MyButton buttonBuild;
 
     private GameListener gameListener;
     public GameUI(LevelState levelState, WaveManager waveManager) {
@@ -35,6 +36,13 @@ public class GameUI {
         buttonPause.setAction(()->{
             if (gameListener != null) {
                 gameListener.onPause();
+            }
+        });
+        buttonBuild = new MyButton("Build wall", 64, 64);
+        buttonBuild.setButton(18 * Constants.Tiles.TILE_SIZE - 32, 1 * Constants.Tiles.TILE_SIZE - 32, Constants.Tiles.TILE_SIZE, Constants.Tiles.TILE_SIZE);
+        buttonBuild.setAction(()->{
+            if (gameListener != null) {
+                gameListener.onBuild();
             }
         });
     }
@@ -93,13 +101,16 @@ public class GameUI {
 
     private void drawButtons(Graphics g){
         buttonPause.draw(g);
+        buttonBuild.draw(g);
     }
-
+    
     public void mousePressed(int x, int y) {
         if (buttonPause.getBounds().contains(x, y)) {
             buttonPause.setMousePressed(true);
         }
-        
+        if (buttonBuild.getBounds().contains(x, y)) {
+            buttonBuild.setMousePressed(true);
+        }
     }
 
     public void mouseReleased(int x, int y) {
@@ -108,6 +119,11 @@ public class GameUI {
         } else {
             buttonPause.setMousePressed(false);
         }
+        if (buttonBuild.getBounds().contains(x, y) && buttonBuild.isMousePressed()) {
+            buttonBuild.execute();
+        } else {
+            buttonBuild.setMousePressed(false);
+        }
     }
 
     public void mouseMoved(int x, int y) {
@@ -115,6 +131,11 @@ public class GameUI {
             buttonPause.setMouseOver(true);
         }else{
             buttonPause.setMouseOver(false);
+        }
+        if (buttonBuild.getBounds().contains(x,y)) {
+            buttonBuild.setMouseOver(true);
+        }else{
+            buttonBuild.setMouseOver(false);
         }
     }
 
